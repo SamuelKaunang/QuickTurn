@@ -40,10 +40,6 @@ function LoginPage() {
 
   return (
     <div className="login-page">
-      <header className="login-header"></header>
-      <div className="login-header-image">
-        <img src="/images/grownncheer_logo.png" alt="Logo" />
-      </div>
       <div className="login-container">
         <h2>Login</h2>
         <input

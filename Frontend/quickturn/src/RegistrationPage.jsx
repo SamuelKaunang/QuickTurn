@@ -63,10 +63,6 @@ function RegistrationPage() {
 
   return (
     <div className="registration-page">
-      <header className="registration-header"></header>
-      <div className="registration-header-image">
-        <img src="/images/grownncheer_logo.png" alt="Logo" />
-      </div>
       <div className="registration-container">
         <h2>Registrasi</h2>
         <input
