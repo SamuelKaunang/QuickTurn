@@ -1,0 +1,130 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.registration-page {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100vh;
+  background-image: url(bg.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.registration-container {
+    width: 350px;
+    margin: 20px auto 0;
+    padding: 20px;
+    border: 1px solid #3b32a5;
+    text-align: center;
+    background-color: #FFFFFF;
+    color: black;
+    background: rgba(123, 113, 203, 0.33);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(6.4px);
+    -webkit-backdrop-filter: blur(6.4px);
+}
+
+.registration-input-field {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  background-color: #eee;
+  box-sizing: border-box;
+}
+
+.registration-button {
+  width: 100%;
+  padding: 8px;
+  background-color: #32ADE6;
+  color: white;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.registration-button:hover {
+  opacity: 0.9;
+}
+
+.registration-message {
+  margin-top: 15px;
+  color: #d9534f;
+  font-weight: bold;
+}
+
+.registration-login-text {
+  text-align: center;
+  margin-top: 10px;
+  color: #666666;
+}
+
+.registration-login-link {
+  color: #007AFF;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.registration-login-link:hover {
+  color: #271D83;
+}
+
+.registration-password-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.registration-confirm-password-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.registration-password-wrapper .registration-input-field {
+  padding-right: 40px;
+}
+
+.registration-toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.registration-toggle-confirm-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.registration-terms-and-conditions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  margin: 10px 0;
+  color: #666666;
+  font-size: 14px;
+}
+
+.registration-terms-and-conditions input {
+  margin-right: 10px;
+}
+
