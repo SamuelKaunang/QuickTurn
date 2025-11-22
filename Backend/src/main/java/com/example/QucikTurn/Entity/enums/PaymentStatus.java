@@ -1,4 +1,4 @@
-package com.example.QucikTurn.Entity;
+package com.example.QucikTurn.Entity.enums;
 
 public enum PaymentStatus {
     PENDING,
