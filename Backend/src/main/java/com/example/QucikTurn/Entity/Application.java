@@ -1,0 +1,96 @@
+package com.example.QucikTurn.Entity;
+
+import com.example.QucikTurn.Entity.enums.ApplicationStatus;
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "project_applications") 
+public class Application {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
+
+    @ManyToOne
+    @JoinColumn(name = "applicant_id", nullable = false)  
+    private User student;
+
+    @Column(name = "proposal_text", nullable = false, columnDefinition = "TEXT")  
+    private String proposal;
+
+    @Column(name = "bid_amount", nullable = false) 
+    private BigDecimal bidAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ApplicationStatus status = ApplicationStatus.PENDING;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+   
+
+    @PrePersist
+    void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // --- Getters & Setters ---
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public User getStudent() {
+        return student;
+    }
+
+    public void setStudent(User student) {
+        this.student = student;
+    }
+
+    public String getProposal() {
+        return proposal;
+    }
+
+    public void setProposal(String proposal) {
+        this.proposal = proposal;
+    }
+
+    public BigDecimal getBidAmount() {
+        return bidAmount;
+    }
+
+    public void setBidAmount(BigDecimal bidAmount) {
+        this.bidAmount = bidAmount;
+    }
+
+    public ApplicationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ApplicationStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+}
