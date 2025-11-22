@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickTurn - Daftar</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated background elements */
+    .bg-shapes {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .bg-shapes .shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .shape-1 {
+      width: 400px;
+      height: 400px;
+      background: #e50914;
+      top: -100px;
+      right: -100px;
+      animation-delay: 0s;
+    }
+
+    .shape-2 {
+      width: 300px;
+      height: 300px;
+      background: #667eea;
+      bottom: -50px;
+      left: -50px;
+      animation-delay: 2s;
+    }
+
+    .shape-3 {
+      width: 200px;
+      height: 200px;
+      background: #f093fb;
+      top: 50%;
+      left: 50%;
+      animation-delay: 4s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -30px) scale(1.1); }
+    }
+
+    /* Main Container */
+    .register-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* Logo */
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo h1 {
+      font-size: 42px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #e50914, #ff6b6b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo p {
+      color: #888;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    /* Glassmorphism Card */
+    .register-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .register-card h2 {
+      color: #fff;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .register-card .subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #b3b3b3;
+      font-size: 13px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      font-size: 16px;
+      transition: color 0.3s;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      padding: 15px 15px 15px 48px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    .input-wrapper input::placeholder {
+      color: #555;
+    }
+
+    .input-wrapper input:focus {
+      border-color: #e50914;
+      background: rgba(229, 9, 20, 0.05);
+    }
+
+    .input-wrapper input:focus + i,
+    .input-wrapper:focus-within i {
+      color: #e50914;
+    }
+
+    /* Password strength */
+    .password-strength {
+      margin-top: 8px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .password-strength .bar {
+      height: 100%;
+      width: 0%;
+      transition: all 0.3s;
+      border-radius: 2px;
+    }
+
+    .strength-text {
+      font-size: 11px;
+      margin-top: 5px;
+      color: #666;
+    }
+
+    /* Role Selection */
+    .role-selection {
+      display: flex;
+      gap: 15px;
+      margin-top: 8px;
+    }
+
+    .role-option {
+      flex: 1;
+      position: relative;
+    }
+
+    .role-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .role-option label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 15px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .role-option label:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .role-option input:checked + label {
+      border-color: #e50914;
+      background: rgba(229, 9, 20, 0.1);
+    }
+
+    .role-option .role-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      font-size: 22px;
+      transition: all 0.3s;
+    }
+
+    .role-option:first-child .role-icon {
+      background: rgba(102, 126, 234, 0.2);
+      color: #667eea;
+    }
+
+    .role-option:last-child .role-icon {
+      background: rgba(229, 9, 20, 0.2);
+      color: #e50914;
+    }
+
+    .role-option input:checked + label .role-icon {
+      background: #e50914;
+      color: #fff;
+    }
+
+    .role-option .role-title {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .role-option .role-desc {
+      color: #666;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    /* Submit Button */
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(229, 9, 20, 0.4);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 25px 0;
+      color: #444;
+      font-size: 13px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .divider span {
+      padding: 0 15px;
+    }
+
+    /* Social Login */
+    .social-btns {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-social {
+      flex: 1;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-social:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .btn-social.google:hover { border-color: #ea4335; }
+    .btn-social.github:hover { border-color: #fff; }
+
+    /* Login Link */
+    .login-link {
+      text-align: center;
+      margin-top: 25px;
+      color: #888;
+      font-size: 14px;
+    }
+
+    .login-link a {
+      color: #e50914;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .login-link a:hover {
+      color: #ff6b6b;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      padding: 15px 25px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transform: translateX(400px);
+      transition: transform 0.4s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      border: 1px solid #46d369;
+    }
+
+    .toast.success i {
+      color: #46d369;
+    }
+
+    .toast.error {
+      border: 1px solid #e50914;
+    }
+
+    .toast.error i {
+      color: #e50914;
+    }
+
+    /* Responsive */
+    @media (max-width: 520px) {
+      .register-card {
+        padding: 30px 25px;
+      }
+
+      .role-selection {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .role-option label {
+        flex-direction: row;
+        padding: 15px;
+        gap: 15px;
+      }
+
+      .role-option .role-icon {
+        margin-bottom: 0;
+      }
+
+      .role-text {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toast-message">Registrasi berhasil!</span>
+  </div>
+
+  <!-- Register Container -->
+  <div class="register-container">
+    <!-- Logo -->
+    <div class="logo">
+      <h1>QuickTurn</h1>
+      <p>Kolaborasi UMKM & Mahasiswa</p>
+    </div>
+
+    <!-- Register Card -->
+    <div class="register-card">
+      <h2>Daftar Sekarang</h2>
+      <p class="subtitle">Mulai perjalananmu bersama QuickTurn</p>
+
+      <form id="registerForm">
+        <!-- Nama Lengkap -->
+        <div class="form-group">
+          <label>Nama Lengkap</label>
+          <div class="input-wrapper">
+            <input type="text" id="fullname" placeholder="Budi Santoso" required>
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label>Email</label>
+          <div class="input-wrapper">
+            <input type="email" id="email" placeholder="budi@student.com" required>
+            <i class="fas fa-envelope"></i>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" placeholder="Minimal 8 karakter" required minlength="8">
+            <i class="fas fa-lock"></i>
+          </div>
+          <div class="password-strength">
+            <div class="bar" id="strengthBar"></div>
+          </div>
+          <div class="strength-text" id="strengthText"></div>
+        </div>
+
+        <!-- Role Selection -->
+        <div class="form-group">
+          <label>Daftar Sebagai</label>
+          <div class="role-selection">
+            <div class="role-option">
+              <input type="radio" name="role" id="mahasiswa" value="mahasiswa" checked>
+              <label for="mahasiswa">
+                <div class="role-icon"><i class="fas fa-graduation-cap"></i></div>
+                <div class="role-text">
+                  <div class="role-title">Mahasiswa</div>
+                  <div class="role-desc">Cari project & kembangkan skill</div>
+                </div>
+              </label>
+            </div>
+            <div class="role-option">
+              <input type="radio" name="role" id="umkm" value="umkm">
+              <label for="umkm">
+                <div class="role-icon"><i class="fas fa-store"></i></div>
+                <div class="role-text">
+                  <div class="role-title">UMKM</div>
+                  <div class="role-desc">Posting project & cari talent</div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-rocket"></i>
+          Daftar Sekarang
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="divider"><span>atau daftar dengan</span></div>
+
+      <!-- Social Buttons -->
+      <div class="social-btns">
+        <button class="btn-social google"><i class="fab fa-google"></i></button>
+        <button class="btn-social github"><i class="fab fa-github"></i></button>
+      </div>
+
+      <!-- Login Link -->
+      <div class="login-link">
+        Sudah punya akun? <a href="#">Login di sini</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Password Strength Checker
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+
+    passwordInput.addEventListener('input', function() {
+      const val = this.value;
+      let strength = 0;
+      let text = '';
+      let color = '';
+
+      if (val.length >= 8) strength++;
+      if (val.match(/[a-z]/) && val.match(/[A-Z]/)) strength++;
+      if (val.match(/\d/)) strength++;
+      if (val.match(/[^a-zA-Z\d]/)) strength++;
+
+      switch(strength) {
+        case 0:
+        case 1:
+          text = 'Lemah';
+          color = '#e50914';
+          break;
+        case 2:
+          text = 'Cukup';
+          color = '#ffc107';
+          break;
+        case 3:
+          text = 'Kuat';
+          color = '#4facfe';
+          break;
+        case 4:
+          text = 'Sangat Kuat';
+          color = '#46d369';
+          break;
+      }
+
+      strengthBar.style.width = (strength * 25) + '%';
+      strengthBar.style.background = color;
+      strengthText.textContent = val.length > 0 ? text : '';
+      strengthText.style.color = color;
+    });
+
+    // Form Submit
+    const form = document.getElementById('registerForm');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+
+    function showToast(message, type) {
+      toast.className = 'toast ' + type;
+      toastMessage.textContent = message;
+      toast.querySelector('i').className = type === 'success' 
+        ? 'fas fa-check-circle' 
+        : 'fas fa-exclamation-circle';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const fullname = document.getElementById('fullname').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const role = document.querySelector('input[name="role"]:checked').value;
+
+      // Validation
+      if (password.length < 8) {
+        showToast('Password minimal 8 karakter', 'error');
+        return;
+      }
+
+      // Simulate API call
+      showToast('Registrasi berhasil! Silakan login.', 'success');
+      
+      // Reset form after success
+      setTimeout(() => {
+        form.reset();
+        strengthBar.style.width = '0%';
+        strengthText.textContent = '';
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
