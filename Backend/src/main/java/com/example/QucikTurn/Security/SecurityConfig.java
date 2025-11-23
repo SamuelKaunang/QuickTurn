@@ -88,6 +88,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**", "/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
+                //
                 .httpBasic(Customizer.withDefaults());
 
         // 5. Filter JWT (Punya kamu)
