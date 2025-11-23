@@ -27,7 +27,7 @@ function LoginPage() {
   
       if (response.ok) {
         localStorage.setItem('token', data.token); 
-        navigate('/profile');
+        navigate('/dashboard');
       } else {
         setMessage(data.error || "Login gagal");
       }
