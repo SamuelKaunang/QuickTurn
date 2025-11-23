@@ -1,8 +1,8 @@
-
 body, html {
   margin: 0;
   padding: 0;
   height: 100%;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
 }
 
 .login-page {
@@ -10,37 +10,43 @@ body, html {
   display: flex;
   flex-direction:row;
   align-items: center;
-  background-image: url(bg.jpg);
-  background-repeat: no-repeat;
-  background-size: cover;
 }
 
 .login-container {
   width: 350px;
   margin: 20px auto 0;
   padding: 20px;
-  border: 1px solid #3b32a5;
-  border-radius: 10px;
-  box-shadow: 2px 2px 15px rgba(0,0,0,0.3);
+  border: 1px solid #ff0000;
   text-align: center;
   background-color: #FFFFFF;
-  color: black;
+  color: rgb(255, 255, 255);
+  background: rgba(79, 79, 79, 0.53);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6.4px);
+  -webkit-backdrop-filter: blur(6.4px);
 }
 
 .login-input-field {
+  color: #ffffff;
   width: 100%;
   padding: 8px;
   margin: 10px 0;
-  border: 1px solid #bbb;
+  border: 1px solid #ffffff;
   border-radius: 5px;
-  background-color: #eee;
+  background-color: #eeeeee00;
   box-sizing: border-box;
+}
+
+.login-input-field::placeholder {
+  color: #ffffff;
+  opacity: 0.5;
 }
 
 .login-button {
   width: 100%;
   padding: 8px;
-  background-color: #32ADE6;
+  background-color: #e50914;
   color: white;
   margin-top: 10px;
   border: none;
@@ -61,17 +67,17 @@ body, html {
 .login-register-text {
   text-align: center;
   margin-top: 10px;
-  color: #666666;
+  color: #ffffff;
 }
 
 .login-register-link {
-  color: #007AFF;
+  color: #ff0000;
   cursor: pointer;
   text-decoration: underline;
 }
 
 .login-register-link:hover {
-  color: #271D83;
+  color: #7668f4;
 }
 
 .login-password-wrapper {
@@ -93,18 +99,4 @@ body, html {
   border: none;
   cursor: pointer;
   font-size: 18px;
-}
-
-.login-remember-me {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  margin: 10px 0;
-  color: #666666;
-  font-size: 14px;
-}
-
-.login-remember-me input {
-  margin-right: 10px;
 }
