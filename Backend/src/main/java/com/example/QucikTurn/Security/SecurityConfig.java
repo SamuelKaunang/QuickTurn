@@ -14,6 +14,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import java.util.Arrays;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -39,23 +43,56 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // Izinkan asal request (Frontend React kamu)
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+
+        // Izinkan method HTTP (GET, POST, dll)
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Izinkan semua header (Authorization, Content-Type, dll)
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        // Izinkan kredensial (cookies/auth headers)
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Terapkan ke semua URL
+        return source;
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
         return cfg.getAuthenticationManager();
     }
 
     // ✅ Inject JwtAuthFilter HANYA sebagai parameter method bean
+// ✅ Inject JwtAuthFilter tetap sebagai parameter
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         http
+                // 1. CSRF Disable (Sudah ada punya kamu)
                 .csrf(csrf -> csrf.disable())
+
+                // 2. TAMBAHAN PENTING: Aktifkan CORS di sini!
+                // Ini akan memanggil method corsConfigurationSource() di bawah
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // 3. Session Management (Punya kamu)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 4. Authorization Rules (Punya kamu)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
 
+        // 5. Filter JWT (Punya kamu)
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }
