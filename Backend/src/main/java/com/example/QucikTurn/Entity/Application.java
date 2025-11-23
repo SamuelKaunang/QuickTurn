@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "project_applications") 
+@Table(name = "project_applications")
 public class Application {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,13 +18,13 @@ public class Application {
     private Project project;
 
     @ManyToOne
-    @JoinColumn(name = "applicant_id", nullable = false)  
-    private User student;
+    @JoinColumn(name = "applicant_id", nullable = false)
+    private User student; // Variabel ini yang dipanggil "getStudent()" di Service
 
-    @Column(name = "proposal_text", nullable = false, columnDefinition = "TEXT")  
-    private String proposal;
+    @Column(name = "proposal_text", nullable = false, columnDefinition = "TEXT")
+    private String proposal; // Variabel ini yang dipanggil "getProposal()" di Service
 
-    @Column(name = "bid_amount", nullable = false) 
+    @Column(name = "bid_amount", nullable = false)
     private BigDecimal bidAmount;
 
     @Enumerated(EnumType.STRING)
@@ -34,63 +34,29 @@ public class Application {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-   
-
     @PrePersist
     void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
     // --- Getters & Setters ---
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Project getProject() { return project; }
+    public void setProject(Project project) { this.project = project; }
 
-    public Project getProject() {
-        return project;
-    }
+    public User getStudent() { return student; }
+    public void setStudent(User student) { this.student = student; }
 
-    public void setProject(Project project) {
-        this.project = project;
-    }
+    public String getProposal() { return proposal; }
+    public void setProposal(String proposal) { this.proposal = proposal; }
 
-    public User getStudent() {
-        return student;
-    }
+    public BigDecimal getBidAmount() { return bidAmount; }
+    public void setBidAmount(BigDecimal bidAmount) { this.bidAmount = bidAmount; }
 
-    public void setStudent(User student) {
-        this.student = student;
-    }
+    public ApplicationStatus getStatus() { return status; }
+    public void setStatus(ApplicationStatus status) { this.status = status; }
 
-    public String getProposal() {
-        return proposal;
-    }
-
-    public void setProposal(String proposal) {
-        this.proposal = proposal;
-    }
-
-    public BigDecimal getBidAmount() {
-        return bidAmount;
-    }
-
-    public void setBidAmount(BigDecimal bidAmount) {
-        this.bidAmount = bidAmount;
-    }
-
-    public ApplicationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ApplicationStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }
