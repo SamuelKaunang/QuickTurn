@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 D:\QucikTurn\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Controller\ApplicationController.java
 D:\QucikTurn\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Controller\AuthController.java
 D:\QucikTurn\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Controller\ProjectController.java
@@ -29,3 +30,23 @@ D:\QucikTurn\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Security\Secu
 D:\QucikTurn\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Service\ApplicationService.java
 D:\QucikTurn\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Service\AuthService.java
 D:\QucikTurn\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Service\ProjectService.java
+=======
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Controller\AuthController.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\dto\ApiResponse.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\dto\auth\AuthResponse.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\dto\auth\LoginRequest.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\dto\auth\RegisterRequest.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Entity\enums\ApplicationStatus.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Entity\enums\ContractStatus.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Entity\enums\PaymentMethod.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Entity\enums\PaymentStatus.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Entity\enums\ProjectStatus.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Entity\enums\Role.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Entity\User.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\QucikTurnApplication.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Repository\UserRepository.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Security\JwtAuthFilter.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Security\JwtService.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Security\SecurityConfig.java
+D:\tesgithub\QuickTurn\Backend\src\main\java\com\example\QucikTurn\Service\AuthService.java
+>>>>>>> Stashed changes

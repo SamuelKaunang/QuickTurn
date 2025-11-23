@@ -8,7 +8,6 @@ function RegistrationPage() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [acceptTerms, setAcceptTerms] = useState(false);
   const [message, setMessage] = useState('');
   const [passwordMatch, setPasswordMatch] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -30,10 +29,6 @@ function RegistrationPage() {
     }
     if (!confirmPassword) {
       setMessage('Harap konfirmasi password.');
-      return;
-    }
-    if (!acceptTerms) {
-      setMessage('Harap terima semua kondisi.');
       return;
     }
 
@@ -122,16 +117,6 @@ function RegistrationPage() {
           >
             {showConfirmPassword ? '🚫' : '👁️'}
           </button>
-        </div>
-
-        <div className="registration-terms-and-conditions">
-          <input
-            type="checkbox"
-            id="accept-terms"
-            checked={acceptTerms}
-            onChange={() => setAcceptTerms(!acceptTerms)}
-          />
-          <label htmlFor="accept-terms">Terima Semua Kondisi</label>
         </div>
 
         <button className="registration-button" onClick={handleRegistration}>Buat Akun</button>
