@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: quickturn-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: quickturn
+      MYSQL_USER: quickturn
+      MYSQL_PASSWORD: password123
+    ports:
+      - "3306:3306"
+    restart: always
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: .
+    container_name: quickturn-backend
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/quickturn?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Jakarta&characterEncoding=utf8
+      SPRING_DATASOURCE_USERNAME: quickturn
+      SPRING_DATASOURCE_PASSWORD: password123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    restart: always
+
+  phpmyadmin: # ✅ Indentasi yang benar
+    image: phpmyadmin/phpmyadmin:5.2.1
+    container_name: quickturn-pma
+    environment:
+      PMA_HOST: mysql           # ✅ Nama service MySQL
+      PMA_USER: quickturn       # ✅ Gunakan user non-root
+      PMA_PASSWORD: password123 # ✅ Password user non-root
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:

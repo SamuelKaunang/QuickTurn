@@ -1,0 +1,9 @@
+# Pake base image yang support macem-macem arsitektur
+FROM eclipse-temurin:21-jdk-alpine
+
+WORKDIR /app
+
+# Langsung copy file JAR yang udah jadi (dari langkah 1)
+COPY target/*.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
