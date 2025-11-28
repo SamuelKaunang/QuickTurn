@@ -83,9 +83,19 @@ public class SecurityConfig {
                 // 3. Session Management (Punya kamu)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 4. Authorization Rules (Punya kamu)
+                // SETELAH (Copy-Paste gantiin bagian auth -> auth)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/actuator/health").permitAll()
+                        // 1. Endpoint yang WAJIB DIIZINKAN (Tanpa Token)
+                        .requestMatchers(
+                                "/api/auth/register",
+                                "/api/auth/login",
+                                "/api/auth/forgot-password", // WAJIB
+                                "/api/auth/reset-password",  // WAJIB
+                                "/actuator/health"
+                        )
+                        .permitAll() // <--- Bikin semua list di atas PURE PUBLIC
+
+                        // 2. Semua request lain (misal: /api/auth/profile atau /api/data)
                         .anyRequest().authenticated()
                 )
                 //
