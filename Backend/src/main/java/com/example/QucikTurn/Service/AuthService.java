@@ -86,21 +86,22 @@ public class AuthService {
 
     // -------- NEW: FORGOT PASSWORD --------
     public void processForgotPassword(ForgotPasswordRequest req) {
-        // 1. Cari user, kalau gak ada throw error (nanti ditangkap controller)
-        User user = userRepository.findByEmail(req.getEmail())
-                .orElseThrow(() -> new RuntimeException("Email tidak ditemukan di sistem kami."));
+        // 1. Cari user, jika tidak ditemukan, jangan beri tahu client untuk mencegah user enumeration
+        userRepository.findByEmail(req.getEmail()).ifPresent(user -> {
+            // 2. Generate token random
+            String tokenString = UUID.randomUUID().toString();
 
-        // 2. Generate token random
-        String tokenString = UUID.randomUUID().toString();
+            // 3. Simpan ke DB (Hapus token lama user ini kalau ada, opsional tapi rapi)
+            tokenRepo.findByUser(user).ifPresent(tokenRepo::delete);
 
-        // 3. Simpan ke DB (Hapus token lama user ini kalau ada, opsional tapi rapi)
-        tokenRepo.findByUser(user).ifPresent(tokenRepo::delete);
+            PasswordResetToken token = new PasswordResetToken(user, tokenString);
+            tokenRepo.save(token);
 
-        PasswordResetToken token = new PasswordResetToken(user, tokenString);
-        tokenRepo.save(token);
-
-        // 4. Kirim Email (Pastikan method ini ada di EmailService)
-        emailService.sendResetTokenEmail(user.getEmail(), tokenString);
+            // 4. Kirim Email (Pastikan method ini ada di EmailService)
+            emailService.sendResetTokenEmail(user.getEmail(), tokenString);
+        });
+        // Jika email tidak ditemukan, tidak lakukan apa-apa (tetapi client tetap mendapat respons sukses)
+        // Ini untuk mencegah attacker mengetahui email mana yang terdaftar
     }
 
     // -------- NEW: RESET PASSWORD --------

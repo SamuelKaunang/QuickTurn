@@ -35,12 +35,10 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
         try {
             svc.processForgotPassword(req);
-            // Kita return 200 OK walaupun email gak ada (security practice),
-            // tapi karena ini project kuliah/personal, return error message juga gapapa biar gampang debug.
-            // Di sini gue bikin return success message.
-            return ResponseEntity.ok(ApiResponse.ok("Link reset password telah dikirim ke email kamu.", null));
+            // Always return success to prevent user enumeration
+            return ResponseEntity.ok(ApiResponse.ok("Jika email terdaftar, link reset password telah dikirim.", null));
         } catch (RuntimeException e) {
-            // Tangkap error dari service (misal email gak ketemu)
+            // This should rarely happen now, but keep it for other potential errors
             return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
         }
     }

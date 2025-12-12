@@ -37,27 +37,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             String username = jwt.username(token);
 
-            // Cek log username hasil extract
-            System.out.println("DEBUG JWT Filter - Username from token: " + username);
-
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null){
                 var user = uds.loadUserByUsername(username);
 
-                // Cek apakah validasi berhasil
                 boolean isValid = jwt.valid(token, user.getUsername());
-                System.out.println("DEBUG JWT Filter - Is Valid? " + isValid);
 
                 if (isValid){
                     var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    System.out.println("DEBUG JWT Filter - Authentication Set Success!");
                 }
             }
         } catch (Exception e) {
-            // 🔥 JANGAN DI-IGNORE! Print error-nya biar ketahuan
-            System.out.println("DEBUG JWT Filter - ERROR: " + e.getMessage());
-            e.printStackTrace();
+            // Log error if needed (in production, use a proper logger)
+            // For now, we just continue the filter chain without setting authentication
         }
         chain.doFilter(req, res);
     }
