@@ -1,6 +1,7 @@
 package com.example.QucikTurn.Controller;
 
 import com.example.QucikTurn.Entity.mongo.ChatMessage;
+import com.example.QucikTurn.Repository.UserRepository;
 import com.example.QucikTurn.Service.ChatService;
 import com.example.QucikTurn.dto.ChatResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;

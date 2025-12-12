@@ -48,6 +48,12 @@ public class SecurityConfig {
 
         // Izinkan asal request (Frontend React kamu)
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        
+        // Allow WebSocket headers
+        configuration.addAllowedHeader("Authorization");
+        configuration.addAllowedHeader("Content-Type");
+        configuration.addAllowedHeader("Access-Control-Allow-Origin");
+        configuration.addAllowedHeader("Access-Control-Allow-Credentials");
 
         // Izinkan method HTTP (GET, POST, dll)
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

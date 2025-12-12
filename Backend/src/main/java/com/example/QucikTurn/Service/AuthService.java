@@ -62,7 +62,7 @@ public class AuthService {
         claims.put("uid", user.getId());
         claims.put("role", user.getRole().name());
 
-        String token = jwtService.generateToken(user.getUsername(), claims);
+        String token = jwtService.generateToken(user.getEmail(), claims);
         return new AuthResponse(true, "Registration successful", token, "Bearer", (int) jwtService.getExpires());
     }
 
@@ -80,7 +80,7 @@ public class AuthService {
         claims.put("uid", user.getId());
         claims.put("role", user.getRole().name());
 
-        String token = jwtService.generateToken(user.getUsername(), claims);
+        String token = jwtService.generateToken(user.getEmail(), claims);
         return new AuthResponse(true, "Login successful", token, "Bearer", (int) jwtService.getExpires());
     }
 
