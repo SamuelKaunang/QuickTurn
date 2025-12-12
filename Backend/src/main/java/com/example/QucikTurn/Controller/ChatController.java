@@ -36,14 +36,8 @@ public class ChatController {
         Long senderId = chatMessageDTO.getSenderId();
         Long recipientId = chatMessageDTO.getRecipientId();
         
-        // Cek apakah ada kontrak aktif antara kedua user
-        boolean hasActiveContract = applicationRepository.existsByProjectIdAndStudentId(senderId, recipientId) ||
-                                   applicationRepository.existsByProjectIdAndStudentId(recipientId, senderId);
-        
-        // Untuk sementara, kita izinkan semua chat, tapi nanti bisa ditambahkan validasi
-        // if (!hasActiveContract) {
-        //     throw new RuntimeException("Tidak dapat mengirim pesan: Tidak ada kontrak aktif");
-        // }
+        // Validasi akan dilakukan di ChatService.saveMessage()
+        // Jadi kita tidak perlu validasi di sini lagi
 
         // Simpan ke MongoDB
         ChatMessage saved = chatService.saveMessage(
@@ -114,13 +108,14 @@ public class ChatController {
                 .filter(app -> app.getStatus().name().equals("APPROVED"))
                 .map(app -> {
                     User umkm = app.getProject().getOwner();
-                    return Map.of(
-                        "userId", umkm.getId(),
-                        "name", umkm.getNama(),
-                        "email", umkm.getEmail(),
-                        "role", umkm.getRole().name(),
-                        "projectTitle", app.getProject().getTitle()
-                    );
+                    // Buat Map dengan tipe eksplisit untuk menghindari masalah generic bounds
+                    Map<String, Object> contactMap = new java.util.HashMap<>();
+                    contactMap.put("userId", umkm.getId());
+                    contactMap.put("name", umkm.getNama());
+                    contactMap.put("email", umkm.getEmail());
+                    contactMap.put("role", umkm.getRole().name());
+                    contactMap.put("projectTitle", app.getProject().getTitle());
+                    return contactMap;
                 })
                 .collect(Collectors.toList());
         } else {
@@ -130,13 +125,14 @@ public class ChatController {
                 .filter(app -> app.getStatus().name().equals("APPROVED"))
                 .map(app -> {
                     User mahasiswa = app.getStudent();
-                    return Map.of(
-                        "userId", mahasiswa.getId(),
-                        "name", mahasiswa.getNama(),
-                        "email", mahasiswa.getEmail(),
-                        "role", mahasiswa.getRole().name(),
-                        "projectTitle", app.getProject().getTitle()
-                    );
+                    // Buat Map dengan tipe eksplisit untuk menghindari masalah generic bounds
+                    Map<String, Object> contactMap = new java.util.HashMap<>();
+                    contactMap.put("userId", mahasiswa.getId());
+                    contactMap.put("name", mahasiswa.getNama());
+                    contactMap.put("email", mahasiswa.getEmail());
+                    contactMap.put("role", mahasiswa.getRole().name());
+                    contactMap.put("projectTitle", app.getProject().getTitle());
+                    return contactMap;
                 })
                 .collect(Collectors.toList());
         }
@@ -157,6 +153,15 @@ public class ChatController {
             .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
                            (app.getProject().getOwner().getId().equals(otherUserId) || 
                             app.getStudent().getId().equals(otherUserId)));
+        
+        // Juga cek dari sisi user lain
+        if (!hasContract) {
+            hasContract = applicationRepository.findByStudentId(otherUserId)
+                .stream()
+                .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
+                               (app.getProject().getOwner().getId().equals(currentUser.getId()) || 
+                                app.getStudent().getId().equals(currentUser.getId())));
+        }
         
         if (!hasContract) {
             return ResponseEntity.badRequest()

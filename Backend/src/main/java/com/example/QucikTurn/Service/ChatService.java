@@ -74,19 +74,34 @@ public class ChatService {
 
     private void validateChatPermission(Long userId1, Long userId2) {
         // Cek apakah ada kontrak aktif (Application dengan status APPROVED) antara kedua user
+        // Cek dari sisi user pertama sebagai mahasiswa
         boolean hasActiveContract = applicationRepository.findByStudentId(userId1)
             .stream()
             .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
-                           (app.getProject().getOwner().getId().equals(userId2) || 
-                            app.getStudent().getId().equals(userId2)));
+                           app.getProject().getOwner().getId().equals(userId2));
         
-        // Cek dari sisi user kedua juga
+        // Cek dari sisi user pertama sebagai UMKM (pemilik project)
+        if (!hasActiveContract) {
+            hasActiveContract = applicationRepository.findByProject_Owner_Id(userId1)
+                .stream()
+                .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
+                               app.getStudent().getId().equals(userId2));
+        }
+        
+        // Cek dari sisi user kedua sebagai mahasiswa
         if (!hasActiveContract) {
             hasActiveContract = applicationRepository.findByStudentId(userId2)
                 .stream()
                 .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
-                               (app.getProject().getOwner().getId().equals(userId1) || 
-                                app.getStudent().getId().equals(userId1)));
+                               app.getProject().getOwner().getId().equals(userId1));
+        }
+        
+        // Cek dari sisi user kedua sebagai UMKM (pemilik project)
+        if (!hasActiveContract) {
+            hasActiveContract = applicationRepository.findByProject_Owner_Id(userId2)
+                .stream()
+                .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
+                               app.getStudent().getId().equals(userId1));
         }
         
         if (!hasActiveContract) {
