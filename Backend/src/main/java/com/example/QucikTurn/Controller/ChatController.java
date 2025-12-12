@@ -41,9 +41,16 @@ public class ChatController {
         responseDTO.setContent(saved.getContent());
         responseDTO.setTimestamp(saved.getTimestamp());
         
-        // Get sender name from user repository
-        // This could be enhanced to include in the response
-        // For now, we'll send without name, and frontend can fetch if needed
+        // Get sender name from user repository to include in the response
+        try {
+            var sender = userRepository.findById(saved.getSenderId());
+            if (sender.isPresent()) {
+                responseDTO.setSenderName(sender.get().getNama());
+            }
+        } catch (Exception e) {
+            // Log error but don't break the chat
+            e.printStackTrace();
+        }
 
         // Kirim notifikasi real-time ke Penerima (Topik khusus user)
         // Client penerima harus subscribe ke: /user/{recipientId}/queue/messages (Advance)

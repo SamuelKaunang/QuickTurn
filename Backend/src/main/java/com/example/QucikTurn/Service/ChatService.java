@@ -34,11 +34,17 @@ public class ChatService {
         List<User> users = userRepository.findAllById(List.of(userId1, userId2));
 
         // Convert List User ke Map biar gampang di-get by ID
-        // Assuming User entity has getName() method
+        // Using getNama() which is the correct method in User entity
         Map<Long, String> userNames = users.stream()
                 .collect(Collectors.toMap(
                     User::getId, 
-                    user -> user.getName() != null ? user.getName() : user.getEmail()
+                    user -> {
+                        if (user.getNama() != null && !user.getNama().isEmpty()) {
+                            return user.getNama();
+                        } else {
+                            return user.getEmail();
+                        }
+                    }
                 ));
 
         // 3. Mapping (Manual Join)
