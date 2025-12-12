@@ -91,7 +91,8 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/forgot-password", // WAJIB
                                 "/api/auth/reset-password",  // WAJIB
-                                "/actuator/health"
+                                "/actuator/health",
+                                "/ws/**"
                         )
                         .permitAll() // <--- Bikin semua list di atas PURE PUBLIC
 
