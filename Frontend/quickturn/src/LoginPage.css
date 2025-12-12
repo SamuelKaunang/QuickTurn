@@ -20,7 +20,7 @@ body, html {
   text-align: center;
   background-color: #FFFFFF;
   color: rgb(255, 255, 255);
-  background: rgba(79, 79, 79, 0.53);
+  background: rgba(158, 158, 158, 0.53);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(6.4px);
@@ -71,7 +71,7 @@ body, html {
 }
 
 .login-register-link {
-  color: #ff0000;
+  color: #ff1100;
   cursor: pointer;
   text-decoration: underline;
 }
