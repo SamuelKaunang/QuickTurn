@@ -21,17 +21,4 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Stri
         // Since userId1 = senderId1 and userId2 = recipientId1, we can use findChatBetweenUsers
         return findChatBetweenUsers(senderId1, recipientId1);
     }
-    @Query("{ $or: [ { senderId: ?0, recipientId: ?1 }, { senderId: ?1, recipientId: ?0 } ] }")
-    List<ChatMessage> findChatBetweenUsers(Long userId1, Long userId2);
-    
-    // Keep the old method for compatibility, but implement using @Query
-    default List<ChatMessage> findBySenderIdAndRecipientIdOrSenderIdAndRecipientIdOrderByTimestampAsc(
-            Long senderId1, Long recipientId1, Long senderId2, Long recipientId2) {
-        // This should be userId1, userId2 where userId1 is senderId1 and userId2 is recipientId1
-        // But to maintain compatibility, we'll use the new method
-        // However, the parameters are confusing, so let's use a different approach
-        // Since the old method is called with (userId1, userId2, userId2, userId1)
-        // We can just call findChatBetweenUsers with the first two parameters
-        return findChatBetweenUsers(senderId1, recipientId1);
-    }
 }

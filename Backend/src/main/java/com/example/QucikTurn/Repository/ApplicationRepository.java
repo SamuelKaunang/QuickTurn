@@ -19,4 +19,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     
     // Ambil aplikasi spesifik berdasarkan project dan student
     Optional<Application> findByProjectIdAndStudentId(Long projectId, Long studentId);
+    
+    // Ambil semua aplikasi untuk project milik UMKM tertentu
+    List<Application> findByProject_Owner_Id(Long ownerId);
 }

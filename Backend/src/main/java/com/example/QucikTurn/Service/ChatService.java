@@ -3,6 +3,7 @@ package com.example.QucikTurn.Service;
 
 import com.example.QucikTurn.Entity.User;
 import com.example.QucikTurn.Entity.mongo.ChatMessage;
+import com.example.QucikTurn.Repository.ApplicationRepository;
 import com.example.QucikTurn.Repository.ChatMessageRepository;
 import com.example.QucikTurn.Repository.UserRepository;
 import com.example.QucikTurn.dto.ChatResponseDTO;
@@ -19,13 +20,20 @@ public class ChatService {
 
     @Autowired private ChatMessageRepository chatMessageRepository;
     @Autowired private UserRepository userRepository; // MySQL Repo
+    @Autowired private ApplicationRepository applicationRepository;
 
     public ChatMessage saveMessage(Long senderId, Long recipientId, String content) {
+        // Validasi: Pastikan ada kontrak aktif antara kedua user
+        validateChatPermission(senderId, recipientId);
+        
         ChatMessage chat = new ChatMessage(senderId, recipientId, content);
         return chatMessageRepository.save(chat);
     }
 
     public List<ChatResponseDTO> getChatHistory(Long userId1, Long userId2) {
+        // Validasi: Pastikan ada kontrak aktif antara kedua user
+        validateChatPermission(userId1, userId2);
+        
         // 1. Ambil raw data dari MongoDB using the clearer method
         List<ChatMessage> chats = chatMessageRepository.findChatBetweenUsers(userId1, userId2);
 
@@ -62,5 +70,27 @@ public class ChatService {
         }
 
         return result;
+    }
+
+    private void validateChatPermission(Long userId1, Long userId2) {
+        // Cek apakah ada kontrak aktif (Application dengan status APPROVED) antara kedua user
+        boolean hasActiveContract = applicationRepository.findByStudentId(userId1)
+            .stream()
+            .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
+                           (app.getProject().getOwner().getId().equals(userId2) || 
+                            app.getStudent().getId().equals(userId2)));
+        
+        // Cek dari sisi user kedua juga
+        if (!hasActiveContract) {
+            hasActiveContract = applicationRepository.findByStudentId(userId2)
+                .stream()
+                .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
+                               (app.getProject().getOwner().getId().equals(userId1) || 
+                                app.getStudent().getId().equals(userId1)));
+        }
+        
+        if (!hasActiveContract) {
+            throw new RuntimeException("Tidak dapat mengakses chat: Tidak ada kontrak aktif antara kedua user");
+        }
     }
 }
