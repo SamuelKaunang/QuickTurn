@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import './RegistrationPage.css';
+import './RegistrationPageM.css';
 import { useNavigate } from 'react-router-dom';
 
 function RegistrationPage() {
@@ -13,6 +13,10 @@ function RegistrationPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+
+    const handleRoleToggle = (role) => {
+      navigate(role === 'UMKM' ? '/registeru' : '/registerm');
+  };
 
   const handleRegistration = async () => {
     if (!name) {
@@ -59,7 +63,7 @@ function RegistrationPage() {
   return (
     <div className="registration-page">
       <div className="registration-container">
-        <h2>Registrasi</h2>
+        <h2>Registrasi Mahasiswa</h2>
         <input
           type="text"
           placeholder="Nama Lengkap"
@@ -124,6 +128,11 @@ function RegistrationPage() {
         <p className="registration-login-text">
           Sudah punya akun? <Link className="registration-login-link" to="/login">Login disini</Link>
         </p>
+      </div>
+      {/* Role Toggle */}
+      <div className="role-toggle">
+        <button className="role-btn" onClick={() => handleRoleToggle('UMKM')}>UMKM</button>
+        <button className="role-btn active" onClick={() => handleRoleToggle('Mahasiswa')}>Mahasiswa</button>
       </div>
     </div>
   );

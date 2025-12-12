@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import './Dashboard.css'; // Link to the CSS file
+import { Link, Navigate } from 'react-router-dom';
+import './DashboardM.css'; // Link to the CSS file
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -16,10 +19,6 @@ const Dashboard = () => {
     };
   }, []);
 
-  const handleRoleToggle = (role) => {
-    // Add logic for role switching here
-  };
-
   return (
     <div className="dashboard">
       <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
@@ -27,20 +26,17 @@ const Dashboard = () => {
         <nav>
           <ul className="nav-menu">
             <li><a href="#" className="active">Home</a></li>
-            <li><a href="#">Projects</a></li>
+            <li><a href="#">My Projects</a></li>
             <li><a href="#">My Applications</a></li>
             <li><a href="#">Messages</a></li>
           </ul>
         </nav>
         <div className="header-right">
-          <div className="search-box">
-            <i className="fas fa-search" style={{ color: '#888' }}></i>
-            <input type="text" placeholder="Cari project..." />
-          </div>
           <i className="fas fa-bell" style={{ color: '#b3b3b3', cursor: 'pointer' }}></i>
           <div className="profile-btn">
             <i className="fas fa-user"></i>
           </div>
+           <div className="logo">Mahasiswa</div>
         </div>
       </header>
 
@@ -53,7 +49,7 @@ const Dashboard = () => {
             <h1>Temukan Project Impianmu</h1>
             <p>Bergabunglah dengan ribuan mahasiswa dan UMKM yang sudah sukses berkolaborasi. Mulai perjalananmu sekarang!</p>
             <div className="hero-btns">
-              <button className="btn-primary">
+              <button onClick={() => navigate('/postproject')} className="btn-primary">
                 <i className="fas fa-plus"></i> Post Project
               </button>
               <button className="btn-glass">
@@ -64,7 +60,7 @@ const Dashboard = () => {
         </section>
 
         {/* Stats */}
-        <div className="stats-grid">
+        <div className="stats-gridM">
           <div className="stat-card">
             <div className="stat-icon red"><i className="fas fa-briefcase"></i></div>
             <div className="stat-value">24</div>
@@ -78,12 +74,7 @@ const Dashboard = () => {
           <div className="stat-card">
             <div className="stat-icon blue"><i className="fas fa-users"></i></div>
             <div className="stat-value">156</div>
-            <div className="stat-label">Applicants</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon purple"><i className="fas fa-wallet"></i></div>
-            <div className="stat-value">12.5M</div>
-            <div className="stat-label">Total Earned</div>
+            <div className="stat-label">Applications</div>
           </div>
         </div>
 
@@ -212,12 +203,6 @@ const Dashboard = () => {
           </div>
         </div>
       </main>
-
-      {/* Role Toggle */}
-      <div className="role-toggle">
-        <button className="role-btn active" onClick={() => handleRoleToggle('UMKM')}>UMKM</button>
-        <button className="role-btn" onClick={() => handleRoleToggle('Mahasiswa')}>Mahasiswa</button>
-      </div>
     </div>
   );
 };

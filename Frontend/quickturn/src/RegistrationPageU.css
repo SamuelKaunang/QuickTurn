@@ -1,0 +1,120 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+}
+
+.registration-page {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100vh;
+}
+
+.registration-container {
+  width: 350px;
+  margin: 20px auto 0;
+  padding: 20px;
+  border: 1px solid #ff0000;
+  text-align: center;
+  background-color: #FFFFFF;
+  color: rgb(255, 255, 255);
+  background: rgba(79, 79, 79, 0.53);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6.4px);
+  -webkit-backdrop-filter: blur(6.4px);
+}
+
+.registration-input-field {
+  color: #ffffff;
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  background-color: #eeeeee00;
+  box-sizing: border-box;
+}
+
+.registration-input-field::placeholder {
+  color: #ffffff;
+  opacity: 0.5;
+}
+
+.registration-button {
+  width: 100%;
+  padding: 8px;
+  background-color: #e50914;
+  color: white;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.registration-button:hover {
+  opacity: 0.9;
+}
+
+.registration-message {
+  margin-top: 15px;
+  color: #d9534f;
+  font-weight: bold;
+}
+
+.registration-login-text {
+  text-align: center;
+  margin-top: 10px;
+  color: #ffffff;
+}
+
+.registration-login-link {
+  color: #ff0000;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.registration-login-link:hover {
+  color: #7668f4;
+}
+
+.registration-password-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.registration-confirm-password-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.registration-password-wrapper .registration-input-field {
+  padding-right: 40px;
+}
+
+.registration-toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.registration-toggle-confirm-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
