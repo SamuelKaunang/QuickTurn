@@ -13,7 +13,7 @@ body {
     overflow-x: hidden;
 }
 
-.header {
+.headerU {
     position: fixed;
     top: 0;
     left: 0;
@@ -27,11 +27,11 @@ body {
     transition: background 0.3s;
 }
 
-.header.scrolled {
+.headerU.scrolled {
     background: rgba(0,0,0,0.95);
 }
 
-.logo {
+.logoU {
     font-size: 28px;
     font-weight: bold;
     background: linear-gradient(90deg, #e50914, #ff6b6b);
@@ -40,30 +40,30 @@ body {
     background-clip: text;
 }
 
-.nav-menu {
+.nav-menuU {
     display: flex;
     gap: 30px;
     list-style: none;
 }
 
-.nav-menu a {
+.nav-menuU a{
     color: #b3b3b3;
     text-decoration: none;
     font-size: 14px;
     transition: color 0.3s;
 }
 
-.nav-menu a:hover, .nav-menu a.active {
+.nav-menuU a:hover, .nav-menuU a.active {
     color: #fff;
 }
 
-.header-right {
+.header-rightU {
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
-.search-box {
+.search-boxU {
     background: rgba(255,255,255,0.1);
     border: 1px solid rgba(255,255,255,0.2);
     border-radius: 4px;
@@ -74,7 +74,7 @@ body {
     backdrop-filter: blur(10px);
 }
 
-.search-box input {
+.search-boxU input {
     background: transparent;
     border: none;
     color: #fff;
@@ -82,11 +82,11 @@ body {
     width: 200px;
 }
 
-.search-box input::placeholder {
+.search-boxU input::placeholder {
     color: #888;
 }
 
-.profile-btn {
+.profile-btnU {
     width: 35px;
     height: 35px;
     border-radius: 5px;
@@ -98,12 +98,12 @@ body {
 }
 
 /* Main Content */
-.main-content {
+.main-contentU {
     padding: 100px 40px 40px;
 }
 
 /* Hero Section */
-.hero {
+.heroU {
     position: relative;
     height: 450px;
     border-radius: 10px;
@@ -112,7 +112,7 @@ body {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
 }
 
-.hero-overlay {
+.hero-overlayU {
     position: absolute;
     inset: 0;
     background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, transparent 60%);
@@ -122,7 +122,7 @@ body {
     justify-content: center;
 }
 
-.hero-badge {
+.hero-badgeU {
     background: #e50914;
     padding: 5px 15px;
     border-radius: 3px;
@@ -132,25 +132,25 @@ body {
     margin-bottom: 15px;
 }
 
-.hero h1 {
+.heroU h1 {
     font-size: 48px;
     margin-bottom: 15px;
     max-width: 500px;
 }
 
-.hero p {
+.heroU p {
     color: #b3b3b3;
     max-width: 450px;
     line-height: 1.6;
     margin-bottom: 25px;
 }
 
-.hero-btns {
+.hero-btnsU {
     display: flex;
     gap: 15px;
 }
 
-.btn-primary {
+.btn-primaryU {
     background: #e50914;
     color: #fff;
     border: none;
@@ -165,11 +165,11 @@ body {
     transition: background 0.3s;
 }
 
-.btn-primary:hover {
+.btn-primaryU:hover {
     background: #f40612;
 }
 
-.btn-glass {
+.btn-glassU {
     background: rgba(255,255,255,0.15);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.2);
@@ -184,12 +184,12 @@ body {
     transition: all 0.3s;
 }
 
-.btn-glass:hover {
+.btn-glassU:hover {
     background: rgba(255,255,255,0.25);
 }
 
 /* Section Title */
-.section-title {
+.section-titleU {
     font-size: 22px;
     margin-bottom: 20px;
     display: flex;
@@ -197,18 +197,18 @@ body {
     gap: 15px;
 }
 
-.section-title span {
+.section-titleU span {
     color: #e50914;
 }
 
-.see-all {
+.see-allU {
     font-size: 14px;
     color: #b3b3b3;
     cursor: pointer;
     margin-left: auto;
 }
 
-.see-all:hover {
+.see-allU:hover {
     color: #fff;
 }
 
@@ -222,12 +222,12 @@ body {
     scrollbar-width: none;
 }
 
-.projects-row::-webkit-scrollbar {
+.projects-rowU::-webkit-scrollbar {
     display: none;
 }
 
 /* Glassmorphism Card */
-.project-card {
+.project-cardU {
     min-width: 280px;
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(20px);
@@ -238,14 +238,14 @@ body {
     cursor: pointer;
 }
 
-.project-card:hover {
+.project-cardU:hover {
     transform: scale(1.05);
     background: rgba(255,255,255,0.1);
     border-color: rgba(229,9,20,0.5);
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
-.card-header {
+.card-headerU {
     height: 120px;
     background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
     display: flex;
@@ -254,24 +254,24 @@ body {
     position: relative;
 }
 
-.card-header.design {
+.card-headerU.design {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.card-header.marketing {
+.card-headerU.marketing {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
-.card-header.it {
+.card-headerU.it {
     background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
-.card-header i {
+.card-headerU i {
     font-size: 40px;
     opacity: 0.3;
 }
 
-.card-status {
+.card-statusU {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -282,19 +282,19 @@ body {
     background: rgba(0,0,0,0.6);
 }
 
-.card-status.open {
+.card-statusU.open {
     color: #46d369;
 }
 
-.card-status.ongoing {
+.card-statusU.ongoing {
     color: #ffc107;
 }
 
-.card-body {
+.card-bodyU {
     padding: 20px;
 }
 
-.card-category {
+.card-categoryU {
     font-size: 12px;
     color: #e50914;
     margin-bottom: 8px;
@@ -302,14 +302,14 @@ body {
     letter-spacing: 1px;
 }
 
-.card-title {
+.card-titleU {
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 10px;
     line-height: 1.3;
 }
 
-.card-meta {
+.card-metaU {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -317,13 +317,13 @@ body {
     border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.card-budget {
+.card-budgetU {
     font-size: 18px;
     font-weight: bold;
     color: #46d369;
 }
 
-.card-deadline {
+.card-deadlineU {
     font-size: 12px;
     color: #888;
 }
@@ -336,7 +336,7 @@ body {
     margin-bottom: 40px;
 }
 
-.stat-card {
+.stat-cardU {
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255,255,255,0.1);
@@ -345,12 +345,12 @@ body {
     transition: all 0.3s;
 }
 
-.stat-card:hover {
+.stat-card:hoverU {
     background: rgba(255,255,255,0.1);
     transform: translateY(-5px);
 }
 
-.stat-icon {
+.stat-iconU {
     width: 50px;
     height: 50px;
     border-radius: 10px;
@@ -361,45 +361,40 @@ body {
     font-size: 22px;
 }
 
-.stat-icon.red {
+.stat-iconU.red {
     background: rgba(229,9,20,0.2);
     color: #e50914;
 }
 
-.stat-icon.green {
+.stat-iconU.green {
     background: rgba(70,211,105,0.2);
     color: #46d369;
 }
 
-.stat-icon.blue {
+.stat-iconU.blue {
     background: rgba(79,172,254,0.2);
     color: #4facfe;
 }
 
-.stat-icon.purple {
-    background: rgba(102,126,234,0.2);
-    color: #667eea;
-}
-
-.stat-value {
+.stat-valueU {
     font-size: 32px;
     font-weight: bold;
     margin-bottom: 5px;
 }
 
-.stat-label {
+.stat-labelU {
     color: #888;
     font-size: 14px;
 }
 
 /* Quick Actions */
-.quick-actions {
+.quick-actionsU {
     display: flex;
     gap: 15px;
     margin-bottom: 40px;
 }
 
-.action-card {
+.action-cardU {
     flex: 1;
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(20px);
@@ -413,12 +408,12 @@ body {
     transition: all 0.3s;
 }
 
-.action-card:hover {
+.action-card:hoverU {
     background: rgba(229,9,20,0.1);
     border-color: rgba(229,9,20,0.3);
 }
 
-.action-icon {
+.action-iconU {
     width: 60px;
     height: 60px;
     border-radius: 15px;
@@ -429,18 +424,18 @@ body {
     font-size: 24px;
 }
 
-.action-text h3 {
+.action-text h3U {
     font-size: 18px;
     margin-bottom: 5px;
 }
 
-.action-text p {
+.action-text pU {
     color: #888;
     font-size: 14px;
 }
 
 /* Role Toggle */
-.role-toggle {
+.role-toggleU {
     position: fixed;
     bottom: 30px;
     right: 30px;
@@ -453,7 +448,7 @@ body {
     gap: 5px;
 }
 
-.role-btn {
+.role-btnU {
     padding: 10px 20px;
     border-radius: 50px;
     border: none;
@@ -464,19 +459,19 @@ body {
     font-size: 14px;
 }
 
-.role-btn.active {
+.role-btn.activeU {
     background: #e50914;
     color: #fff;
 }
 
 @media (max-width: 768px) {
-    .header { padding: 15px 20px; }
-    .nav-menu { display: none; }
-    .main-content { padding: 80px 20px 20px; }
-    .hero { height: 350px; }
-    .hero h1 { font-size: 28px; }
-    .hero-overlay { padding: 30px; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .quick-actions { flex-direction: column; }
-    .search-box input { width: 120px; }
+    .headerU { padding: 15px 20px; }
+    .nav-menuU { display: none; }
+    .main-contentU { padding: 80px 20px 20px; }
+    .heroU { height: 350px; }
+    .hero h1U { font-size: 28px; }
+    .hero-overlayU { padding: 30px; }
+    .stats-gridU { grid-template-columns: repeat(2, 1fr); }
+    .quick-actionsU { flex-direction: column; }
+    .search-box inputU { width: 120px; }
 }

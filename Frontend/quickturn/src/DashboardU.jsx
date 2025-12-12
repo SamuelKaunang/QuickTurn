@@ -20,34 +20,34 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="dashboard">
-      <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
-        <div className="logo">QuickTurn</div>
+    <div className="dashboardU">
+      <header className={`headerU ${isScrolled ? 'scrolled' : ''}`}>
+        <div className="logoU">QuickTurn</div>
         <nav>
-          <ul className="nav-menu">
+          <ul className="nav-menuU">
             <li><a href="#" className="active">Home</a></li>
             <li><a href="#"> My Projects</a></li>
             <li><a href="#">Messages</a></li>
           </ul>
         </nav>
-        <div className="header-right">
+        <div className="header-rightU">
           <i className="fas fa-bell" style={{ color: '#b3b3b3', cursor: 'pointer' }}></i>
-          <div className="profile-btn">
+          <div className="profile-btnU">
             <i className="fas fa-user"></i>
           </div>
-          <div className="logo">UMKM</div>
+          <div className="logoU">UMKM</div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="main-content">
+      <main className="main-contentU">
         {/* Hero Section */}
-        <section className="hero">
-          <div className="hero-overlay">
+        <section className="heroU">
+          <div className="hero-overlayU ">
             <h1>Percepat proses perekrutan Anda dengan kandidat yang sesuai</h1>
             <p>Ketika Anda memposting lowongan pekerjaan, kami akan mencocokkan Anda dengan kandidat yang relevan dari database kami.</p>
-            <div className="hero-btns">
-              <button onClick={() => navigate('/postproject')} className="btn-primary">
+            <div className="hero-btnsU">
+              <button onClick={() => navigate('/postproject')} className="btn-primaryU">
                 <i className="fas fa-plus"></i> Post Project
               </button>
             </div>
@@ -56,42 +56,42 @@ const Dashboard = () => {
 
         {/* Stats */}
         <div className="stats-gridU">
-          <div className="stat-card">
-            <div className="stat-icon red"><i className="fas fa-briefcase"></i></div>
-            <div className="stat-value">24</div>
-            <div className="stat-label">Total Projects</div>
+          <div className="stat-cardU">
+            <div className="stat-iconU red"><i className="fas fa-briefcase"></i></div>
+            <div className="stat-valueU">24</div>
+            <div className="stat-labelU">Total Projects</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon green"><i className="fas fa-check-circle"></i></div>
-            <div className="stat-value">18</div>
-            <div className="stat-label">Completed</div>
+          <div className="stat-cardU">
+            <div className="stat-iconU green"><i className="fas fa-check-circle"></i></div>
+            <div className="stat-valueU">18</div>
+            <div className="stat-labelU">Completed</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon blue"><i className="fas fa-users"></i></div>
-            <div className="stat-value">156</div>
-            <div className="stat-label">Applicants</div>
+          <div className="stat-cardU">
+            <div className="stat-iconU blue"><i className="fas fa-users"></i></div>
+            <div className="stat-valueU">156</div>
+            <div className="stat-labelU">Applicants</div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="quick-actions">
-          <div className="action-card">
-            <div className="action-icon"><i className="fas fa-plus"></i></div>
-            <div className="action-text">
+        <div className="quick-actionsU">
+          <div className="action-cardU">
+            <div className="action-iconU"><i className="fas fa-plus"></i></div>
+            <div className="action-textU">
               <h3>Post Project Baru</h3>
               <p>Buat lowongan untuk mahasiswa</p>
             </div>
           </div>
-          <div className="action-card">
-            <div className="action-icon"><i className="fas fa-search"></i></div>
-            <div className="action-text">
+          <div className="action-cardU">
+            <div className="action-iconU"><i className="fas fa-search"></i></div>
+            <div className="action-textU">
               <h3>Cari Talent</h3>
               <p>Temukan mahasiswa berbakat</p>
             </div>
           </div>
-          <div className="action-card">
-            <div className="action-icon"><i className="fas fa-chart-line"></i></div>
-            <div className="action-text">
+          <div className="action-cardU">
+            <div className="action-iconU"><i className="fas fa-chart-line"></i></div>
+            <div className="action-textU">
               <h3>Lihat Analytics</h3>
               <p>Pantau performa project</p>
             </div>
@@ -99,64 +99,64 @@ const Dashboard = () => {
         </div>
 
         {/* Projects Row: Open */}
-        <div className="section-title">
+        <div className="section-titleU">
           <span>●</span> Project Terbaru
-          <div className="see-all">Lihat Semua <i className="fas fa-chevron-right"></i></div>
+          <div className="see-allU">Lihat Semua <i className="fas fa-chevron-right"></i></div>
         </div>
         <div className="projects-rowU">
-          <div className="project-card">
-            <div className="card-header design">
+          <div className="project-cardU">
+            <div className="card-headerU design">
               <i className="fas fa-paint-brush"></i>
-              <span className="card-status open">● OPEN</span>
+              <span className="card-statusU open">● OPEN</span>
             </div>
-            <div className="card-body">
-              <div className="card-category">Desain</div>
-              <div className="card-title">Desain Logo Modern untuk Coffee Shop</div>
-              <div className="card-meta">
-                <span className="card-budget">Rp 500.000</span>
-                <span className="card-deadline">⏰ 5 hari lagi</span>
+            <div className="card-bodyU">
+              <div className="card-categoryU">Desain</div>
+              <div className="card-titleU">Desain Logo Modern untuk Coffee Shop</div>
+              <div className="card-metaU">
+                <span className="card-budgetU">Rp 500.000</span>
+                <span className="card-deadlineU">⏰ 5 hari lagi</span>
               </div>
             </div>
           </div>
-          <div className="project-card">
-            <div className="card-header it">
+          <div className="project-cardU">
+            <div className="card-headerU it">
               <i className="fas fa-code"></i>
-              <span className="card-status open">● OPEN</span>
+              <span className="card-statusU open">● OPEN</span>
             </div>
-            <div className="card-body">
-              <div className="card-category">IT / Web</div>
-              <div className="card-title">Pembuatan Website Company Profile</div>
-              <div className="card-meta">
-                <span className="card-budget">Rp 2.500.000</span>
-                <span className="card-deadline">⏰ 14 hari lagi</span>
+            <div className="card-bodyU">
+              <div className="card-categoryU">IT / Web</div>
+              <div className="card-titleU">Pembuatan Website Company Profile</div>
+              <div className="card-metaU">
+                <span className="card-budgetU">Rp 2.500.000</span>
+                <span className="card-deadlineU">⏰ 14 hari lagi</span>
               </div>
             </div>
           </div>
-          <div className="project-card">
-            <div className="card-header marketing">
+          <div className="project-cardU">
+            <div className="card-headerU marketing">
               <i className="fas fa-bullhorn"></i>
-              <span className="card-status open">● OPEN</span>
+              <span className="card-statusU open">● OPEN</span>
             </div>
-            <div className="card-body">
-              <div className="card-category">Marketing</div>
-              <div className="card-title">Social Media Management 1 Bulan</div>
-              <div className="card-meta">
-                <span className="card-budget">Rp 1.200.000</span>
-                <span className="card-deadline">⏰ 7 hari lagi</span>
+            <div className="card-bodyU">
+              <div className="card-categoryU">Marketing</div>
+              <div className="card-titleU">Social Media Management 1 Bulan</div>
+              <div className="card-metaU">
+                <span className="card-budgetU">Rp 1.200.000</span>
+                <span className="card-deadlineU">⏰ 7 hari lagi</span>
               </div>
             </div>
           </div>
-          <div className="project-card">
-            <div className="card-header">
+          <div className="project-cardU">
+            <div className="card-headerU">
               <i className="fas fa-video"></i>
-              <span className="card-status open">● OPEN</span>
+              <span className="card-statusU open">● OPEN</span>
             </div>
-            <div className="card-body">
-              <div className="card-category">Video</div>
-              <div className="card-title">Video Promosi Produk UMKM</div>
-              <div className="card-meta">
-                <span className="card-budget">Rp 800.000</span>
-                <span className="card-deadline">⏰ 10 hari lagi</span>
+            <div className="card-bodyU">
+              <div className="card-categoryU">Video</div>
+              <div className="card-titleU">Video Promosi Produk UMKM</div>
+              <div className="card-metaU">
+                <span className="card-budgetU">Rp 800.000</span>
+                <span className="card-deadlineU">⏰ 10 hari lagi</span>
               </div>
             </div>
           </div>
