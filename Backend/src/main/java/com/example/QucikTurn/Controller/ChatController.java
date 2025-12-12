@@ -24,28 +24,40 @@ public class ChatController {
     // 1. Handle kirim pesan via WebSocket
     // Client kirim ke: /app/chat.sendMessage
     @MessageMapping("/chat.sendMessage")
-    public void sendMessage(@Payload ChatMessage chatMessage) {
+    public void sendMessage(@Payload com.example.QucikTurn.dto.ChatMessageDTO chatMessageDTO) {
         // Simpan ke MongoDB
         ChatMessage saved = chatService.saveMessage(
-                chatMessage.getSenderId(),
-                chatMessage.getRecipientId(),
-                chatMessage.getContent()
+                chatMessageDTO.getSenderId(),
+                chatMessageDTO.getRecipientId(),
+                chatMessageDTO.getContent()
         );
+
+        // Convert to DTO for sending to clients
+        com.example.QucikTurn.dto.ChatMessageDTO responseDTO = new com.example.QucikTurn.dto.ChatMessageDTO();
+        responseDTO.setId(saved.getId());
+        responseDTO.setSenderId(saved.getSenderId());
+        responseDTO.setRecipientId(saved.getRecipientId());
+        responseDTO.setContent(saved.getContent());
+        responseDTO.setTimestamp(saved.getTimestamp());
+        
+        // Get sender name from user repository
+        // This could be enhanced to include in the response
+        // For now, we'll send without name, and frontend can fetch if needed
 
         // Kirim notifikasi real-time ke Penerima (Topik khusus user)
         // Client penerima harus subscribe ke: /user/{recipientId}/queue/messages (Advance)
-        // Atau cara simpel: Subscribe ke /topic/chat/{recipientId}
+        // Atau cara simpel: Subscribe ke /topic/public/{recipientId}
 
         // Disini kita broadcast ke topic spesifik penerima
         messagingTemplate.convertAndSend(
-                "/topic/public/" + chatMessage.getRecipientId(),
-                saved
+                "/topic/public/" + chatMessageDTO.getRecipientId(),
+                responseDTO
         );
 
         // (Opsional) Kirim balik ke pengirim biar UI update (ack)
         messagingTemplate.convertAndSend(
-                "/topic/public/" + chatMessage.getSenderId(),
-                saved
+                "/topic/public/" + chatMessageDTO.getSenderId(),
+                responseDTO
         );
     }
 

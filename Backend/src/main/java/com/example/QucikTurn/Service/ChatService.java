@@ -26,19 +26,20 @@ public class ChatService {
     }
 
     public List<ChatResponseDTO> getChatHistory(Long userId1, Long userId2) {
-        // 1. Ambil raw data dari MongoDB
-        List<ChatMessage> chats = chatMessageRepository
-                .findBySenderIdAndRecipientIdOrSenderIdAndRecipientIdOrderByTimestampAsc(
-                        userId1, userId2, userId2, userId1
-                );
+        // 1. Ambil raw data dari MongoDB using the clearer method
+        List<ChatMessage> chats = chatMessageRepository.findChatBetweenUsers(userId1, userId2);
 
         // 2. Ambil User info dari MySQL (Optimized Query)
         // Kita butuh info User 1 dan User 2
         List<User> users = userRepository.findAllById(List.of(userId1, userId2));
 
         // Convert List User ke Map biar gampang di-get by ID
+        // Assuming User entity has getName() method
         Map<Long, String> userNames = users.stream()
-                .collect(Collectors.toMap(User::getId, User::getNama));
+                .collect(Collectors.toMap(
+                    User::getId, 
+                    user -> user.getName() != null ? user.getName() : user.getEmail()
+                ));
 
         // 3. Mapping (Manual Join)
         List<ChatResponseDTO> result = new ArrayList<>();
