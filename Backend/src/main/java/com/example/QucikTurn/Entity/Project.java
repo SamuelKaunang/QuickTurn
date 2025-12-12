@@ -40,6 +40,19 @@ public class Project {
     @Column(nullable=false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    // Finishing mechanism fields
+    @Column(name = "finishing_submitted_at")
+    private LocalDateTime finishingSubmittedAt;
+    
+    @Column(name = "finishing_link")
+    private String finishingLink;
+    
+    @Column(name = "finished_at")
+    private LocalDateTime finishedAt;
+    
+    @Column(name = "finished_by_umkm_id")
+    private Long finishedByUmkmId;
+
     @PreUpdate
     void onUpdate(){ this.updatedAt = LocalDateTime.now(); }
 
@@ -61,4 +74,12 @@ public class Project {
     public void setStatus(ProjectStatus status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public LocalDateTime getFinishingSubmittedAt() { return finishingSubmittedAt; }
+    public void setFinishingSubmittedAt(LocalDateTime finishingSubmittedAt) { this.finishingSubmittedAt = finishingSubmittedAt; }
+    public String getFinishingLink() { return finishingLink; }
+    public void setFinishingLink(String finishingLink) { this.finishingLink = finishingLink; }
+    public LocalDateTime getFinishedAt() { return finishedAt; }
+    public void setFinishedAt(LocalDateTime finishedAt) { this.finishedAt = finishedAt; }
+    public Long getFinishedByUmkmId() { return finishedByUmkmId; }
+    public void setFinishedByUmkmId(Long finishedByUmkmId) { this.finishedByUmkmId = finishedByUmkmId; }
 }

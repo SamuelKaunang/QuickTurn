@@ -34,6 +34,16 @@ public class Application {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // Finishing mechanism fields
+    @Column(name = "finishing_submitted_at")
+    private LocalDateTime finishingSubmittedAt;
+    
+    @Column(name = "finishing_link")
+    private String finishingLink;
+    
+    @Column(name = "is_finished_by_student")
+    private Boolean isFinishedByStudent = false;
+
     @PrePersist
     void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -59,4 +69,10 @@ public class Application {
     public void setStatus(ApplicationStatus status) { this.status = status; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getFinishingSubmittedAt() { return finishingSubmittedAt; }
+    public void setFinishingSubmittedAt(LocalDateTime finishingSubmittedAt) { this.finishingSubmittedAt = finishingSubmittedAt; }
+    public String getFinishingLink() { return finishingLink; }
+    public void setFinishingLink(String finishingLink) { this.finishingLink = finishingLink; }
+    public Boolean getIsFinishedByStudent() { return isFinishedByStudent; }
+    public void setIsFinishedByStudent(Boolean isFinishedByStudent) { this.isFinishedByStudent = isFinishedByStudent; }
 }

@@ -7,12 +7,14 @@ import com.example.QucikTurn.Service.ProjectService;
 import com.example.QucikTurn.dto.ApiResponse;
 import com.example.QucikTurn.dto.ApplicantResponse;     // ✅ Pastikan Import ini ada
 import com.example.QucikTurn.dto.CreateProjectRequest;
+import com.example.QucikTurn.dto.FinishProjectRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -59,5 +61,45 @@ public class ProjectController {
     ) {
         applicationSvc.acceptApplicant(user.getId(), projectId, appId);
         return ResponseEntity.ok(ApiResponse.ok("Pelamar diterima, project dimulai!", null));
+    }
+
+    // --- MAHASISWA SUBMIT FINISHING ---
+    @PostMapping("/{projectId}/finish")
+    public ResponseEntity<ApiResponse<String>> submitFinishing(
+            @PathVariable Long projectId,
+            @Valid @RequestBody FinishProjectRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        try {
+            projectSvc.submitFinishing(projectId, currentUser.getId(), request.getFinishingLink());
+            return ResponseEntity.ok(ApiResponse.ok("Finishing submitted successfully. Waiting for UMKM review.", null));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
+    }
+
+    // --- UMKM CONFIRM FINISHING ---
+    @PostMapping("/{projectId}/finish/confirm")
+    public ResponseEntity<ApiResponse<String>> confirmFinishing(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal User currentUser) {
+        try {
+            projectSvc.confirmFinishing(projectId, currentUser.getId());
+            return ResponseEntity.ok(ApiResponse.ok("Project officially finished and closed.", null));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
+    }
+
+    // --- GET FINISHING STATUS ---
+    @GetMapping("/{projectId}/finish-status")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getFinishingStatus(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal User currentUser) {
+        try {
+            Map<String, Object> status = projectSvc.getFinishingStatus(projectId, currentUser.getId());
+            return ResponseEntity.ok(ApiResponse.ok("Finishing status retrieved", status));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
     }
 }
