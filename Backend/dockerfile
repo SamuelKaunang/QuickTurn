@@ -1,9 +1,31 @@
-# Pake base image yang support macem-macem arsitektur
-FROM eclipse-temurin:21-jdk-alpine
+# --------------------------------------------------------------------------
+# STAGE 1: BUILDER STAGE
+# --------------------------------------------------------------------------
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
 WORKDIR /app
 
-# Langsung copy file JAR yang udah jadi (dari langkah 1)
-COPY target/*.jar app.jar
+# **[YANG HARUS DITAMBAHKAN/DIRUBAH]**
+# Copy Maven Wrapper files (penting banget buat ngeganti 'mvn')
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
 
+# **GRANT EXECUTION PERMISSIONS**
+# Karena di Alpine (Linux), file script butuh permission eksekusi
+RUN chmod +x mvnw
+
+# Copy source code
+COPY src /app/src
+
+# Lakukan proses build menggunakan Maven Wrapper!
+# Pake './mvnw' BUKAN 'mvn'
+RUN ./mvnw clean package -DskipTests
+
+# --------------------------------------------------------------------------
+# STAGE 2: FINAL IMAGE STAGE (Sama kayak sebelumnya)
+# --------------------------------------------------------------------------
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

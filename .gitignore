@@ -4,3 +4,5 @@ target/
 !mvnw.cmd
 .mvn
 /Backend/target
+.aider*
+.env

@@ -23,8 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    // ⛔ TIDAK ADA field JwtAuthFilter / constructor di sini!
-
     @Bean
     public UserDetailsService userDetailsService(UserRepository repo) {
         return username -> repo.findByEmail(username)
@@ -46,26 +44,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Izinkan asal request (Frontend React kamu)
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        
-        // Allow WebSocket headers
-        configuration.addAllowedHeader("Authorization");
-        configuration.addAllowedHeader("Content-Type");
-        configuration.addAllowedHeader("Access-Control-Allow-Origin");
-        configuration.addAllowedHeader("Access-Control-Allow-Credentials");
+        // PENTING: Gunakan setAllowedOriginPatterns("*") supaya Postman bisa masuk
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
 
-        // Izinkan method HTTP (GET, POST, dll)
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // Izinkan semua header (Authorization, Content-Type, dll)
         configuration.setAllowedHeaders(Arrays.asList("*"));
-
-        // Izinkan kredensial (cookies/auth headers)
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Terapkan ke semua URL
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
@@ -74,41 +61,30 @@ public class SecurityConfig {
         return cfg.getAuthenticationManager();
     }
 
-    // ✅ Inject JwtAuthFilter HANYA sebagai parameter method bean
-// ✅ Inject JwtAuthFilter tetap sebagai parameter
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         http
-                // 1. CSRF Disable (Sudah ada punya kamu)
                 .csrf(csrf -> csrf.disable())
-
-                // 2. TAMBAHAN PENTING: Aktifkan CORS di sini!
-                // Ini akan memanggil method corsConfigurationSource() di bawah
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // 3. Session Management (Punya kamu)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // SETELAH (Copy-Paste gantiin bagian auth -> auth)
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Endpoint yang WAJIB DIIZINKAN (Tanpa Token)
+                        // DAFTAR URL PUBLIC (TANPA TOKEN)
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
-                                "/api/auth/forgot-password", // WAJIB
-                                "/api/auth/reset-password",  // WAJIB
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password",
                                 "/actuator/health",
-                                "/ws/**"
+                                "/ws/**",      // Untuk Frontend React
+                                "/ws-raw/**"   // <--- WAJIB: Untuk Postman
                         )
-                        .permitAll() // <--- Bikin semua list di atas PURE PUBLIC
+                        .permitAll()
 
-                        // 2. Semua request lain (misal: /api/auth/profile atau /api/data)
+                        // SISANYA WAJIB LOGIN
                         .anyRequest().authenticated()
                 )
-                //
                 .httpBasic(Customizer.withDefaults());
 
-        // 5. Filter JWT (Punya kamu)
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

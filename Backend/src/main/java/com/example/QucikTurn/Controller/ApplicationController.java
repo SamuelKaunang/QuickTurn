@@ -15,19 +15,19 @@ import java.util.Map;
 @RequestMapping("/api/projects")
 public class ApplicationController {
 
-    private final ApplicationService applicationService;
+        private final ApplicationService applicationService;
 
     public ApplicationController(ApplicationService applicationService) {
-        this.applicationService = applicationService;
-    }
+            this.applicationService = applicationService;
+        }
 
-    // Endpoint: POST /api/projects/{projectId}/apply
-    // Header: Authorization: Bearer <token_mahasiswa>
-    @PostMapping("/{projectId}/apply")
-    public ResponseEntity<?> applyToProject(
-            @PathVariable Long projectId,
-            @AuthenticationPrincipal User user, // Mahasiswa yang login
-            @Valid @RequestBody ApplyProjectRequest req
+        // Endpoint: POST /api/projects/{projectId}/apply
+        // Header: Authorization: Bearer <token_mahasiswa>
+        @PostMapping("/{projectId}/apply")
+        public ResponseEntity<?> applyToProject(
+                @PathVariable Long projectId,
+                @AuthenticationPrincipal User user, // Mahasiswa yang login
+                @Valid @RequestBody ApplyProjectRequest req
     ) {
         try {
             ApplyProjectResponse response = applicationService.applyToProject(
