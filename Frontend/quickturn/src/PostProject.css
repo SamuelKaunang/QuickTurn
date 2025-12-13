@@ -1,0 +1,266 @@
+/* Styling for the main container */
+.container {
+  padding-top: 7rem;
+  padding-bottom: 2.5rem;
+  padding-left: 1rem;
+  padding-right: 2.5rem;
+  max-width: 1200px;
+  margin: auto;
+  min-height: 100vh;
+}
+
+/* Back Button */
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #b3b3b3;
+  transition: color 0.2s ease;
+}
+
+.back-btn:hover {
+  color: white;
+}
+
+.back-btn-icon {
+  width: 18px;
+}
+
+/* Main flex layout for left and right columns */
+.main-flex {
+  display: flex;
+  gap: 2rem;
+}
+
+/* Left Column Form */
+.form-column {
+  flex: 1;
+}
+
+/* Heading for the form */
+.form-header {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+/* Subheading */
+.form-subheading {
+  color: #b3b3b3;
+  margin-bottom: 2rem;
+}
+
+/* Progress step styling */
+.progress-steps {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.step-circle {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.step-completed {
+  background-color: #e50914;
+  color: white;
+}
+
+.step-incomplete {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #888;
+}
+
+.step-line {
+  width: 3rem;
+  height: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.125rem;
+}
+
+.step-line-active {
+  background-color: #e50914;
+}
+
+/* Form content background */
+.form-content {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Form inputs */
+.input-label {
+  font-size: 0.875rem;
+  color: #b3b3b3;
+}
+
+.input-field {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: white;
+  transition: border-color 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: #e50914;
+}
+
+.text-helper {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.btn-main {
+  background-color: #e50914;
+  color: white;
+}
+
+.btn-main:hover {
+  background-color: #f40612;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-back {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-back:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-next {
+  flex: 1;
+  background-color: #e50914;
+  color: white;
+}
+
+.btn-next:hover {
+  background-color: #f40612;
+}
+
+.card-preview {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+  transform: scale(1);
+  transition: transform 0.3s ease;
+}
+
+.card-preview:hover {
+  transform: scale(1.02);
+}
+
+.card-header {
+  height: 8rem;
+  background: linear-gradient(to bottom right, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.card-header-icon {
+  opacity: 0.3;
+}
+
+.card-header-new {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #46d369;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.card-content {
+  padding: 1.25rem;
+}
+
+.card-category {
+  font-size: 0.75rem;
+  color: #e50914;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.card-description {
+  font-size: 0.875rem;
+  color: #b3b3b3;
+  line-clamp: 3;
+  margin-bottom: 1rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-budget {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #46d369;
+}
+
+.card-deadline {
+  font-size: 0.75rem;
+  color: #888;
+}
