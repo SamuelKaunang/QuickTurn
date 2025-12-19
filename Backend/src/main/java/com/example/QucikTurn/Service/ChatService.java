@@ -1,4 +1,3 @@
-
 package com.example.QucikTurn.Service;
 
 import com.example.QucikTurn.Entity.User;
@@ -8,6 +7,10 @@ import com.example.QucikTurn.Repository.ChatMessageRepository;
 import com.example.QucikTurn.Repository.UserRepository;
 import com.example.QucikTurn.dto.ChatResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,80 +21,138 @@ import java.util.stream.Collectors;
 @Service
 public class ChatService {
 
-    @Autowired private ChatMessageRepository chatMessageRepository;
-    @Autowired private UserRepository userRepository; // MySQL Repo
-    @Autowired private ApplicationRepository applicationRepository;
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ApplicationRepository applicationRepository;
 
+    /**
+     * Save a chat message after validating contract permission
+     */
     public ChatMessage saveMessage(Long senderId, Long recipientId, String content) {
-        // Validasi: Pastikan ada kontrak aktif antara kedua user
         validateChatPermission(senderId, recipientId);
-        
+
         ChatMessage chat = new ChatMessage(senderId, recipientId, content);
         return chatMessageRepository.save(chat);
     }
 
+    /**
+     * Get chat history between two users (non-paginated, sorted by timestamp)
+     */
     public List<ChatResponseDTO> getChatHistory(Long userId1, Long userId2) {
-        // Validasi: Pastikan ada kontrak aktif antara kedua user
         validateChatPermission(userId1, userId2);
-        
-        // 1. Ambil raw data dari MongoDB using the clearer method
+
         List<ChatMessage> chats = chatMessageRepository.findChatBetweenUsers(userId1, userId2);
+        return mapToResponseDTO(chats, userId1, userId2);
+    }
 
-        // 2. Ambil User info dari MySQL (Optimized Query)
-        // Kita butuh info User 1 dan User 2
+    /**
+     * Get paginated chat history between two users
+     */
+    public Page<ChatResponseDTO> getChatHistoryPaged(Long userId1, Long userId2, int page, int size) {
+        validateChatPermission(userId1, userId2);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
+        Page<ChatMessage> chatPage = chatMessageRepository.findChatBetweenUsersPaged(userId1, userId2, pageable);
+
+        // Get user names once
+        Map<Long, String> userNames = getUserNames(userId1, userId2);
+
+        return chatPage.map(chat -> new ChatResponseDTO(
+                chat.getId(),
+                chat.getSenderId(),
+                userNames.getOrDefault(chat.getSenderId(), "Unknown"),
+                chat.getContent(),
+                chat.getTimestamp()));
+    }
+
+    /**
+     * Mark all messages from a sender as read for the recipient
+     */
+    public void markMessagesAsRead(Long recipientId, Long senderId) {
+        List<ChatMessage> unreadMessages = chatMessageRepository
+                .findByRecipientIdAndSenderIdAndIsReadFalse(recipientId, senderId);
+
+        for (ChatMessage msg : unreadMessages) {
+            msg.setRead(true);
+        }
+
+        if (!unreadMessages.isEmpty()) {
+            chatMessageRepository.saveAll(unreadMessages);
+        }
+    }
+
+    /**
+     * Get count of unread messages for a user
+     */
+    public long getUnreadCount(Long recipientId) {
+        return chatMessageRepository.countByRecipientIdAndIsReadFalse(recipientId);
+    }
+
+    /**
+     * Get count of unread messages from a specific sender
+     */
+    public long getUnreadCountFromSender(Long recipientId, Long senderId) {
+        return chatMessageRepository.countByRecipientIdAndSenderIdAndIsReadFalse(recipientId, senderId);
+    }
+
+    /**
+     * Validate that two users have an active contract (APPROVED application)
+     */
+    public boolean hasActiveContract(Long userId1, Long userId2) {
+        // Check if userId1 is student with approved app to userId2's project
+        boolean hasContract = applicationRepository.findByStudentId(userId1)
+                .stream()
+                .anyMatch(app -> app.getStatus().name().equals("APPROVED") &&
+                        app.getProject().getOwner().getId().equals(userId2));
+
+        if (!hasContract) {
+            // Check reverse: userId2 is student with approved app to userId1's project
+            hasContract = applicationRepository.findByStudentId(userId2)
+                    .stream()
+                    .anyMatch(app -> app.getStatus().name().equals("APPROVED") &&
+                            app.getProject().getOwner().getId().equals(userId1));
+        }
+
+        return hasContract;
+    }
+
+    // -------- PRIVATE HELPER METHODS --------
+
+    private void validateChatPermission(Long userId1, Long userId2) {
+        if (!hasActiveContract(userId1, userId2)) {
+            throw new RuntimeException("Tidak dapat mengakses chat: Tidak ada kontrak aktif antara kedua user");
+        }
+    }
+
+    private Map<Long, String> getUserNames(Long userId1, Long userId2) {
         List<User> users = userRepository.findAllById(List.of(userId1, userId2));
-
-        // Convert List User ke Map biar gampang di-get by ID
-        // Using getNama() which is the correct method in User entity
-        Map<Long, String> userNames = users.stream()
+        return users.stream()
                 .collect(Collectors.toMap(
-                    User::getId, 
-                    user -> {
-                        if (user.getNama() != null && !user.getNama().isEmpty()) {
-                            return user.getNama();
-                        } else {
+                        User::getId,
+                        user -> {
+                            if (user.getNama() != null && !user.getNama().isEmpty()) {
+                                return user.getNama();
+                            }
                             return user.getEmail();
-                        }
-                    }
-                ));
+                        }));
+    }
 
-        // 3. Mapping (Manual Join)
+    private List<ChatResponseDTO> mapToResponseDTO(List<ChatMessage> chats, Long userId1, Long userId2) {
+        Map<Long, String> userNames = getUserNames(userId1, userId2);
+
         List<ChatResponseDTO> result = new ArrayList<>();
         for (ChatMessage chat : chats) {
             String name = userNames.getOrDefault(chat.getSenderId(), "Unknown");
-
             result.add(new ChatResponseDTO(
                     chat.getId(),
                     chat.getSenderId(),
                     name,
                     chat.getContent(),
-                    chat.getTimestamp()
-            ));
+                    chat.getTimestamp()));
         }
-
         return result;
-    }
-
-    private void validateChatPermission(Long userId1, Long userId2) {
-        // Cek apakah ada kontrak aktif (Application dengan status APPROVED) antara kedua user
-        // Kontrak aktif berarti ada aplikasi dengan status APPROVED di mana:
-        // - userId1 adalah student dan userId2 adalah project owner, ATAU
-        // - userId2 adalah student dan userId1 adalah project owner
-        
-        boolean hasActiveContract = applicationRepository.findByStudentId(userId1)
-            .stream()
-            .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
-                           app.getProject().getOwner().getId().equals(userId2));
-        
-        if (!hasActiveContract) {
-            hasActiveContract = applicationRepository.findByStudentId(userId2)
-                .stream()
-                .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
-                               app.getProject().getOwner().getId().equals(userId1));
-        }
-        
-        if (!hasActiveContract) {
-            throw new RuntimeException("Tidak dapat mengakses chat: Tidak ada kontrak aktif antara kedua user");
-        }
     }
 }

@@ -4,13 +4,17 @@ import com.example.QucikTurn.Entity.mongo.ChatMessage;
 import com.example.QucikTurn.Repository.ApplicationRepository;
 import com.example.QucikTurn.Repository.UserRepository;
 import com.example.QucikTurn.Service.ChatService;
+import com.example.QucikTurn.dto.ChatMessageDTO;
 import com.example.QucikTurn.dto.ChatResponseDTO;
 import com.example.QucikTurn.dto.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,154 +24,240 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Controller // Note: Pake @Controller, bukan @RestController buat WebSocket
+@Controller
 public class ChatController {
 
-    @Autowired private SimpMessagingTemplate messagingTemplate;
-    @Autowired private ChatService chatService;
-    @Autowired private UserRepository userRepository;
-    @Autowired private ApplicationRepository applicationRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private ChatService chatService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ApplicationRepository applicationRepository;
 
-    // 1. Handle kirim pesan via WebSocket
-    // Client kirim ke: /app/chat.sendMessage
+    // ========== WEBSOCKET ENDPOINTS ==========
+
+    /**
+     * Handle sending messages via WebSocket
+     * Client sends to: /app/chat.sendMessage
+     */
     @MessageMapping("/chat.sendMessage")
-    public void sendMessage(@Payload com.example.QucikTurn.dto.ChatMessageDTO chatMessageDTO) {
-        // Validasi: Pastikan pengirim dan penerima memiliki kontrak aktif
-        Long senderId = chatMessageDTO.getSenderId();
-        Long recipientId = chatMessageDTO.getRecipientId();
-        
-        // Validasi akan dilakukan di ChatService.saveMessage()
-        // Jadi kita tidak perlu validasi di sini lagi
-
-        // Simpan ke MongoDB
-        ChatMessage saved = chatService.saveMessage(
-                senderId,
-                recipientId,
-                chatMessageDTO.getContent()
-        );
-
-        // Convert to DTO for sending to clients
-        com.example.QucikTurn.dto.ChatMessageDTO responseDTO = new com.example.QucikTurn.dto.ChatMessageDTO();
-        responseDTO.setId(saved.getId());
-        responseDTO.setSenderId(saved.getSenderId());
-        responseDTO.setRecipientId(saved.getRecipientId());
-        responseDTO.setContent(saved.getContent());
-        responseDTO.setTimestamp(saved.getTimestamp());
-        
-        // Get sender name from user repository to include in the response
+    public void sendMessage(@Payload ChatMessageDTO chatMessageDTO) {
         try {
-            var sender = userRepository.findById(saved.getSenderId());
-            if (sender.isPresent()) {
-                responseDTO.setSenderName(sender.get().getNama());
+            Long senderId = chatMessageDTO.getSenderId();
+            Long recipientId = chatMessageDTO.getRecipientId();
+
+            // Validate and save message (validation in service)
+            ChatMessage saved = chatService.saveMessage(
+                    senderId,
+                    recipientId,
+                    chatMessageDTO.getContent());
+
+            // Build response DTO
+            ChatMessageDTO responseDTO = new ChatMessageDTO();
+            responseDTO.setId(saved.getId());
+            responseDTO.setSenderId(saved.getSenderId());
+            responseDTO.setRecipientId(saved.getRecipientId());
+            responseDTO.setContent(saved.getContent());
+            responseDTO.setTimestamp(saved.getTimestamp());
+
+            // Get sender name
+            Long senderIdValue = saved.getSenderId();
+            if (senderIdValue != null) {
+                userRepository.findById(senderIdValue)
+                        .ifPresent(sender -> responseDTO.setSenderName(sender.getNama()));
             }
+
+            // Send to recipient
+            messagingTemplate.convertAndSend(
+                    "/topic/public/" + recipientId,
+                    responseDTO);
+
+            // Send acknowledgment to sender
+            messagingTemplate.convertAndSend(
+                    "/topic/public/" + senderId,
+                    responseDTO);
+
         } catch (Exception e) {
-            // Log error but don't break the chat
-            e.printStackTrace();
+            // Send error notification to sender
+            ChatMessageDTO errorDTO = new ChatMessageDTO();
+            errorDTO.setContent("Error: " + e.getMessage());
+            errorDTO.setSenderId(0L); // System message
+            errorDTO.setRecipientId(chatMessageDTO.getSenderId());
+
+            messagingTemplate.convertAndSend(
+                    "/topic/errors/" + chatMessageDTO.getSenderId(),
+                    errorDTO);
         }
-
-        // Kirim notifikasi real-time ke Penerima (Topik khusus user)
-        // Client penerima harus subscribe ke: /topic/public/{recipientId}
-        messagingTemplate.convertAndSend(
-                "/topic/public/" + chatMessageDTO.getRecipientId(),
-                responseDTO
-        );
-
-        // Kirim balik ke pengirim biar UI update (ack)
-        messagingTemplate.convertAndSend(
-                "/topic/public/" + chatMessageDTO.getSenderId(),
-                responseDTO
-        );
     }
 
-    // 2. REST API buat load history (dipanggil pas pertama buka chat)
+    /**
+     * Handle WebSocket errors
+     */
+    @MessageExceptionHandler
+    @SendToUser("/queue/errors")
+    public String handleException(Throwable exception) {
+        return "Error: " + exception.getMessage();
+    }
+
+    // ========== REST API ENDPOINTS ==========
+
+    /**
+     * Get chat history (non-paginated)
+     */
     @GetMapping("/api/chat/history")
     @ResponseBody
     public ResponseEntity<ApiResponse<List<ChatResponseDTO>>> getHistory(
             @RequestParam Long otherUserId,
             @AuthenticationPrincipal User currentUser) {
-        
-        List<ChatResponseDTO> history = chatService.getChatHistory(currentUser.getId(), otherUserId);
-        return ResponseEntity.ok(ApiResponse.ok("Chat history retrieved", history));
+
+        try {
+            List<ChatResponseDTO> history = chatService.getChatHistory(currentUser.getId(), otherUserId);
+
+            // Mark messages from otherUser as read
+            chatService.markMessagesAsRead(currentUser.getId(), otherUserId);
+
+            return ResponseEntity.ok(ApiResponse.ok("Chat history retrieved", history));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
     }
 
-    // 3. Endpoint baru: Dapatkan daftar user yang bisa diajak chat (berdasarkan kontrak aktif)
+    /**
+     * Get paginated chat history
+     */
+    @GetMapping("/api/chat/history/paged")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Page<ChatResponseDTO>>> getHistoryPaged(
+            @RequestParam Long otherUserId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @AuthenticationPrincipal User currentUser) {
+
+        try {
+            Page<ChatResponseDTO> history = chatService.getChatHistoryPaged(
+                    currentUser.getId(), otherUserId, page, size);
+
+            // Mark messages as read when viewing
+            chatService.markMessagesAsRead(currentUser.getId(), otherUserId);
+
+            return ResponseEntity.ok(ApiResponse.ok("Chat history retrieved", history));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
+    }
+
+    /**
+     * Get unread message count
+     */
+    @GetMapping("/api/chat/unread")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getUnreadCount(
+            @AuthenticationPrincipal User currentUser) {
+
+        long count = chatService.getUnreadCount(currentUser.getId());
+        return ResponseEntity.ok(ApiResponse.ok("Unread count retrieved",
+                Map.of("unreadCount", count)));
+    }
+
+    /**
+     * Get unread count from specific user
+     */
+    @GetMapping("/api/chat/unread/{senderId}")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getUnreadCountFromSender(
+            @PathVariable Long senderId,
+            @AuthenticationPrincipal User currentUser) {
+
+        long count = chatService.getUnreadCountFromSender(currentUser.getId(), senderId);
+        return ResponseEntity.ok(ApiResponse.ok("Unread count retrieved",
+                Map.of("unreadCount", count)));
+    }
+
+    /**
+     * Mark messages as read
+     */
+    @PostMapping("/api/chat/mark-read")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<String>> markAsRead(
+            @RequestParam Long senderId,
+            @AuthenticationPrincipal User currentUser) {
+
+        chatService.markMessagesAsRead(currentUser.getId(), senderId);
+        return ResponseEntity.ok(ApiResponse.ok("Messages marked as read", null));
+    }
+
+    /**
+     * Get list of chat contacts (users with active contracts)
+     */
     @GetMapping("/api/chat/contacts")
     @ResponseBody
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getChatContacts(
             @AuthenticationPrincipal User currentUser) {
-        
-        // Untuk mahasiswa: dapatkan semua UMKM yang memiliki project dengan aplikasi APPROVED
-        // Untuk UMKM: dapatkan semua mahasiswa yang memiliki aplikasi APPROVED di project mereka
-        
-        List<Map<String, Object>> contacts;
-        
-        if (currentUser.getRole().name().equals("MAHASISWA")) {
-            // Mahasiswa: dapatkan UMKM dari project yang dia apply dan APPROVED
-            contacts = applicationRepository.findByStudentId(currentUser.getId())
-                .stream()
-                .filter(app -> app.getStatus().name().equals("APPROVED"))
-                .map(app -> {
-                    User umkm = app.getProject().getOwner();
-                    // Buat Map dengan tipe eksplisit untuk menghindari masalah generic bounds
-                    Map<String, Object> contactMap = new java.util.HashMap<>();
-                    contactMap.put("userId", umkm.getId());
-                    contactMap.put("name", umkm.getNama());
-                    contactMap.put("email", umkm.getEmail());
-                    contactMap.put("role", umkm.getRole().name());
-                    contactMap.put("projectTitle", app.getProject().getTitle());
-                    return contactMap;
-                })
-                .collect(Collectors.toList());
-        } else {
-            // UMKM: dapatkan mahasiswa yang apply ke project mereka dan APPROVED
-            contacts = applicationRepository.findByProject_Owner_Id(currentUser.getId())
-                .stream()
-                .filter(app -> app.getStatus().name().equals("APPROVED"))
-                .map(app -> {
-                    User mahasiswa = app.getStudent();
-                    // Buat Map dengan tipe eksplisit untuk menghindari masalah generic bounds
-                    Map<String, Object> contactMap = new java.util.HashMap<>();
-                    contactMap.put("userId", mahasiswa.getId());
-                    contactMap.put("name", mahasiswa.getNama());
-                    contactMap.put("email", mahasiswa.getEmail());
-                    contactMap.put("role", mahasiswa.getRole().name());
-                    contactMap.put("projectTitle", app.getProject().getTitle());
-                    return contactMap;
-                })
-                .collect(Collectors.toList());
-        }
-        
+
+        List<Map<String, Object>> contacts = getContactsForUser(currentUser);
         return ResponseEntity.ok(ApiResponse.ok("Chat contacts retrieved", contacts));
     }
 
-    // 4. Endpoint untuk memulai chat (validasi kontrak)
+    /**
+     * Start chat (validate contract exists)
+     */
     @PostMapping("/api/chat/start")
     @ResponseBody
     public ResponseEntity<ApiResponse<String>> startChat(
             @RequestParam Long otherUserId,
             @AuthenticationPrincipal User currentUser) {
-        
-        // Cek apakah ada kontrak aktif antara kedua user
-        boolean hasContract = applicationRepository.findByStudentId(currentUser.getId())
-            .stream()
-            .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
-                           (app.getProject().getOwner().getId().equals(otherUserId) || 
-                            app.getStudent().getId().equals(otherUserId)));
-        
-        // Juga cek dari sisi user lain
-        if (!hasContract) {
-            hasContract = applicationRepository.findByStudentId(otherUserId)
-                .stream()
-                .anyMatch(app -> app.getStatus().name().equals("APPROVED") && 
-                               (app.getProject().getOwner().getId().equals(currentUser.getId()) || 
-                                app.getStudent().getId().equals(currentUser.getId())));
-        }
-        
+
+        boolean hasContract = chatService.hasActiveContract(currentUser.getId(), otherUserId);
+
         if (!hasContract) {
             return ResponseEntity.badRequest()
-                .body(ApiResponse.fail("Tidak dapat memulai chat: Tidak ada kontrak aktif dengan user ini"));
+                    .body(ApiResponse.fail("Tidak dapat memulai chat: Tidak ada kontrak aktif dengan user ini"));
         }
-        
+
         return ResponseEntity.ok(ApiResponse.ok("Chat dapat dimulai", null));
+    }
+
+    // ========== PRIVATE HELPER METHODS ==========
+
+    private List<Map<String, Object>> getContactsForUser(User currentUser) {
+        if (currentUser.getRole().name().equals("MAHASISWA")) {
+            // Mahasiswa: get UMKM from approved applications
+            return applicationRepository.findByStudentId(currentUser.getId())
+                    .stream()
+                    .filter(app -> app.getStatus().name().equals("APPROVED"))
+                    .map(app -> {
+                        User umkm = app.getProject().getOwner();
+                        Map<String, Object> contactMap = new java.util.HashMap<>();
+                        contactMap.put("userId", umkm.getId());
+                        contactMap.put("name", umkm.getNama());
+                        contactMap.put("email", umkm.getEmail());
+                        contactMap.put("role", umkm.getRole().name());
+                        contactMap.put("projectTitle", app.getProject().getTitle());
+                        contactMap.put("unreadCount", chatService.getUnreadCountFromSender(
+                                currentUser.getId(), umkm.getId()));
+                        return contactMap;
+                    })
+                    .collect(Collectors.toList());
+        } else {
+            // UMKM: get students with approved applications
+            return applicationRepository.findByProject_Owner_Id(currentUser.getId())
+                    .stream()
+                    .filter(app -> app.getStatus().name().equals("APPROVED"))
+                    .map(app -> {
+                        User mahasiswa = app.getStudent();
+                        Map<String, Object> contactMap = new java.util.HashMap<>();
+                        contactMap.put("userId", mahasiswa.getId());
+                        contactMap.put("name", mahasiswa.getNama());
+                        contactMap.put("email", mahasiswa.getEmail());
+                        contactMap.put("role", mahasiswa.getRole().name());
+                        contactMap.put("projectTitle", app.getProject().getTitle());
+                        contactMap.put("unreadCount", chatService.getUnreadCountFromSender(
+                                currentUser.getId(), mahasiswa.getId()));
+                        return contactMap;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 }

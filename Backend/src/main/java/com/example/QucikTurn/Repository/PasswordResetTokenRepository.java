@@ -1,30 +1,29 @@
 package com.example.QucikTurn.Repository;
 
 import com.example.QucikTurn.Entity.PasswordResetToken;
-import com.example.QucikTurn.Entity.User; // Import entity User lo
+import com.example.QucikTurn.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Repository
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
 
-    // 1. Method utama: Cari token berdasarkan string tokennya
-    // Return Optional biar kita bisa cek null dengan elegan (ifPresent, dll)
-    Optional<PasswordResetToken> findByToken(String token);
+    // Cari berdasarkan verification code (untuk step verify-code)
+    Optional<PasswordResetToken> findByVerificationCode(String verificationCode);
 
-    // 2. (Optional tapi Bagus) Cari token berdasarkan User
-    // Berguna kalau lo mau cek "User ini udah request reset password belum sih?"
+    // Cari berdasarkan reset token (untuk step reset-password)
+    Optional<PasswordResetToken> findByResetToken(String resetToken);
+
+    // Cari berdasarkan User (untuk hapus token lama sebelum buat baru)
     Optional<PasswordResetToken> findByUser(User user);
 
-    // 3. (Pro Tip) Bersih-bersih token sampah
-    // Query ini buat ngehapus semua token yang udah expired biar database gak penuh sampah
-    // Lo bisa panggil ini pake Scheduler nanti (fitur tambahan aja)
+    // Bersih-bersih token yang sudah expired
     @Modifying
-    @Query("delete from PasswordResetToken t where t.expiryDate <= ?1")
-    void deleteAllExpiredSince(Date now);
+    @Query("delete from PasswordResetToken t where t.codeExpiryDate <= ?1")
+    void deleteAllExpiredSince(LocalDateTime now);
 }

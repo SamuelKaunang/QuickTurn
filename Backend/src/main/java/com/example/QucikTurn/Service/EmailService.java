@@ -13,38 +13,51 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    // Method ini yang bakal dipanggil nanti pas user klik "Forgot Password"
-    public void sendResetTokenEmail(String toEmail, String token) {
-        // Kita set URL endpoint di aplikasi lo buat reset password
-        // Asumsi aplikasi jalan di localhost:8080
-        String resetUrl = "http://localhost:8080/api/auth/reset-password?token=" + token;
+    // Kirim verification code ke email user untuk reset password
+    public void sendVerificationCodeEmail(String toEmail, String code) {
+        String subject = "Kode Verifikasi Reset Password - QucikTurn";
 
-        // Bikin template email HTML biar cakep
-        String subject = "Reset Password - QucikTurn";
-        String htmlContent = "<h3>Halo, Sobat QucikTurn!</h3>"
-                + "<p>Lo baru aja minta reset password ya? Kalau bukan lo, cuekin aja email ini.</p>"
-                + "<p>Kalau emang lo yang minta, klik tombol di bawah ini buat ganti password:</p>"
-                + "<a href=\"" + resetUrl + "\" style=\"background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;\">Ganti Password Sekarang</a>"
-                + "<br><br>"
-                + "<p>Link ini cuma berlaku 15 menit ya, bestie!</p>";
+        // Template email dengan code yang ditampilkan prominent
+        String htmlContent = """
+                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
+                    <h2 style="color: #333; text-align: center;">Reset Password</h2>
+                    <p style="color: #666; text-align: center;">Halo, Sobat QucikTurn!</p>
+                    <p style="color: #666; text-align: center;">Gunakan kode verifikasi di bawah ini untuk reset password kamu:</p>
+
+                    <div style="background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); padding: 30px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                        <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: white;">%s</span>
+                    </div>
+
+                    <p style="color: #999; font-size: 12px; text-align: center;">
+                        ⚠️ Kode ini berlaku selama 15 menit.
+                    </p>
+                    <p style="color: #999; font-size: 12px; text-align: center;">
+                        Jika kamu tidak merasa meminta reset password, abaikan email ini.
+                    </p>
+
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                    <p style="color: #bbb; font-size: 11px; text-align: center;">
+                        QucikTurn Team
+                    </p>
+                </div>
+                """
+                .formatted(code);
 
         try {
-            // MimeMessage itu buat email yang support HTML/Attachment
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
             helper.setTo(toEmail);
             helper.setSubject(subject);
-            helper.setText(htmlContent, true); // Parameter 'true' artinya ini HTML
-            helper.setFrom("qucikturn.bot@gmail.com"); // Samain sama email di properties lo
+            helper.setText(htmlContent, true);
+            helper.setFrom("qucikturn.bot@gmail.com");
 
             mailSender.send(message);
-            System.out.println("Email reset password berhasil dikirim ke: " + toEmail);
+            System.out.println("✅ Verification code berhasil dikirim ke: " + toEmail);
 
         } catch (MessagingException e) {
-            // Kalau gagal, kita log error-nya
             e.printStackTrace();
-            throw new RuntimeException("Gagal ngirim email, bro. Cek koneksi atau settingan SMTP lo.");
+            throw new RuntimeException("Gagal mengirim email. Cek koneksi atau settingan SMTP.");
         }
     }
 }
