@@ -1,7 +1,7 @@
 import React from 'react';
 import './ProjectsU.css'; 
 
-const ProjectsU = ({ projects, token, onRefresh, onViewApplicants }) => {
+const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContract }) => {
     
     const handleCompleteProject = async (projectId) => {
         if(!window.confirm("Apakah Anda yakin pekerjaan selesai dan sesuai? Project akan ditutup.")) return;
@@ -73,7 +73,6 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants }) => {
                                 )}
 
                                 {/* 3. DONE: Student Submitted -> UMKM Can Finish */}
-                                {/* ✅ THIS IS THE FIX: Button now appears for DONE status */}
                                 {p.status === 'DONE' && (
                                     <button 
                                         className="btn-primaryU" 
@@ -90,6 +89,23 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants }) => {
                                         🎉 Project Selesai
                                     </div>
                                 )}
+
+                                {/* ✅ [FR-09] LIHAT KONTRAK BUTTON (Appears for Ongoing, Done, Closed) */}
+                                {(p.status === 'ONGOING' || p.status === 'DONE' || p.status === 'CLOSED') && (
+                                    <button 
+                                        onClick={() => onViewContract(p.id)}
+                                        style={{
+                                            width: '100%', padding: '8px', 
+                                            background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#aaa', 
+                                            borderRadius: '5px', cursor: 'pointer', fontSize:'13px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px'
+                                        }}
+                                        onMouseOver={(e) => {e.target.style.color='white'; e.target.style.borderColor='white'}}
+                                        onMouseOut={(e) => {e.target.style.color='#aaa'; e.target.style.borderColor='rgba(255,255,255,0.2)'}}
+                                    >
+                                        📄 Lihat Kontrak
+                                    </button>
+                                )}
+
                             </div>
                         </div>
                     </div>

@@ -3,13 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import './DashboardU.css';
 import ProjectsU from './ProjectsU';
 import ApplicantsModalU from './ApplicantsModalU';
+import ContractModal from './ContractModal'; // ✅ Import Contract Modal
 
 const DashboardU = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [token, setToken] = useState("");
   const [projects, setProjects] = useState([]); 
+  
+  // Modals State
   const [showApplicantsModal, setShowApplicantsModal] = useState(false);
+  const [showContractModal, setShowContractModal] = useState(false); // ✅ Contract State
   const [selectedProjectId, setSelectedProjectId] = useState(null);
 
   useEffect(() => {
@@ -35,38 +39,19 @@ const DashboardU = () => {
       } catch (err) { console.error(err); }
   };
 
-  // === 📊 REAL-TIME STATS CALCULATION ===
-  
-  // 1. Total Projects
+  // === STATS CALCULATION ===
   const totalProjects = projects.length;
-
-  // 2. Completed Projects
   const completedProjects = projects.filter(p => p.status === 'CLOSED').length;
-
-  // 3. Applicants (Mocked sum for now, or actual if API provides it)
   const totalApplicants = projects.reduce((acc, curr) => acc + (curr.applicantCount || 0), 0);
-
-  // 4. TOTAL SPENT (The Fix)
-  // Logic: Sum of 'budget' ONLY for projects that are 'CLOSED'
+  
   const totalSpentRaw = projects
     .filter(p => p.status === 'CLOSED')
     .reduce((acc, curr) => acc + (Number(curr.budget) || 0), 0);
 
-  // Format to IDR (e.g., "Rp 1.250.000")
-  const formatRupiah = (number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(number);
-  };
-
-  // Optional: If you strictly want the "1.25M" format:
   const formatCompact = (number) => {
       return new Intl.NumberFormat('en-US', {
           notation: "compact",
-          maximumFractionDigits: 2
+          maximumFractionDigits: 2 
       }).format(number);
   };
 
@@ -83,7 +68,7 @@ const DashboardU = () => {
 
       <main className="main-contentU">
         
-        {/* === 1. STATS GRID === */}
+        {/* STATS GRID */}
         <div className="stats-grid-new">
             <div className="stat-card-new">
                 <div className="stat-icon-box red"><i className="fas fa-briefcase"></i></div>
@@ -100,16 +85,14 @@ const DashboardU = () => {
                 <h1>{totalApplicants}</h1>
                 <p>Applicants</p>
             </div>
-            {/* UPDATED CARD: Total Spent */}
             <div className="stat-card-new">
                 <div className="stat-icon-box purple"><i className="fas fa-wallet"></i></div>
-                {/* Using compact format (1.2M) to fit card, or use formatRupiah(totalSpentRaw) for full text */}
                 <h1>{formatCompact(totalSpentRaw)}</h1> 
                 <p>Total Spent (Rp)</p>
             </div>
         </div>
 
-        {/* === 2. QUICK ACTIONS === */}
+        {/* QUICK ACTIONS */}
         <div className="quick-actions-grid">
             <div className="action-card" onClick={() => navigate('/post-project')}>
                 <div className="action-icon red"><i className="fas fa-plus"></i></div>
@@ -134,7 +117,7 @@ const DashboardU = () => {
             </div>
         </div>
 
-        {/* === 3. PROJECT LIST === */}
+        {/* PROJECT LIST */}
         <div className="section-titleU">
           <span>●</span> Project Terbaru
         </div>
@@ -144,16 +127,26 @@ const DashboardU = () => {
             token={token} 
             onRefresh={() => fetchProjects(token)}
             onViewApplicants={(id) => { setSelectedProjectId(id); setShowApplicantsModal(true); }} 
+            onViewContract={(id) => { setSelectedProjectId(id); setShowContractModal(true); }} // ✅ Pass Contract Handler
         />
       </main>
 
-      {/* MODAL */}
+      {/* APPLICANTS MODAL */}
       {showApplicantsModal && (
           <ApplicantsModalU 
               projectId={selectedProjectId}
               token={token}
               onClose={() => setShowApplicantsModal(false)}
               onAcceptSuccess={() => fetchProjects(token)}
+          />
+      )}
+
+      {/* ✅ CONTRACT MODAL */}
+      {showContractModal && (
+          <ContractModal 
+              projectId={selectedProjectId}
+              token={token}
+              onClose={() => setShowContractModal(false)}
           />
       )}
     </div>

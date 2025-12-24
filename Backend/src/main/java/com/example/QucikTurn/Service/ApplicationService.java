@@ -3,63 +3,58 @@ package com.example.QucikTurn.Service;
 import com.example.QucikTurn.Entity.Application;
 import com.example.QucikTurn.Entity.Project;
 import com.example.QucikTurn.Entity.User;
+import com.example.QucikTurn.Entity.Contract; // ✅ IMPORT NEW ENTITY
 import com.example.QucikTurn.Entity.enums.ApplicationStatus;
 import com.example.QucikTurn.Entity.enums.ProjectStatus;
 import com.example.QucikTurn.Entity.enums.Role;
 import com.example.QucikTurn.Repository.ApplicationRepository;
 import com.example.QucikTurn.Repository.ProjectRepository;
 import com.example.QucikTurn.Repository.UserRepository;
-import com.example.QucikTurn.dto.ApplicantResponse; // ✅ Import ini wajib ada
+import com.example.QucikTurn.Repository.ContractRepository; // ✅ IMPORT NEW REPO
+import com.example.QucikTurn.dto.ApplicantResponse;
 import com.example.QucikTurn.dto.ApplyProjectRequest;
 import com.example.QucikTurn.dto.ApplyProjectResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class ApplicationService {
 
-    private final ApplicationRepository applicationRepo; // ✅ Nama variabel panjang (tidak disingkat)
+    private final ApplicationRepository applicationRepo;
     private final ProjectRepository projectRepo;
     private final UserRepository userRepo;
+    private final ContractRepository contractRepo; // ✅ Inject ContractRepo
 
     public ApplicationService(
             ApplicationRepository applicationRepo,
             ProjectRepository projectRepo,
-            UserRepository userRepo
+            UserRepository userRepo,
+            ContractRepository contractRepo
     ) {
         this.applicationRepo = applicationRepo;
         this.projectRepo = projectRepo;
         this.userRepo = userRepo;
+        this.contractRepo = contractRepo;
     }
 
     // --- LOGIC MAHASISWA APPLY ---
     @Transactional
     public ApplyProjectResponse applyToProject(Long projectId, Long studentId, ApplyProjectRequest req) {
-        // 1. Validasi User
-        User student = userRepo.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User student = userRepo.findById(studentId).orElseThrow(() -> new RuntimeException("User not found"));
+        if (student.getRole() != Role.MAHASISWA) throw new RuntimeException("Only students can apply");
 
-        if (student.getRole() != Role.MAHASISWA) {
-            throw new RuntimeException("Hanya mahasiswa yang boleh apply project");
-        }
+        Project project = projectRepo.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        if (project.getStatus() != ProjectStatus.OPEN) throw new RuntimeException("Project closed");
 
-        // 2. Validasi Project
-        Project project = projectRepo.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
-
-        if (project.getStatus() != ProjectStatus.OPEN) {
-            throw new RuntimeException("Project sudah tidak menerima aplikasi");
-        }
-
-        // 3. Validasi Duplikasi
         if (applicationRepo.existsByProjectIdAndStudentId(projectId, studentId)) {
-            throw new RuntimeException("You have already applied for this project");
+            throw new RuntimeException("Already applied");
         }
 
-        // 4. Simpan Aplikasi
         Application application = new Application();
         application.setProject(project);
         application.setStudent(student);
@@ -68,72 +63,88 @@ public class ApplicationService {
         application.setStatus(ApplicationStatus.PENDING);
 
         Application saved = applicationRepo.save(application);
-
-        return new ApplyProjectResponse(
-                saved.getId(),
-                saved.getProject().getId(),
-                saved.getStudent().getId(),
-                saved.getStatus().name()
-        );
+        return new ApplyProjectResponse(saved.getId(), saved.getProject().getId(), saved.getStudent().getId(), saved.getStatus().name());
     }
 
     // --- LOGIC UMKM MELIHAT LIST PELAMAR ---
     public List<ApplicantResponse> getApplicantsForProject(Long ownerId, Long projectId) {
-        Project project = projectRepo.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
-
-        if (!project.getOwner().getId().equals(ownerId)) {
-            throw new RuntimeException("Unauthorized: You are not the owner of this project");
-        }
+        Project project = projectRepo.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        if (!project.getOwner().getId().equals(ownerId)) throw new RuntimeException("Unauthorized");
 
         List<Application> apps = applicationRepo.findByProjectId(projectId);
-
         return apps.stream().map(app -> new ApplicantResponse(
-                app.getId(),
-                app.getStudent().getId(),      // ✅ FIX: Sesuai Entity (student)
-                app.getStudent().getNama(),    // ✅ FIX: Sesuai Entity (student)
-                app.getStudent().getEmail(),   // ✅ FIX: Sesuai Entity (student)
-                app.getProposal(),             // ✅ FIX: Sesuai Entity (proposal)
-                app.getBidAmount(),
-                app.getStatus().name(),
-                app.getCreatedAt()
+                app.getId(), app.getStudent().getId(), app.getStudent().getNama(), app.getStudent().getEmail(),
+                app.getProposal(), app.getBidAmount(), app.getStatus().name(), app.getCreatedAt()
         )).collect(Collectors.toList());
     }
 
-    // --- LOGIC UMKM MENERIMA PELAMAR ---
+    // --- LOGIC UMKM MENERIMA PELAMAR + BUAT KONTRAK (FR-08 & FR-09) ---
     @Transactional
     public void acceptApplicant(Long ownerId, Long projectId, Long applicationId) {
-        Project project = projectRepo.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
-
-        if (!project.getOwner().getId().equals(ownerId)) {
-            throw new RuntimeException("Unauthorized Access");
-        }
-
-        if (project.getStatus() != ProjectStatus.OPEN) {
-            throw new RuntimeException("Project is already closed or ongoing");
-        }
+        Project project = projectRepo.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        if (!project.getOwner().getId().equals(ownerId)) throw new RuntimeException("Unauthorized");
+        if (project.getStatus() != ProjectStatus.OPEN) throw new RuntimeException("Project not open");
 
         List<Application> allApps = applicationRepo.findByProjectId(projectId);
-        boolean found = false;
+        Application acceptedApp = null;
 
         for (Application app : allApps) {
             if (app.getId().equals(applicationId)) {
                 app.setStatus(ApplicationStatus.APPROVED);
-                found = true;
-            } else {
-                if (app.getStatus() == ApplicationStatus.PENDING) {
-                    app.setStatus(ApplicationStatus.REJECTED);
-                }
+                acceptedApp = app;
+            } else if (app.getStatus() == ApplicationStatus.PENDING) {
+                app.setStatus(ApplicationStatus.REJECTED);
             }
         }
 
-        if (!found) throw new RuntimeException("Application ID not found in this project");
+        if (acceptedApp == null) throw new RuntimeException("Application ID not found");
 
         project.setStatus(ProjectStatus.ONGOING);
         projectRepo.save(project);
-
-        // ✅ FIX: Menggunakan variabel applicationRepo (bukan appRepo)
         applicationRepo.saveAll(allApps);
+
+        // ✅ FR-09: GENERATE DIGITAL CONTRACT
+        String contractText = generateContractText(project, acceptedApp);
+        
+        Contract contract = new Contract();
+        contract.setProject(project);
+        contract.setUmkm(project.getOwner());
+        contract.setStudent(acceptedApp.getStudent());
+        contract.setContent(contractText);
+        
+        contractRepo.save(contract); // Save to DB
+    }
+    
+    // Helper to generate the text
+    private String generateContractText(Project p, Application app) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+        return "SURAT PERJANJIAN KERJASAMA (SPK)\n" +
+               "Nomor: QT/CTR/" + p.getId() + "/" + System.currentTimeMillis() + "\n\n" +
+               "Pada hari ini, " + LocalDateTime.now().format(fmt) + ", telah disepakati kerjasama antara:\n\n" +
+               "PIHAK PERTAMA (PEMBERI KERJA):\n" +
+               "Nama: " + p.getOwner().getNama() + "\n" +
+               "Email: " + p.getOwner().getEmail() + "\n\n" +
+               "PIHAK KEDUA (PELAKSANA):\n" +
+               "Nama: " + app.getStudent().getNama() + "\n" +
+               "Email: " + app.getStudent().getEmail() + "\n\n" +
+               "Kedua belah pihak sepakat untuk melaksanakan pekerjaan dengan detail:\n" +
+               "- Judul Project: " + p.getTitle() + "\n" +
+               "- Kategori: " + p.getCategory() + "\n" +
+               "- Nilai Kontrak: Rp " + app.getBidAmount() + "\n" +
+               "- Deadline: " + p.getDeadline() + "\n\n" +
+               "Surat ini digenerate secara otomatis oleh sistem QuickTurn dan sah sebagai bukti kerjasama digital.";
+    }
+    
+    // --- GET CONTRACT ---
+    public String getContractByProject(Long projectId, Long userId) {
+        Contract contract = contractRepo.findByProjectId(projectId)
+                .orElseThrow(() -> new RuntimeException("Kontrak belum terbit"));
+        
+        // Security check
+        if(!contract.getUmkm().getId().equals(userId) && !contract.getStudent().getId().equals(userId)) {
+             throw new RuntimeException("Unauthorized");
+        }
+        
+        return contract.getContent();
     }
 }

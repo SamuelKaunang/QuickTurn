@@ -119,4 +119,17 @@ public class ProjectController {
             return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
         }
     }
+    // --- GET DIGITAL CONTRACT (FR-09) ---
+    @GetMapping("/{projectId}/contract")
+    public ResponseEntity<ApiResponse<String>> getContract(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal User user
+    ) {
+        try {
+            String contractContent = applicationSvc.getContractByProject(projectId, user.getId());
+            return ResponseEntity.ok(ApiResponse.ok("Contract retrieved", contractContent));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
+    }
 }
