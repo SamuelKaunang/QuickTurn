@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './RegistrationPageM.css';
-import { useNavigate } from 'react-router-dom';
 
-function RegistrationPage() {
+function RegistrationPageM() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -14,25 +13,13 @@ function RegistrationPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
-    const handleRoleToggle = (role) => {
+  const handleRoleToggle = (role) => {
       navigate(role === 'UMKM' ? '/registeru' : '/registerm');
   };
 
   const handleRegistration = async () => {
-    if (!name) {
-      setMessage('Harap isi nama.');
-      return;
-    }
-    if (!email) {
-      setMessage('Harap isi email.');
-      return;
-    }
-    if (!password) {
-      setMessage('Harap isi password.');
-      return;
-    }
-    if (!confirmPassword) {
-      setMessage('Harap konfirmasi password.');
+    if (!name || !email || !password || !confirmPassword) {
+      setMessage('Harap isi semua kolom.');
       return;
     }
 
@@ -42,21 +29,30 @@ function RegistrationPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/register', {
+      // 1. FIX: Use relative path (Proxy)
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        // 2. FIX: Send the ROLE explicitly
+        body: JSON.stringify({ 
+            nama: name, 
+            email, 
+            password, 
+            role: 'MAHASISWA' 
+        })
       });
 
       const data = await response.json();
 
-      if (data.success === true) {
+      if (response.ok && data.success) {
+        alert("Registrasi Berhasil! Silakan Login.");
         navigate('/login');
-      } else if (data.message) {
-        setMessage(data.message);
+      } else {
+        setMessage(data.message || "Registrasi Gagal");
       }
     } catch (err) {
       setMessage('Terjadi kesalahan saat menghubungi server.');
+      console.error(err);
     }
   };
 
@@ -102,16 +98,10 @@ function RegistrationPage() {
             value={confirmPassword}
             onChange={(e) => {
               setConfirmPassword(e.target.value);
-              if (e.target.value === password) {
-                setPasswordMatch(true);
-              } else if (e.target.value !== '') {
-                setPasswordMatch(false);
-              } else {
-                setPasswordMatch(null);
-              }
+              setPasswordMatch(e.target.value === password);
             }}
             style={{
-              borderColor: passwordMatch === true ? 'green' : passwordMatch === false ? 'red' : 'initial',
+              borderColor: passwordMatch === true ? 'green' : passwordMatch === false ? 'red' : '#ccc',
             }}
           />
           <button
@@ -129,13 +119,14 @@ function RegistrationPage() {
           Sudah punya akun? <Link className="registration-login-link" to="/login">Login disini</Link>
         </p>
       </div>
-      {/* Role Toggle */}
+      
+      {/* Role Toggle at the bottom allows switching to UMKM */}
       <div className="role-toggle">
         <button className="role-btn" onClick={() => handleRoleToggle('UMKM')}>UMKM</button>
-        <button className="role-btn active" onClick={() => handleRoleToggle('Mahasiswa')}>Mahasiswa</button>
+        <button className="role-btn active" disabled>Mahasiswa</button>
       </div>
     </div>
   );
 }
 
-export default RegistrationPage;
+export default RegistrationPageM;

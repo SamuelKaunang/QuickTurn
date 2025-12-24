@@ -3,118 +3,179 @@ body, html {
   padding: 0;
   height: 100%;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Added font for better look */
 }
 
 .registration-page {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: 100vh;
+  flex-direction: column; /* FIX: Stacks card and buttons vertically */
+  justify-content: center; /* Centers everything vertically */
+  align-items: center;     /* Centers everything horizontally */
+  min-height: 100vh;       /* Ensures full height */
+  padding: 20px;
 }
 
 .registration-container {
   width: 350px;
-  margin: 20px auto 0;
-  padding: 20px;
-  border: 1px solid #ff0000;
+  padding: 30px;
   text-align: center;
-  background-color: #FFFFFF;
   color: rgb(255, 255, 255);
-  background: rgba(79, 79, 79, 0.53);
+  background: rgba(30, 30, 30, 0.6); /* Slightly darker for better contrast */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
   border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(6.4px);
-  -webkit-backdrop-filter: blur(6.4px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  margin-bottom: 20px; /* Space between card and toggle buttons */
 }
 
+.registration-container h2 {
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* Input Fields */
 .registration-input-field {
   color: #ffffff;
   width: 100%;
-  padding: 8px;
-  margin: 10px 0;
-  border: 1px solid #ffffff;
-  border-radius: 5px;
-  background-color: #eeeeee00;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
   box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.registration-input-field:focus {
+  border-color: #e50914; /* Red highlight on focus */
 }
 
 .registration-input-field::placeholder {
-  color: #ffffff;
-  opacity: 0.5;
+  color: #cccccc;
+  opacity: 0.7;
 }
 
-.registration-button {
-  width: 100%;
-  padding: 8px;
-  background-color: #e50914;
-  color: white;
-  margin-top: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.registration-button:hover {
-  opacity: 0.9;
-}
-
-.registration-message {
-  margin-top: 15px;
-  color: #d9534f;
-  font-weight: bold;
-}
-
-.registration-login-text {
-  text-align: center;
-  margin-top: 10px;
-  color: #ffffff;
-}
-
-.registration-login-link {
-  color: #ff0000;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.registration-login-link:hover {
-  color: #7668f4;
-}
-
-.registration-password-wrapper {
-  position: relative;
-  width: 100%;
-  margin: 10px 0;
-}
-
+/* Password Wrappers */
+.registration-password-wrapper,
 .registration-confirm-password-wrapper {
   position: relative;
   width: 100%;
-  margin: 10px 0;
+  margin: 8px 0;
 }
 
-.registration-password-wrapper .registration-input-field {
-  padding-right: 40px;
+.registration-password-wrapper .registration-input-field,
+.registration-confirm-password-wrapper .registration-input-field {
+  padding-right: 45px; /* Space for the eye icon */
 }
 
-.registration-toggle-password {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-}
-
+.registration-toggle-password,
 .registration-toggle-confirm-password {
   position: absolute;
-  right: 10px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 1.2rem;
+  color: #ffffff;
+  opacity: 0.7;
+  transition: opacity 0.2s;
 }
 
+.registration-toggle-password:hover,
+.registration-toggle-confirm-password:hover {
+  opacity: 1;
+}
+
+/* Main Action Button */
+.registration-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #e50914; /* Netflix Red */
+  color: white;
+  margin-top: 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: transform 0.1s, background-color 0.2s;
+}
+
+.registration-button:hover {
+  background-color: #f40612;
+  transform: scale(1.02);
+}
+
+.registration-button:active {
+  transform: scale(0.98);
+}
+
+/* Messages & Links */
+.registration-message {
+  margin-top: 15px;
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  min-height: 20px;
+}
+
+.registration-login-text {
+  margin-top: 15px;
+  color: #bbbbbb;
+  font-size: 0.9rem;
+}
+
+.registration-login-link {
+  color: #ffffff;
+  font-weight: bold;
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+.registration-login-link:hover {
+  text-decoration: underline;
+  color: #e50914;
+}
+
+/* --- NEW: ROLE TOGGLE BUTTONS --- */
+.role-toggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 5px;
+  border-radius: 30px;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.role-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.role-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* The Active State (Selected Button) */
+.role-btn.active {
+  background-color: #e50914;
+  color: white;
+  box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+}
+
+/* Disabled state for the button representing the current page */
+.role-btn.active:disabled {
+  cursor: default;
+  pointer-events: none;
+}
