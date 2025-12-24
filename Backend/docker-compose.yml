@@ -32,9 +32,6 @@ services:
     networks:
       - app-network
 
-  # Mongo Express
-
-
   # Backend Spring Boot
   backend:
     build: .
@@ -46,13 +43,29 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/quickturn?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Jakarta&characterEncoding=utf8
       SPRING_DATASOURCE_USERNAME: quickturn
       SPRING_DATASOURCE_PASSWORD: password123
-
       SPRING_DATA_MONGODB_URI: mongodb://root:example@mongodb:27017/quickturn_chat?authSource=admin
-
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     ports:
       - "8080:8080"
     restart: always
+    networks:
+      - app-network
+
+  # [NEW] Frontend React App
+  frontend:
+    build:
+      context: ../Frontend/quickturn  # Points to your Frontend folder
+      dockerfile: Dockerfile
+    container_name: quickturn-frontend
+    ports:
+      - "3000:3000"  # Access via http://localhost:3000
+    volumes:
+      - ../Frontend/quickturn:/app  # Hot-reloading: changes in VS Code show up in browser
+      - /app/node_modules       # Keep container node_modules separate from Windows
+    environment:
+      - WATCHPACK_POLLING=true  # Required for hot-reloading on Windows
+    depends_on:
+      - backend
     networks:
       - app-network
 
@@ -70,6 +83,8 @@ services:
       - mysql
     networks:
       - app-network
+
+  # Mongo Express
   mongo-express:
     image: mongo-express
     container_name: mongo-express
