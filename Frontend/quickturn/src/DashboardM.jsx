@@ -93,11 +93,21 @@ const DashboardM = () => {
           <ul className="nav-menuM">
             <li><a href="#" className={activeTab === 'browse' ? 'active' : ''} onClick={() => setActiveTab('browse')}>Home</a></li>
             <li><a href="#" className={activeTab === 'active' ? 'active' : ''} onClick={() => setActiveTab('active')}>My Projects</a></li>
-            <li><a href="#">Messages</a></li>
+            
+            {/* ✅ UPDATED MESSAGES LINK */}
+            <li>
+                <span 
+                    onClick={() => navigate('/chat')} 
+                    style={{cursor: 'pointer', color: '#ccc', fontSize:'14px', transition:'0.3s'}}
+                    onMouseOver={(e) => e.target.style.color='white'}
+                    onMouseOut={(e) => e.target.style.color='#ccc'}
+                >
+                    Messages
+                </span>
+            </li>
           </ul>
         </nav>
         <div className="header-rightM">
-            {/* ✅ LINK TO FULL PROFILE PAGE */}
             <div 
                 className="profile-btnM" 
                 onClick={() => navigate('/profile-mahasiswa')} 

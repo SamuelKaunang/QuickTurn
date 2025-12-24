@@ -8,6 +8,7 @@ import DashboardM from "./DashboardM";
 import PostProject from "./PostProject";
 import ProfileM from './ProfileM';
 import ProfileU from './ProfileU';
+import ChatPage from './ChatPage';
 
 function App() {
   return (
@@ -24,6 +25,8 @@ function App() {
 
         <Route path="/profile-mahasiswa" element={<ProfileM />} />
         <Route path="/profile-umkm" element={<ProfileU />} />
+
+        <Route path="/chat" element={<ChatPage />} />
         
         {/* Feature Routes */}
         {/* FIXED: Added hyphen to match DashboardU navigation */}

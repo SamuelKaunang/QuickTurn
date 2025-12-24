@@ -61,18 +61,27 @@ const DashboardU = () => {
 
   return (
     <div className="dashboardU">
-      {/* HEADER (Identical to DashboardM) */}
       <header className={`headerU ${isScrolled ? 'scrolled' : ''}`}>
         <div className="logoU">QuickTurn</div>
         <nav>
           <ul className="nav-menuU">
             <li><a href="#" className="active">Home</a></li>
             <li><a href="#">My Projects</a></li>
-            <li><a href="#">Messages</a></li>
+            
+            {/* ✅ UPDATED MESSAGES LINK */}
+            <li>
+                <span 
+                    onClick={() => navigate('/chat')} 
+                    style={{cursor: 'pointer', color: '#ccc', fontSize:'14px', transition:'0.3s'}}
+                    onMouseOver={(e) => e.target.style.color='white'}
+                    onMouseOut={(e) => e.target.style.color='#ccc'}
+                >
+                    Messages
+                </span>
+            </li>
           </ul>
         </nav>
         <div className="header-rightU">
-           {/* ✅ Profile Icon (Navigate to Profile Page) */}
            <div 
                 className="profile-btnU" 
                 onClick={() => navigate('/profile-umkm')} 
@@ -90,15 +99,12 @@ const DashboardU = () => {
       </header>
 
       <main className="main-contentU">
-        
-        {/* ✅ HERO SECTION (Identical Structure to DashboardM) */}
         <section className="heroU">
           <div className="hero-overlayU">
             <div className="hero-badgeU">🚀 HIRING</div>
             <h1>Percepat Proses Perekrutan</h1>
             <p>Posting lowongan pekerjaan dan temukan kandidat mahasiswa terbaik untuk bisnis Anda.</p>
             <div className="hero-btnsU">
-              {/* Main Action: Post Project */}
               <button className="btn-primaryU" onClick={() => navigate('/post-project')}>
                 <i className="fas fa-plus"></i> Post Project
               </button>
@@ -106,7 +112,6 @@ const DashboardU = () => {
           </div>
         </section>
 
-        {/* STATS GRID */}
         <div className="stats-grid-new">
             <div className="stat-card-new">
                 <div className="stat-icon-box red"><i className="fas fa-briefcase"></i></div>
@@ -130,9 +135,6 @@ const DashboardU = () => {
             </div>
         </div>
 
-        {/* ❌ QUICK ACTIONS REMOVED (To match DashboardM) */}
-
-        {/* PROJECT LIST */}
         <div className="section-titleU">
           <span>●</span> Project Terbaru
         </div>
@@ -146,7 +148,6 @@ const DashboardU = () => {
         />
       </main>
 
-      {/* MODALS */}
       {showApplicantsModal && (
           <ApplicantsModalU 
               projectId={selectedProjectId}
