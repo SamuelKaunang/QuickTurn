@@ -6,17 +6,26 @@ import RegistrationPageM from './RegistrationPageM';
 import DashboardU from "./DashboardU";
 import DashboardM from "./DashboardM";
 import PostProject from "./PostProject";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Auth Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registeru" element={<RegistrationPageU/>} />
         <Route path="/registerm" element={<RegistrationPageM/>} />
+        
+        {/* Dashboard Routes */}
         <Route path="/dashboardu" element={<DashboardU />} />
         <Route path="/dashboardm" element={<DashboardM />} />
+        
+        {/* Feature Routes */}
+        {/* FIXED: Added hyphen to match DashboardU navigation */}
+        <Route path="/post-project" element={<PostProject />} />
+        
+        {/* Default / Fallback */}
         <Route path="*" element={<LoginPage />} />
-        <Route path="/postproject" element={<PostProject />} />
       </Routes>
     </BrowserRouter>
   );
