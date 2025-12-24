@@ -1,9 +1,9 @@
 * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
 body {
     min-height: fit-content;
@@ -63,29 +63,6 @@ body {
     gap: 20px;
 }
 
-.search-boxU {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 4px;
-    padding: 8px 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    backdrop-filter: blur(10px);
-}
-
-.search-boxU input {
-    background: transparent;
-    border: none;
-    color: #fff;
-    outline: none;
-    width: 200px;
-}
-
-.search-boxU input::placeholder {
-    color: #888;
-}
-
 .profile-btnU {
     width: 35px;
     height: 35px;
@@ -120,16 +97,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-}
-
-.hero-badgeU {
-    background: #e50914;
-    padding: 5px 15px;
-    border-radius: 3px;
-    font-size: 12px;
-    font-weight: bold;
-    width: fit-content;
-    margin-bottom: 15px;
 }
 
 .heroU h1 {
@@ -169,25 +136,6 @@ body {
     background: #f40612;
 }
 
-.btn-glassU {
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
-    padding: 12px 30px;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s;
-}
-
-.btn-glassU:hover {
-    background: rgba(255,255,255,0.25);
-}
-
 /* Section Title */
 .section-titleU {
     font-size: 22px;
@@ -206,10 +154,6 @@ body {
     color: #b3b3b3;
     cursor: pointer;
     margin-left: auto;
-}
-
-.see-allU:hover {
-    color: #fff;
 }
 
 /* Project Cards Row */
@@ -254,17 +198,9 @@ body {
     position: relative;
 }
 
-.card-headerU.design {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.card-headerU.marketing {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.card-headerU.it {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
+.card-headerU.design { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.card-headerU.marketing { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.card-headerU.it { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
 
 .card-headerU i {
     font-size: 40px;
@@ -282,17 +218,9 @@ body {
     background: rgba(0,0,0,0.6);
 }
 
-.card-statusU.open {
-    color: #46d369;
-}
+.card-statusU.open { color: #46d369; }
 
-.card-statusU.ongoing {
-    color: #ffc107;
-}
-
-.card-bodyU {
-    padding: 20px;
-}
+.card-bodyU { padding: 20px; }
 
 .card-categoryU {
     font-size: 12px;
@@ -345,11 +273,6 @@ body {
     transition: all 0.3s;
 }
 
-.stat-card:hoverU {
-    background: rgba(255,255,255,0.1);
-    transform: translateY(-5px);
-}
-
 .stat-iconU {
     width: 50px;
     height: 50px;
@@ -361,20 +284,9 @@ body {
     font-size: 22px;
 }
 
-.stat-iconU.red {
-    background: rgba(229,9,20,0.2);
-    color: #e50914;
-}
-
-.stat-iconU.green {
-    background: rgba(70,211,105,0.2);
-    color: #46d369;
-}
-
-.stat-iconU.blue {
-    background: rgba(79,172,254,0.2);
-    color: #4facfe;
-}
+.stat-iconU.red { background: rgba(229,9,20,0.2); color: #e50914; }
+.stat-iconU.green { background: rgba(70,211,105,0.2); color: #46d369; }
+.stat-iconU.blue { background: rgba(79,172,254,0.2); color: #4facfe; }
 
 .stat-valueU {
     font-size: 32px;
@@ -408,7 +320,7 @@ body {
     transition: all 0.3s;
 }
 
-.action-card:hoverU {
+.action-cardU:hover {
     background: rgba(229,9,20,0.1);
     border-color: rgba(229,9,20,0.3);
 }
@@ -424,54 +336,196 @@ body {
     font-size: 24px;
 }
 
-.action-text h3U {
+.action-textU h3 {
     font-size: 18px;
     margin-bottom: 5px;
 }
 
-.action-text pU {
+.action-textU p {
     color: #888;
     font-size: 14px;
 }
 
-/* Role Toggle */
-.role-toggleU {
+/* =========================================
+   MODAL STYLES (New for FR-04)
+========================================= */
+.modal-overlayU {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 50px;
-    padding: 5px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
     display: flex;
-    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
 }
 
-.role-btnU {
-    padding: 10px 20px;
-    border-radius: 50px;
-    border: none;
-    background: transparent;
-    color: #888;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 14px;
+.modal-contentU {
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: slideUp 0.3s ease;
 }
 
-.role-btn.activeU {
-    background: #e50914;
+.modal-headerU {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+.modal-headerU h3 {
+    font-size: 20px;
     color: #fff;
 }
 
+.close-btnU {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-btnU:hover {
+    color: #fff;
+}
+
+.modal-formU {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-groupU {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-rowU {
+    display: flex;
+    gap: 15px;
+}
+
+.form-groupU label {
+    font-size: 14px;
+    color: #b3b3b3;
+}
+
+.form-groupU input, .form-groupU textarea, .form-groupU select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-groupU textarea {
+    height: 100px;
+    resize: none;
+}
+
+.form-groupU input:focus, .form-groupU textarea:focus, .form-groupU select:focus {
+    border-color: #e50914;
+}
+
+.form-groupU select option {
+    background-color: #1a1a2e;
+    color: #fff;
+}
+
+.modal-actionsU {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn-cancelU {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #b3b3b3;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-cancelU:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.btn-submitU {
+    background: #e50914;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.btn-submitU:hover {
+    background: #f40612;
+}
+
+.msg-error {
+    color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.msg-success {
+    color: #46d369;
+    background: rgba(70, 211, 105, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
     .headerU { padding: 15px 20px; }
     .nav-menuU { display: none; }
     .main-contentU { padding: 80px 20px 20px; }
     .heroU { height: 350px; }
-    .hero h1U { font-size: 28px; }
+    .heroU h1 { font-size: 28px; }
     .hero-overlayU { padding: 30px; }
     .stats-gridU { grid-template-columns: repeat(2, 1fr); }
     .quick-actionsU { flex-direction: column; }
-    .search-box inputU { width: 120px; }
+    .form-rowU { flex-direction: column; gap: 15px; }
 }

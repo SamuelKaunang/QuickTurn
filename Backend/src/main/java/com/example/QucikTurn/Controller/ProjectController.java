@@ -2,10 +2,10 @@ package com.example.QucikTurn.Controller;
 
 import com.example.QucikTurn.Entity.Project;
 import com.example.QucikTurn.Entity.User;
-import com.example.QucikTurn.Service.ApplicationService; // ✅ Pastikan Import ini ada
+import com.example.QucikTurn.Service.ApplicationService;
 import com.example.QucikTurn.Service.ProjectService;
 import com.example.QucikTurn.dto.ApiResponse;
-import com.example.QucikTurn.dto.ApplicantResponse;     // ✅ Pastikan Import ini ada
+import com.example.QucikTurn.dto.ApplicantResponse;
 import com.example.QucikTurn.dto.CreateProjectRequest;
 import com.example.QucikTurn.dto.FinishProjectRequest;
 import jakarta.validation.Valid;
@@ -21,13 +21,10 @@ import java.util.Map;
 public class ProjectController {
 
     private final ProjectService projectSvc;
-    private final ApplicationService applicationSvc; // ✅ Variabel ini yang error tadi
+    private final ApplicationService applicationSvc;
 
-    // --- PERBAIKAN DI SINI (CONSTRUCTOR) ---
     public ProjectController(ProjectService projectSvc, ApplicationService applicationSvc) {
         this.projectSvc = projectSvc;
-
-        // ⚠️ INI YANG KEMUNGKINAN HILANG DI CODINGAN KAMU SEBELUMNYA:
         this.applicationSvc = applicationSvc;
     }
 
@@ -40,6 +37,14 @@ public class ProjectController {
         Project project = projectSvc.createProject(user.getId(), req);
         return ResponseEntity.status(201)
                 .body(ApiResponse.ok("Project berhasil dibuat", project));
+    }
+
+    // --- GET MY PROJECTS (UMKM) ---
+    // ✅ ADDED THIS ENDPOINT
+    @GetMapping("/my-projects")
+    public ResponseEntity<ApiResponse<List<Project>>> getMyProjects(@AuthenticationPrincipal User user) {
+        List<Project> list = projectSvc.getProjectsByOwner(user.getId());
+        return ResponseEntity.ok(ApiResponse.ok("Projects retrieved", list));
     }
 
     // --- LIHAT PELAMAR ---
