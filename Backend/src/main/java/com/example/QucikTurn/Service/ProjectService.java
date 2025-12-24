@@ -57,13 +57,17 @@ public class ProjectService {
         return projectRepo.findByOwnerId(ownerId);
     }
 
-    // --- GET ALL OPEN PROJECTS (For Students) ---
-    // ✅ ADDED THIS METHOD
+    // --- GET ALL OPEN PROJECTS (For Browsing) ---
     public List<Project> getAllOpenProjects() {
         return projectRepo.findByStatus(ProjectStatus.OPEN);
     }
 
-    // --- MAHASISWA SUBMIT FINISHING ---
+    // --- GET PROJECTS BY STUDENT (For My Projects Tab) ---
+    public List<Project> getProjectsByStudent(Long studentId) {
+        return projectRepo.findProjectsByStudentId(studentId);
+    }
+
+    // --- MAHASISWA SUBMIT FINISHING (FR-07: Update Status to DONE) ---
     @Transactional
     public void submitFinishing(Long projectId, Long studentId, String finishingLink) {
         Project project = projectRepo.findById(projectId)
@@ -101,10 +105,14 @@ public class ProjectService {
         
         project.setFinishingLink(finishingLink);
         project.setFinishingSubmittedAt(LocalDateTime.now());
+        
+        // ✅ FR-07 UPDATE: Set status to DONE (Waiting for UMKM Review)
+        project.setStatus(ProjectStatus.DONE);
+        
         projectRepo.save(project);
     }
 
-    // --- UMKM CONFIRM FINISHING ---
+    // --- UMKM CONFIRM FINISHING (FR-07: Check DONE Status) ---
     @Transactional
     public void confirmFinishing(Long projectId, Long umkmId) {
         Project project = projectRepo.findById(projectId)
@@ -120,12 +128,9 @@ public class ProjectService {
             throw new RuntimeException("Only UMKM can confirm finishing");
         }
         
-        if (project.getFinishingLink() == null || project.getFinishingSubmittedAt() == null) {
-            throw new RuntimeException("Finishing has not been submitted by the student");
-        }
-        
-        if (project.getStatus() != ProjectStatus.ONGOING) {
-            throw new RuntimeException("Project is not in ONGOING status");
+        // ✅ FR-07 UPDATE: Check if status is DONE (meaning student has submitted work)
+        if (project.getStatus() != ProjectStatus.DONE) {
+            throw new RuntimeException("Student has not submitted the work yet (Status is not DONE)");
         }
         
         project.setStatus(ProjectStatus.CLOSED);

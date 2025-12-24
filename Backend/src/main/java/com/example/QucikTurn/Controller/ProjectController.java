@@ -45,12 +45,18 @@ public class ProjectController {
         return ResponseEntity.ok(ApiResponse.ok("Projects retrieved", list));
     }
 
-    // --- GET ALL OPEN PROJECTS (For Students) ---
-    // ✅ ADDED THIS ENDPOINT
+    // --- GET ALL OPEN PROJECTS (For Students Browsing) ---
     @GetMapping
     public ResponseEntity<ApiResponse<List<Project>>> getAllProjects() {
         List<Project> list = projectSvc.getAllOpenProjects(); 
         return ResponseEntity.ok(ApiResponse.ok("All open projects retrieved", list));
+    }
+
+    // --- ✅ NEW: GET PROJECTS I'M PARTICIPATING IN (For Students Dashboard) ---
+    @GetMapping("/participating")
+    public ResponseEntity<ApiResponse<List<Project>>> getParticipatingProjects(@AuthenticationPrincipal User user) {
+        List<Project> list = projectSvc.getProjectsByStudent(user.getId());
+        return ResponseEntity.ok(ApiResponse.ok("Participating projects retrieved", list));
     }
 
     // --- LIHAT PELAMAR ---

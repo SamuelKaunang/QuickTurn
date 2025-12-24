@@ -1,0 +1,91 @@
+/* FORCE the modal to cover the whole screen */
+.modal-overlay-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85); /* Darker background */
+    backdrop-filter: blur(8px); /* Blur effect */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Force it on top of everything */
+    animation: fadeIn 0.2s ease;
+}
+
+/* The Modal Box */
+.modal-box-modern {
+    background: #151521; /* Dark modern color */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 600px;
+    max-width: 90%;
+    max-height: 80vh;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+.modal-header-modern {
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.02);
+}
+
+.modal-header-modern h3 { font-size: 18px; color: white; margin: 0; }
+
+.btn-close-modern {
+    background: none; border: none; color: #666; font-size: 20px; cursor: pointer;
+    transition: color 0.2s;
+}
+.btn-close-modern:hover { color: white; }
+
+/* Scrollable List Area */
+.modal-body-scroll {
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Individual Applicant Card */
+.applicant-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+.applicant-item:hover { background: rgba(255,255,255,0.06); }
+
+.applicant-details h4 { color: #e50914; margin-bottom: 5px; font-size: 16px; }
+.applicant-details p { color: #aaa; font-size: 13px; margin-bottom: 3px; }
+.applicant-quote { font-style: italic; color: #666; font-size: 12px; }
+
+.btn-accept-modern {
+    background: #46d369; /* Green for Accept */
+    color: #000;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-accept-modern:hover { background: #3ab559; transform: scale(1.05); }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
