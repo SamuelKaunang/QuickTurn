@@ -5,12 +5,16 @@ public record AuthResponse(
         String message,
         String accessToken,
         String tokenType,
-        long expiresIn
+        long expiresIn,
+        String role // <--- NEW FIELD
 ) {
-    public static AuthResponse ok(String token, long exp){
-        return new AuthResponse(true, "Login successful", token, "Bearer", exp);
+    // Helper for success response
+    public static AuthResponse ok(String token, long exp, String role) {
+        return new AuthResponse(true, "Login successful", token, "Bearer", exp, role);
     }
-    public static AuthResponse bad(String msg){
-        return new AuthResponse(false, msg, null, null, 0);
+
+    // Helper for failure response
+    public static AuthResponse bad(String msg) {
+        return new AuthResponse(false, msg, null, null, 0, null);
     }
 }

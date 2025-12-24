@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './LoginPage.css';
-import { useNavigate } from 'react-router-dom';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -17,19 +16,42 @@ function LoginPage() {
     }
   
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password}),
+        body: JSON.stringify({ email, password }),
       });
   
-      const data = await response.json();
+      const responseJson = await response.json();
   
       if (response.ok) {
-        localStorage.setItem('token', data.token); 
-        navigate('/profile');
+        // Extract the data object from the response
+        const data = responseJson.data;
+
+        // 1. Save Token and Role
+        localStorage.setItem('token', data.accessToken); 
+        
+        // Ensure role is uppercase to match logic below
+        const role = data.role ? data.role.toUpperCase() : "";
+        localStorage.setItem('role', role);
+
+        // 2. Switch Page based on Role
+        if (role === 'MAHASISWA') {
+            navigate('/dashboardm');
+        } 
+        else if (role === 'UMKM' || role === 'UKM') {
+            navigate('/dashboardu');
+        } 
+        else if (role === 'ADMIN') {
+            navigate('/dashboardu'); 
+        }
+        else {
+            // Fallback for unknown roles (defaults to Mahasiswa dashboard)
+            navigate('/dashboardm');
+        }
+
       } else {
-        setMessage(data.error || "Login gagal");
+        setMessage(responseJson.message || "Login gagal");
       }
     } catch (err) {
       setMessage("Terjadi kesalahan saat menghubungi server");
@@ -69,7 +91,7 @@ function LoginPage() {
         <button className="login-button" onClick={handleLogin}>Login</button>
         <p className="login-message">{message}</p>
         <p className="login-register-text">
-          Belum punya akun? <Link className="login-register-link" to="/register">Daftar disini</Link>
+          Belum punya akun? <Link className="login-register-link" to="/registerm">Daftar disini</Link>
         </p>
       </div>
     </div>

@@ -48,7 +48,8 @@ public class AuthService {
     // -------- REGISTER --------
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            return new AuthResponse(false, "Email already registered", null, null, 0);
+            // FIXED: Added null for the role field in error case
+            return new AuthResponse(false, "Email already registered", null, null, 0, null);
         }
 
         User user = new User();
@@ -63,7 +64,9 @@ public class AuthService {
         claims.put("role", user.getRole().name());
 
         String token = jwtService.generateToken(user.getEmail(), claims);
-        return new AuthResponse(true, "Registration successful", token, "Bearer", (int) jwtService.getExpires());
+        
+        // FIXED: Added user.getRole().name() to the response
+        return new AuthResponse(true, "Registration successful", token, "Bearer", (int) jwtService.getExpires(), user.getRole().name());
     }
 
     // -------- LOGIN --------
@@ -72,7 +75,8 @@ public class AuthService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         } catch (Exception e) {
-            return new AuthResponse(false, "Invalid email or password", null, null, 0);
+            // FIXED: Added null for the role field in error case
+            return new AuthResponse(false, "Invalid email or password", null, null, 0, null);
         }
 
         User user = userRepository.findByEmail(request.email()).orElseThrow();
@@ -81,73 +85,61 @@ public class AuthService {
         claims.put("role", user.getRole().name());
 
         String token = jwtService.generateToken(user.getEmail(), claims);
-        return new AuthResponse(true, "Login successful", token, "Bearer", (int) jwtService.getExpires());
+
+        // FIXED: Added user.getRole().name() to the response
+        return new AuthResponse(true, "Login successful", token, "Bearer", (int) jwtService.getExpires(), user.getRole().name());
     }
 
     // -------- STEP 1: FORGOT PASSWORD (Kirim verification code ke email) --------
     public void processForgotPassword(ForgotPasswordRequest req) {
         userRepository.findByEmail(req.getEmail()).ifPresent(user -> {
-            // Hapus token lama kalau ada
             tokenRepo.findByUser(user).ifPresent(tokenRepo::delete);
 
-            // Buat token baru dengan verification code
             PasswordResetToken token = new PasswordResetToken(user);
             tokenRepo.save(token);
 
-            // Kirim email dengan verification code
             emailService.sendVerificationCodeEmail(user.getEmail(), token.getVerificationCode());
         });
-        // Tidak throw error kalau email tidak ditemukan (prevent user enumeration)
     }
 
     // -------- STEP 2: VERIFY CODE (Validasi code, return reset token) --------
     @Transactional
     public VerifyCodeResponse verifyResetCode(VerifyCodeRequest req) {
-        // Cari token berdasarkan verification code
         PasswordResetToken token = tokenRepo.findByVerificationCode(req.getCode())
                 .orElseThrow(() -> new RuntimeException("Kode verifikasi tidak valid!"));
 
-        // Cek apakah code sudah expired
         if (token.isCodeExpired()) {
             throw new RuntimeException("Kode verifikasi sudah kadaluarsa. Silakan request ulang.");
         }
 
-        // Cek apakah sudah pernah diverifikasi
         if (token.isCodeVerified()) {
             throw new RuntimeException("Kode sudah pernah digunakan. Silakan request ulang.");
         }
 
-        // Mark as verified dan generate reset token
         token.markCodeVerified();
         tokenRepo.save(token);
 
-        // Return reset token dan email (auto-populated)
         return new VerifyCodeResponse(token.getResetToken(), token.getUser().getEmail());
     }
 
     // -------- STEP 3: RESET PASSWORD (Ganti password dengan reset token) --------
     @Transactional
     public void processResetPassword(ResetPasswordRequest req) {
-        // Cari token berdasarkan reset token
         PasswordResetToken token = tokenRepo.findByResetToken(req.getResetToken())
                 .orElseThrow(() -> new RuntimeException("Reset token tidak valid!"));
 
-        // Pastikan code sudah diverifikasi
         if (!token.isCodeVerified()) {
             throw new RuntimeException("Kode belum diverifikasi. Silakan verifikasi kode terlebih dahulu.");
         }
 
-        // Cek apakah reset token sudah expired
         if (token.isResetTokenExpired()) {
             throw new RuntimeException("Reset token sudah kadaluarsa. Silakan request ulang dari awal.");
         }
 
-        // Ganti password user
         User user = token.getUser();
         user.setPasswordHash(passwordEncoder.encode(req.getNewPassword()));
         userRepository.save(user);
 
-        // Hapus token biar gak bisa dipake lagi
         tokenRepo.delete(token);
     }
 }
