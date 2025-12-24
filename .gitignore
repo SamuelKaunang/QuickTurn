@@ -6,3 +6,4 @@ target/
 /Backend/target
 .aider*
 .env
+/Backend/target

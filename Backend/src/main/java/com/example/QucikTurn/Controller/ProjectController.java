@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 
@@ -40,11 +39,18 @@ public class ProjectController {
     }
 
     // --- GET MY PROJECTS (UMKM) ---
-    // ✅ ADDED THIS ENDPOINT
     @GetMapping("/my-projects")
     public ResponseEntity<ApiResponse<List<Project>>> getMyProjects(@AuthenticationPrincipal User user) {
         List<Project> list = projectSvc.getProjectsByOwner(user.getId());
         return ResponseEntity.ok(ApiResponse.ok("Projects retrieved", list));
+    }
+
+    // --- GET ALL OPEN PROJECTS (For Students) ---
+    // ✅ ADDED THIS ENDPOINT
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Project>>> getAllProjects() {
+        List<Project> list = projectSvc.getAllOpenProjects(); 
+        return ResponseEntity.ok(ApiResponse.ok("All open projects retrieved", list));
     }
 
     // --- LIHAT PELAMAR ---

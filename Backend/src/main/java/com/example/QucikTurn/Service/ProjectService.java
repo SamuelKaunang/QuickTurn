@@ -13,7 +13,7 @@ import com.example.QucikTurn.dto.CreateProjectRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-import java.util.List; // <--- ADDED THIS IMPORT
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -52,9 +52,15 @@ public class ProjectService {
         return projectRepo.save(p);
     }
 
-    // --- GET PROJECTS BY OWNER (NEW) ---
+    // --- GET PROJECTS BY OWNER (UMKM) ---
     public List<Project> getProjectsByOwner(Long ownerId) {
         return projectRepo.findByOwnerId(ownerId);
+    }
+
+    // --- GET ALL OPEN PROJECTS (For Students) ---
+    // ✅ ADDED THIS METHOD
+    public List<Project> getAllOpenProjects() {
+        return projectRepo.findByStatus(ProjectStatus.OPEN);
     }
 
     // --- MAHASISWA SUBMIT FINISHING ---
