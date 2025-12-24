@@ -13,7 +13,7 @@ const DashboardM = () => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState("");
   
-  // --- STATS STATE ---
+  // Stats
   const [availableProjectsCount, setAvailableProjectsCount] = useState(0);
   const [myApplicationsCount, setMyApplicationsCount] = useState(0);
   const [projectsDoneCount, setProjectsDoneCount] = useState(0);
@@ -32,7 +32,6 @@ const DashboardM = () => {
         setToken(storedToken);
         setUser({ name: "Mahasiswa User", role: role });
         
-        // Fetch Data for Stats
         fetchAvailableProjects(storedToken);
         fetchStudentStats(storedToken);
     }
@@ -40,7 +39,6 @@ const DashboardM = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [navigate]);
 
-  // 1. Get Count of OPEN Projects (Available)
   const fetchAvailableProjects = async (authToken) => {
       try {
           const response = await fetch("/api/projects", {
@@ -53,7 +51,6 @@ const DashboardM = () => {
       } catch (err) { console.error(err); }
   };
 
-  // 2. Get Student's Personal Stats (Applications, Done, Earnings)
   const fetchStudentStats = async (authToken) => {
       try {
           const response = await fetch("/api/projects/participating", {
@@ -63,15 +60,11 @@ const DashboardM = () => {
           
           if (response.ok) {
               const myProjects = data.data || [];
-              
-              // A. Applications Sent (Total projects I'm involved in)
               setMyApplicationsCount(myProjects.length);
-
-              // B. Projects Done (Status = CLOSED)
+              
               const doneProjects = myProjects.filter(p => p.status === 'CLOSED');
               setProjectsDoneCount(doneProjects.length);
-
-              // C. Total Earnings (Sum of budget from CLOSED projects)
+              
               const earnings = doneProjects.reduce((sum, p) => sum + (p.budget || 0), 0);
               setTotalEarnings(earnings);
           }
@@ -85,7 +78,6 @@ const DashboardM = () => {
       }, 100);
   };
 
-  // Helper to format currency
   const formatCompact = (number) => {
       return new Intl.NumberFormat('en-US', {
           notation: "compact",
@@ -95,30 +87,26 @@ const DashboardM = () => {
 
   return (
     <div className="dashboardM">
-      {/* HEADER */}
       <header className={`headerM ${isScrolled ? 'scrolled' : ''}`}>
         <div className="logoM">QuickTurn</div>
         <nav>
           <ul className="nav-menuM">
-            <li>
-                <a href="#" 
-                   className={activeTab === 'browse' ? 'active' : ''} 
-                   onClick={() => setActiveTab('browse')}>
-                   Home
-                </a>
-            </li>
-            <li>
-                <a href="#" 
-                   className={activeTab === 'active' ? 'active' : ''}
-                   onClick={() => setActiveTab('active')}>
-                   My Projects
-                </a>
-            </li>
+            <li><a href="#" className={activeTab === 'browse' ? 'active' : ''} onClick={() => setActiveTab('browse')}>Home</a></li>
+            <li><a href="#" className={activeTab === 'active' ? 'active' : ''} onClick={() => setActiveTab('active')}>My Projects</a></li>
             <li><a href="#">Messages</a></li>
           </ul>
         </nav>
         <div className="header-rightM">
-            <div className="profile-btnM"><i className="fas fa-user"></i></div>
+            {/* ✅ LINK TO FULL PROFILE PAGE */}
+            <div 
+                className="profile-btnM" 
+                onClick={() => navigate('/profile-mahasiswa')} 
+                style={{cursor:'pointer'}}
+                title="Edit Profile"
+            >
+                <i className="fas fa-user"></i>
+            </div>
+            
             <div className="logout-btnM" style={{cursor:'pointer', marginLeft:'15px', color:'#ccc'}} 
                  onClick={() => {localStorage.clear(); navigate('/login')}}>
                  Logout
@@ -127,7 +115,6 @@ const DashboardM = () => {
       </header>
 
       <main className="main-contentM">
-        {/* HERO SECTION - Only show on Home */}
         {activeTab === 'browse' && (
             <section className="heroM">
             <div className="hero-overlayM">
@@ -143,7 +130,6 @@ const DashboardM = () => {
             </section>
         )}
 
-        {/* === STATS GRID (Dynamic Data) === */}
         <div className="stats-grid-new">
             <div className="stat-card-new">
                 <div className="stat-icon-box red"><i className="fas fa-briefcase"></i></div>
@@ -167,7 +153,6 @@ const DashboardM = () => {
             </div>
         </div>
 
-        {/* CONDITIONAL RENDERING (Project Lists) */}
         <div ref={projectsRef} style={{marginTop: '40px'}}>
             {activeTab === 'browse' ? (
                 <ProjectsM token={token} />
@@ -175,7 +160,6 @@ const DashboardM = () => {
                 <ActiveProjectsM token={token} />
             )}
         </div>
-
       </main>
     </div>
   );

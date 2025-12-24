@@ -3,20 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import './DashboardU.css';
 import ProjectsU from './ProjectsU';
 import ApplicantsModalU from './ApplicantsModalU';
-import ContractModal from './ContractModal'; // ✅ Import Contract Modal
+import ContractModal from './ContractModal';
 
 const DashboardU = () => {
   const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState("");
   const [projects, setProjects] = useState([]); 
   
   // Modals State
   const [showApplicantsModal, setShowApplicantsModal] = useState(false);
-  const [showContractModal, setShowContractModal] = useState(false); // ✅ Contract State
+  const [showContractModal, setShowContractModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
 
   useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+
     const storedToken = localStorage.getItem("token");
     const role = localStorage.getItem("role");
     if (!storedToken || role !== "UMKM") {
@@ -26,6 +30,7 @@ const DashboardU = () => {
         setUser({ name: "UMKM User", role: role });
         fetchProjects(storedToken); 
     }
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [navigate]);
 
   const fetchProjects = async (authToken) => {
@@ -39,7 +44,6 @@ const DashboardU = () => {
       } catch (err) { console.error(err); }
   };
 
-  // === STATS CALCULATION ===
   const totalProjects = projects.length;
   const completedProjects = projects.filter(p => p.status === 'CLOSED').length;
   const totalApplicants = projects.reduce((acc, curr) => acc + (curr.applicantCount || 0), 0);
@@ -57,17 +61,51 @@ const DashboardU = () => {
 
   return (
     <div className="dashboardU">
-      {/* HEADER */}
-      <header className="headerU">
+      {/* HEADER (Identical to DashboardM) */}
+      <header className={`headerU ${isScrolled ? 'scrolled' : ''}`}>
         <div className="logoU">QuickTurn</div>
+        <nav>
+          <ul className="nav-menuU">
+            <li><a href="#" className="active">Home</a></li>
+            <li><a href="#">My Projects</a></li>
+            <li><a href="#">Messages</a></li>
+          </ul>
+        </nav>
         <div className="header-rightU">
-           <span style={{marginRight:'15px', color:'#ccc'}}>Hello, UMKM</span>
-           <div className="logout-btnU" onClick={()=>{localStorage.clear(); navigate('/login')}}>Logout</div>
+           {/* ✅ Profile Icon (Navigate to Profile Page) */}
+           <div 
+                className="profile-btnU" 
+                onClick={() => navigate('/profile-umkm')} 
+                style={{cursor:'pointer'}}
+                title="Edit Profile"
+            >
+                <i className="fas fa-user"></i>
+            </div>
+
+           <div className="logout-btnU" style={{cursor:'pointer', marginLeft:'15px', color:'#ccc'}} 
+                onClick={()=>{localStorage.clear(); navigate('/login')}}>
+                Logout
+           </div>
         </div>
       </header>
 
       <main className="main-contentU">
         
+        {/* ✅ HERO SECTION (Identical Structure to DashboardM) */}
+        <section className="heroU">
+          <div className="hero-overlayU">
+            <div className="hero-badgeU">🚀 HIRING</div>
+            <h1>Percepat Proses Perekrutan</h1>
+            <p>Posting lowongan pekerjaan dan temukan kandidat mahasiswa terbaik untuk bisnis Anda.</p>
+            <div className="hero-btnsU">
+              {/* Main Action: Post Project */}
+              <button className="btn-primaryU" onClick={() => navigate('/post-project')}>
+                <i className="fas fa-plus"></i> Post Project
+              </button>
+            </div>
+          </div>
+        </section>
+
         {/* STATS GRID */}
         <div className="stats-grid-new">
             <div className="stat-card-new">
@@ -92,30 +130,7 @@ const DashboardU = () => {
             </div>
         </div>
 
-        {/* QUICK ACTIONS */}
-        <div className="quick-actions-grid">
-            <div className="action-card" onClick={() => navigate('/post-project')}>
-                <div className="action-icon red"><i className="fas fa-plus"></i></div>
-                <div>
-                    <h3>Post Project Baru</h3>
-                    <p>Buat lowongan untuk mahasiswa</p>
-                </div>
-            </div>
-            <div className="action-card">
-                <div className="action-icon red"><i className="fas fa-search"></i></div>
-                <div>
-                    <h3>Cari Talent</h3>
-                    <p>Temukan mahasiswa berbakat</p>
-                </div>
-            </div>
-            <div className="action-card">
-                <div className="action-icon red"><i className="fas fa-chart-line"></i></div>
-                <div>
-                    <h3>Lihat Analytics</h3>
-                    <p>Pantau performa project</p>
-                </div>
-            </div>
-        </div>
+        {/* ❌ QUICK ACTIONS REMOVED (To match DashboardM) */}
 
         {/* PROJECT LIST */}
         <div className="section-titleU">
@@ -127,11 +142,11 @@ const DashboardU = () => {
             token={token} 
             onRefresh={() => fetchProjects(token)}
             onViewApplicants={(id) => { setSelectedProjectId(id); setShowApplicantsModal(true); }} 
-            onViewContract={(id) => { setSelectedProjectId(id); setShowContractModal(true); }} // ✅ Pass Contract Handler
+            onViewContract={(id) => { setSelectedProjectId(id); setShowContractModal(true); }} 
         />
       </main>
 
-      {/* APPLICANTS MODAL */}
+      {/* MODALS */}
       {showApplicantsModal && (
           <ApplicantsModalU 
               projectId={selectedProjectId}
@@ -141,7 +156,6 @@ const DashboardU = () => {
           />
       )}
 
-      {/* ✅ CONTRACT MODAL */}
       {showContractModal && (
           <ContractModal 
               projectId={selectedProjectId}

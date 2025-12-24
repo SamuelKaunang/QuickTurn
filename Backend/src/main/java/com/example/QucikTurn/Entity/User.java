@@ -27,6 +27,21 @@ public class User implements UserDetails {
     @Column(nullable=false) private LocalDateTime updatedAt = LocalDateTime.now();
     @PreUpdate void onUpdate(){ this.updatedAt = LocalDateTime.now(); }
 
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
+    @Column(length = 255)
+    private String skills; // Stored as comma-separated string (e.g., "Java, React, Design")
+
+    @Column(length = 255)
+    private String portfolioUrl;
+
+    @Column(length = 100)
+    private String location;
+
+    @Column(length = 20)
+    private String phone;
+
     // UserDetails
     @Override public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_"+role.name()));
@@ -50,4 +65,14 @@ public class User implements UserDetails {
     public void setRole(Role role) { this.role = role; }
     public void setActive(boolean active) { isActive = active; }
     public void setLastLoginAt(LocalDateTime t){ this.lastLoginAt = t; }
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+    public String getSkills() { return skills; }
+    public void setSkills(String skills) { this.skills = skills; }
+    public String getPortfolioUrl() { return portfolioUrl; }
+    public void setPortfolioUrl(String portfolioUrl) { this.portfolioUrl = portfolioUrl; }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 }

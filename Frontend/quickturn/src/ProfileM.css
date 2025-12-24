@@ -1,0 +1,70 @@
+.profile-page {
+    min-height: 100vh;
+    background: #0f0f19; /* Dark background matching dashboard */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.profile-container {
+    background: #1a1a2e;
+    width: 600px;
+    max-width: 90%;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.profile-header-page {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 15px;
+}
+
+.profile-header-page h2 { margin: 0; color: white; font-size: 22px; }
+
+.btn-back {
+    background: transparent; border: 1px solid #444; color: #ccc;
+    padding: 8px 15px; border-radius: 5px; cursor: pointer;
+    transition: 0.2s;
+    display: flex; align-items: center; gap: 8px;
+}
+.btn-back:hover { border-color: white; color: white; }
+
+.profile-form-page { display: flex; flex-direction: column; gap: 20px; }
+
+/* Re-using input styles */
+.form-group label { display: block; color: #ccc; font-size: 13px; margin-bottom: 8px; }
+.form-group input, .form-group textarea {
+    width: 100%; padding: 12px; background: rgba(0,0,0,0.2); 
+    border: 1px solid #333; border-radius: 6px; color: white;
+}
+.form-group input:focus, .form-group textarea:focus { border-color: #e50914; outline: none; }
+.form-group textarea { height: 100px; resize: vertical; }
+
+.form-row { display: flex; gap: 15px; }
+.form-group.half { flex: 1; }
+
+.profile-actions {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-save-page {
+    background: #e50914; color: white; border: none; padding: 12px 25px;
+    border-radius: 6px; font-weight: bold; cursor: pointer;
+}
+.btn-save-page:hover { background: #ff1f2c; }
+
+.btn-logout-page {
+    background: transparent; color: #ff4757; border: 1px solid #ff4757;
+    padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;
+    display: flex; align-items: center; gap: 8px;
+}
+.btn-logout-page:hover { background: #ff4757; color: white; }

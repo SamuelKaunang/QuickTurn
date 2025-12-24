@@ -6,6 +6,8 @@ import RegistrationPageM from './RegistrationPageM';
 import DashboardU from "./DashboardU";
 import DashboardM from "./DashboardM";
 import PostProject from "./PostProject";
+import ProfileM from './ProfileM';
+import ProfileU from './ProfileU';
 
 function App() {
   return (
@@ -19,6 +21,9 @@ function App() {
         {/* Dashboard Routes */}
         <Route path="/dashboardu" element={<DashboardU />} />
         <Route path="/dashboardm" element={<DashboardM />} />
+
+        <Route path="/profile-mahasiswa" element={<ProfileM />} />
+        <Route path="/profile-umkm" element={<ProfileU />} />
         
         {/* Feature Routes */}
         {/* FIXED: Added hyphen to match DashboardU navigation */}
