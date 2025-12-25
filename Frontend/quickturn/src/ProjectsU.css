@@ -1,40 +1,51 @@
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+    background-repeat: no-repeat;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+}
+
 /* Project Cards Row Container */
 .projects-rowU {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     overflow-x: auto;
     padding-bottom: 20px;
     margin-bottom: 40px;
-    scrollbar-width: none; /* Hide scrollbar Firefox */
+    scrollbar-width: none;
 }
 
 .projects-rowU::-webkit-scrollbar {
-    display: none; /* Hide scrollbar Chrome/Safari */
+    display: none;
 }
 
 /* Glassmorphism Card */
 .project-cardU {
-    min-width: 280px;
-    background: rgba(255,255,255,0.05);
+    min-width: 320px;
+    background: var(--glass-bg);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
     overflow: hidden;
-    transition: all 0.4s ease;
+    transition: var(--transition);
     cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .project-cardU:hover {
-    transform: scale(1.05);
+    transform: translateY(-8px);
     background: rgba(255,255,255,0.1);
-    border-color: rgba(229,9,20,0.5);
+    border-color: rgba(229,9,20,0.3);
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
 /* Card Header (Category Colors) */
 .card-headerU {
-    height: 120px;
-    background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
+    height: 140px;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -46,40 +57,49 @@
 .card-headerU.it { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
 
 .card-headerU i {
-    font-size: 40px;
-    opacity: 0.3;
+    font-size: 48px;
+    opacity: 0.4;
+    color: var(--text-primary);
 }
 
 /* Card Status Badge */
 .card-statusU {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 4px 10px;
-    border-radius: 3px;
-    font-size: 11px;
-    font-weight: bold;
+    top: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
     background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
 }
 
-.card-statusU.open { color: #46d369; }
+.card-statusU.open {
+    color: #46d369;
+    background: rgba(70, 211, 105, 0.2);
+}
 
 /* Card Body */
-.card-bodyU { padding: 20px; }
+.card-bodyU {
+    padding: 24px;
+}
 
 .card-categoryU {
     font-size: 12px;
-    color: #e50914;
-    margin-bottom: 8px;
+    color: var(--accent-primary);
+    margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    font-weight: 600;
 }
 
 .card-titleU {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
-    margin-bottom: 10px;
-    line-height: 1.3;
+    margin-bottom: 12px;
+    line-height: 1.4;
+    color: var(--text-primary);
 }
 
 /* Card Meta (Budget & Date) */
@@ -87,17 +107,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 18px;
+    border-top: 1px solid var(--border-color);
 }
 
 .card-budgetU {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 20px;
+    font-weight: 700;
     color: #46d369;
 }
 
 .card-deadlineU {
-    font-size: 12px;
-    color: #888;
+    font-size: 13px;
+    color: var(--text-muted);
 }

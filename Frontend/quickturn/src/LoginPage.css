@@ -2,8 +2,8 @@ body, html {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .login-page {
@@ -16,123 +16,136 @@ body, html {
 }
 
 .login-container {
-  width: 350px;
-  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
   text-align: center;
-  color: rgb(255, 255, 255);
-  
-  /* MATCHING REGISTRATION DESIGN */
-  background: rgba(30, 30, 30, 0.6); 
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px var(--shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: var(--transition);
+}
+
+.login-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px var(--shadow);
 }
 
 .login-container h2 {
-  margin-bottom: 20px;
-  font-weight: 600;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 /* Input Fields */
 .login-input-field {
-  color: #ffffff;
+  color: var(--text-primary);
   width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  margin: 12px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background-color: var(--input-bg);
   box-sizing: border-box;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: var(--transition);
+  font-size: 16px;
 }
 
 .login-input-field:focus {
-  border-color: #e50914; /* Netflix Red Highlight */
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
 }
 
 .login-input-field::placeholder {
-  color: #cccccc;
-  opacity: 0.7;
+  color: var(--text-secondary);
+  opacity: 0.8;
 }
 
 /* Password Wrapper */
 .login-password-wrapper {
   position: relative;
   width: 100%;
-  margin: 8px 0;
+  margin: 12px 0;
 }
 
 .login-password-wrapper .login-input-field {
-  padding-right: 45px;
+  padding-right: 50px;
 }
 
 .login-toggle-password {
   position: absolute;
-  right: 12px;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.2rem;
-  color: #ffffff;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  font-size: 18px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  transition: var(--transition);
 }
 
 .login-toggle-password:hover {
   opacity: 1;
+  color: var(--accent-primary);
 }
 
 /* Buttons */
 .login-button {
   width: 100%;
-  padding: 12px;
-  background-color: #e50914;
-  color: white;
-  margin-top: 20px;
+  padding: 16px;
+  background: var(--accent-primary);
+  color: var(--text-primary);
+  margin-top: 24px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 1rem;
-  transition: transform 0.1s, background-color 0.2s;
+  font-weight: 600;
+  font-size: 16px;
+  transition: var(--transition);
 }
 
 .login-button:hover {
-  background-color: #f40612;
-  transform: scale(1.02);
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(229, 9, 20, 0.3);
 }
 
 .login-button:active {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
 /* Messages & Links */
 .login-message {
-  margin-top: 15px;
+  margin-top: 20px;
   color: #ff6b6b;
-  font-size: 0.9rem;
+  font-size: 14px;
   min-height: 20px;
+  font-weight: 500;
 }
 
 .login-register-text {
-  margin-top: 15px;
-  color: #bbbbbb;
-  font-size: 0.9rem;
+  margin-top: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .login-register-link {
-  color: #ffffff;
-  font-weight: bold;
+  color: var(--accent-primary);
+  font-weight: 600;
   text-decoration: none;
   margin-left: 5px;
+  transition: var(--transition);
 }
 
 .login-register-link:hover {
+  color: var(--accent-hover);
   text-decoration: underline;
-  color: #e50914;
 }

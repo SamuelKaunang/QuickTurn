@@ -90,11 +90,6 @@ const DashboardU = () => {
             >
                 <i className="fas fa-user"></i>
             </div>
-
-           <div className="logout-btnU" style={{cursor:'pointer', marginLeft:'15px', color:'#ccc'}} 
-                onClick={()=>{localStorage.clear(); navigate('/login')}}>
-                Logout
-           </div>
         </div>
       </header>
 

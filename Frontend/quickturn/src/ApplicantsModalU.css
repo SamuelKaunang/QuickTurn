@@ -5,134 +5,166 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.85); /* Darker background */
-    backdrop-filter: blur(8px); /* Blur effect */
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999; /* Force it on top of everything */
-    animation: fadeIn 0.2s ease;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
 }
 
 /* The Modal Box */
 .modal-box-modern {
-    background: #151521; /* Dark modern color */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    width: 600px;
+    background: var(--glass-bg);
+    border: 1px solid var(--border-color);
+    width: 650px;
     max-width: 90%;
     max-height: 80vh;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     overflow: hidden;
     animation: slideUp 0.3s ease;
 }
 
 .modal-header-modern {
-    padding: 20px 25px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: rgba(255,255,255,0.02);
 }
 
-.modal-header-modern h3 { font-size: 18px; color: white; margin: 0; }
+.modal-header-modern h3 {
+    font-size: 20px;
+    color: var(--text-primary);
+    margin: 0;
+    font-weight: 600;
+}
 
 .btn-close-modern {
-    background: none; border: none; color: #666; font-size: 20px; cursor: pointer;
-    transition: color 0.2s;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 24px;
+    cursor: pointer;
+    transition: var(--transition);
+    padding: 4px;
+    border-radius: 6px;
 }
-.btn-close-modern:hover { color: white; }
+.btn-close-modern:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.1);
+}
 
 /* Scrollable List Area */
 .modal-body-scroll {
-    padding: 20px;
+    padding: 24px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
 }
 
 /* Individual Applicant Card */
 .applicant-item {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
-    padding: 15px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 20px;
     border-radius: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.2s;
+    transition: var(--transition);
 }
-.applicant-item:hover { background: rgba(255,255,255,0.06); }
+.applicant-item:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(229, 9, 20, 0.3);
+}
 
-.applicant-details h4 { color: #e50914; margin-bottom: 5px; font-size: 16px; }
-.applicant-details p { color: #aaa; font-size: 13px; margin-bottom: 3px; }
-.applicant-quote { font-style: italic; color: #666; font-size: 12px; }
+.applicant-details h4 {
+    color: var(--accent-primary);
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: 600;
+}
+.applicant-details p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+.applicant-quote {
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 8px;
+}
 
 .btn-accept-modern {
-    background: #46d369; /* Green for Accept */
-    color: #000;
+    background: #46d369;
+    color: var(--text-primary);
     border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: bold;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
+    transition: var(--transition);
+    font-family: inherit;
 }
-.btn-accept-modern:hover { background: #3ab559; transform: scale(1.05); }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-.modal-overlay-fixed {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 2000;
+.btn-accept-modern:hover {
+    background: #3ab559;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(70, 211, 105, 0.3);
 }
-.modal-box-modern {
-    background: #1a1a2e; width: 500px; max-width: 90%; border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.1); display: flex; flexDirection: column;
-}
-.modal-header-modern {
-    padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);
-    display: flex; justify-content: space-between; align-items: center; color: white;
-}
-.btn-close-modern { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; }
-.modal-body-scroll { padding: 20px; max-height: 60vh; overflow-y: auto; }
-
-.applicant-item {
-    background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;
-    margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
-}
-.applicant-details h4 { margin: 0 0 5px 0; color: white; }
-.applicant-details p { margin: 0; color: #aaa; font-size: 13px; }
-.applicant-quote { font-style: italic; color: #888; margin-top: 5px; }
-
-.btn-accept-modern {
-    background: #46d369; color: white; border: none; padding: 8px 15px;
-    border-radius: 5px; cursor: pointer; font-weight: bold;
-    display: flex; align-items: center; gap: 5px;
-}
-.btn-accept-modern:hover { background: #3cc15e; }
 
 /* ✅ NEW REJECT BUTTON STYLE */
 .btn-reject-modern {
-    background: rgba(229, 9, 20, 0.2); 
-    color: #e50914; 
-    border: 1px solid #e50914; 
-    padding: 8px 15px;
-    border-radius: 5px; 
-    cursor: pointer; 
-    font-weight: bold;
-    display: flex; align-items: center; gap: 5px;
-    transition: 0.3s;
+    background: rgba(229, 9, 20, 0.2);
+    color: var(--accent-primary);
+    border: 1px solid var(--accent-primary);
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition);
+    font-family: inherit;
+    font-size: 14px;
 }
 .btn-reject-modern:hover {
-    background: #e50914;
-    color: white;
+    background: var(--accent-primary);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
