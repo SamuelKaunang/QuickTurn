@@ -219,3 +219,37 @@
 .btn-submit-applyM:disabled { opacity: 0.5; cursor: not-allowed; }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* === STATUS AWARE BUTTONS === */
+.btn-status-pending {
+    width: 100%; margin-top: 15px; padding: 8px;
+    background: rgba(255, 193, 7, 0.1); 
+    border: 1px solid #ffc107; 
+    border-radius: 5px;
+    color: #ffc107; 
+    font-weight: bold; 
+    cursor: default;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.btn-status-rejected {
+    width: 100%; margin-top: 15px; padding: 8px;
+    background: rgba(229, 9, 20, 0.1); 
+    border: 1px solid #e50914; 
+    border-radius: 5px;
+    color: #e50914; 
+    font-weight: bold; 
+    cursor: default;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.btn-status-accepted {
+    width: 100%; margin-top: 15px; padding: 8px;
+    background: rgba(70, 211, 105, 0.1); 
+    border: 1px solid #46d369; 
+    border-radius: 5px;
+    color: #46d369; 
+    font-weight: bold; 
+    cursor: default;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}

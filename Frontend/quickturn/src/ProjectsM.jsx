@@ -17,24 +17,24 @@ const ProjectsM = ({ token }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // --- FETCH DATA ---
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const response = await fetch("/api/projects", {
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    const openProjects = (data.data || []).filter(p => p.status === 'OPEN');
-                    setProjects(openProjects);
-                }
-            } catch (err) {
-                console.error("Failed to fetch projects", err);
-            } finally {
-                setLoading(false);
+    const fetchProjects = async () => {
+        try {
+            const response = await fetch("/api/projects", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                // The backend now filters for OPEN status, but returns Status DTO
+                setProjects(data.data || []);
             }
-        };
+        } catch (err) {
+            console.error("Failed to fetch projects", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         if (token) fetchProjects();
     }, [token]);
 
@@ -57,7 +57,7 @@ const ProjectsM = ({ token }) => {
     // --- APPLY ACTIONS ---
     const handleApplyClick = (project) => {
         setSelectedProject(project);
-        setApplyForm({ proposal: "", bidAmount: "" }); // Reset form
+        setApplyForm({ proposal: "", bidAmount: "" }); 
         setIsModalOpen(true);
     };
 
@@ -89,8 +89,9 @@ const ProjectsM = ({ token }) => {
             const data = await response.json();
 
             if (response.ok) {
-                alert("Berhasil mengajukan proposal! Tunggu kabar dari UMKM.");
+                alert("Berhasil mengajukan proposal!");
                 setIsModalOpen(false);
+                fetchProjects(); // Refresh to update button status
             } else {
                 alert(data.message || "Gagal mengajukan proposal.");
             }
@@ -98,6 +99,51 @@ const ProjectsM = ({ token }) => {
             alert("Terjadi kesalahan koneksi.");
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const renderStars = (rating) => {
+        const score = rating || 0;
+        return (
+            <span style={{ color: '#ffc107', fontWeight: 'bold', marginLeft: '5px' }}>
+                ⭐ {score > 0 ? score.toFixed(1) : "New"}
+            </span>
+        );
+    };
+
+    // --- ✅ HELPER: RENDER BUTTON BASED ON STATUS ---
+    const renderActionButton = (project) => {
+        if (project.myApplicationStatus === 'PENDING') {
+            return (
+                <div className="btn-status-pending">
+                    ⏳ Menunggu Konfirmasi
+                </div>
+            );
+        } 
+        else if (project.myApplicationStatus === 'REJECTED') {
+            return (
+                <div className="btn-status-rejected">
+                    ❌ Lamaran Ditolak
+                </div>
+            );
+        }
+        else if (project.myApplicationStatus === 'APPROVED') {
+            return (
+                <div className="btn-status-accepted">
+                    ✅ Diterima
+                </div>
+            );
+        }
+        else {
+            // Default: Not Applied Yet
+            return (
+                <button 
+                    className="btn-applyM"
+                    onClick={() => handleApplyClick(project)}
+                >
+                    Apply Now
+                </button>
+            );
         }
     };
 
@@ -155,26 +201,28 @@ const ProjectsM = ({ token }) => {
                                 <span className="card-statusM open">● {p.status}</span>
                             </div>
                             <div className="card-bodyM">
+                                <div style={{ fontSize: '13px', color: '#ccc', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>🏢 {p.owner ? p.owner.nama : 'Unknown'}</span>
+                                    {p.owner && renderStars(p.owner.averageRating)}
+                                </div>
+
                                 <div className="card-categoryM">{p.category}</div>
                                 <div className="card-titleM">{p.title}</div>
                                 <div className="card-metaM">
                                     <span className="card-budgetM">Rp {p.budget.toLocaleString()}</span>
                                     <span className="card-deadlineM">📅 {p.deadline}</span>
                                 </div>
-                                {/* BUTTON NOW OPENS MODAL */}
-                                <button 
-                                    className="btn-applyM"
-                                    onClick={() => handleApplyClick(p)}
-                                >
-                                    Apply Now
-                                </button>
+                                
+                                {/* ✅ CONDITIONAL BUTTON RENDERING */}
+                                {renderActionButton(p)}
+
                             </div>
                         </div>
                     ))
                 )}
             </div>
 
-            {/* --- APPLY MODAL --- */}
+            {/* APPLY MODAL */}
             {isModalOpen && selectedProject && (
                 <div className="modal-overlayM">
                     <div className="modal-contentM">
@@ -186,6 +234,11 @@ const ProjectsM = ({ token }) => {
                         <div className="project-summaryM">
                             <strong>{selectedProject.title}</strong>
                             <p>Budget Asli: Rp {selectedProject.budget.toLocaleString()}</p>
+                            <div style={{ marginTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '10px', fontSize:'14px' }}>
+                                Client: <span style={{color: 'white'}}>{selectedProject.owner.nama}</span>
+                                <br />
+                                Rating: {renderStars(selectedProject.owner.averageRating)}
+                            </div>
                         </div>
 
                         <form onSubmit={submitApplication} className="apply-formM">

@@ -11,5 +11,6 @@ public record ApplicantResponse(
     String proposal,
     BigDecimal bidAmount,
     String status,
-    LocalDateTime appliedAt
+    LocalDateTime appliedAt,
+    Double studentRating
 ) {}

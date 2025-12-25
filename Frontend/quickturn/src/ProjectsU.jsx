@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react'; // ✅ Added useState
 import './ProjectsU.css'; 
+import ReviewModal from './ReviewModal'; // ✅ Import the Review Modal
 
 const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContract }) => {
     
+    // --- Review Modal State (NEW) ---
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [reviewProject, setReviewProject] = useState(null);
+
     const handleCompleteProject = async (projectId) => {
         if(!window.confirm("Apakah Anda yakin pekerjaan selesai dan sesuai? Project akan ditutup.")) return;
 
@@ -21,6 +26,34 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
         } catch (err) {
             console.error(err);
             alert("Terjadi kesalahan.");
+        }
+    };
+
+    // --- ✅ SUBMIT REVIEW LOGIC (NEW) ---
+    const handleSubmitReview = async (rating, comment) => {
+        if (!reviewProject) return;
+
+        try {
+            const response = await fetch(`/api/projects/${reviewProject.id}/review`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ rating, comment })
+            });
+
+            if (response.ok) {
+                alert("Rating & Review berhasil dikirim untuk Mahasiswa!");
+                setShowReviewModal(false);
+                setReviewProject(null);
+            } else {
+                const err = await response.json();
+                alert(err.message || "Gagal mengirim review.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Terjadi kesalahan koneksi.");
         }
     };
 
@@ -76,21 +109,37 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                                 {p.status === 'DONE' && (
                                     <button 
                                         className="btn-primaryU" 
-                                        style={{width: '100%', fontSize: '14px', justifyContent:'center'}}
+                                        style={{width: '100%', fontSize: '14px', justifyContent:'center', background:'#e50914', color:'white', border:'none', padding:'10px', borderRadius:'5px', cursor:'pointer'}}
                                         onClick={() => handleCompleteProject(p.id)}
                                     >
-                                        ✅ Review & Selesaikan
+                                        ✅ Approve & Selesaikan
                                     </button>
                                 )}
                                 
-                                {/* 4. CLOSED: Done */}
+                                {/* 4. CLOSED: Done -> ✅ RATE STUDENT (NEW) */}
                                 {p.status === 'CLOSED' && (
-                                    <div style={{textAlign:'center', color:'#46d369', fontWeight:'bold', border:'1px solid #46d369', padding:'8px', borderRadius:'5px'}}>
-                                        🎉 Project Selesai
+                                    <div style={{display:'flex', flexDirection:'column', gap:'5px'}}>
+                                        <div style={{textAlign:'center', color:'#46d369', fontWeight:'bold', border:'1px solid #46d369', padding:'8px', borderRadius:'5px', fontSize:'12px'}}>
+                                            🎉 Project Selesai
+                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                setReviewProject(p);
+                                                setShowReviewModal(true);
+                                            }}
+                                            style={{
+                                                width: '100%', padding: '8px', 
+                                                background: 'linear-gradient(45deg, #ffc107, #ffdb58)', 
+                                                color: 'black', fontWeight:'bold', border: 'none', 
+                                                borderRadius: '5px', cursor: 'pointer'
+                                            }}
+                                        >
+                                            ⭐ Rate Mahasiswa
+                                        </button>
                                     </div>
                                 )}
 
-                                {/* ✅ [FR-09] LIHAT KONTRAK BUTTON (Appears for Ongoing, Done, Closed) */}
+                                {/* LIHAT KONTRAK BUTTON */}
                                 {(p.status === 'ONGOING' || p.status === 'DONE' || p.status === 'CLOSED') && (
                                     <button 
                                         onClick={() => onViewContract(p.id)}
@@ -111,6 +160,14 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                     </div>
                 ))
             )}
+
+            {/* ✅ MODAL REVIEW */}
+            <ReviewModal 
+                isOpen={showReviewModal}
+                onClose={() => setShowReviewModal(false)}
+                onSubmit={handleSubmitReview}
+                projectTitle={reviewProject?.title}
+            />
         </div>
     );
 };

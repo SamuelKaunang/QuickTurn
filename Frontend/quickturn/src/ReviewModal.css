@@ -1,0 +1,119 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85); /* Darker overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000; /* High z-index to sit on top of everything */
+  backdrop-filter: blur(5px); /* Nice blur effect */
+}
+
+.modal-content {
+  background: #1a1a2e; /* MATCHES YOUR DASHBOARD THEME */
+  color: white;         /* White text */
+  padding: 30px;
+  border-radius: 16px;
+  width: 500px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5); /* Stronger shadow */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #fff;
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.modal-content p {
+  color: #ccc;
+  font-size: 14px;
+}
+
+.star-rating {
+  font-size: 45px;
+  color: #444; /* Darker empty stars */
+  margin: 20px 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.star.filled {
+  color: #ffc107; /* Golden Yellow */
+  text-shadow: 0 0 10px rgba(255, 193, 7, 0.5); /* Glowing effect */
+}
+
+.star:hover {
+  transform: scale(1.2);
+  transition: transform 0.2s;
+  color: #ffdb58;
+}
+
+textarea.review-input {
+  width: 100%;
+  height: 120px;
+  padding: 15px;
+  margin-bottom: 25px;
+  background: rgba(255, 255, 255, 0.05); /* Dark transparent input */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  resize: none;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+textarea.review-input:focus {
+  outline: none;
+  border-color: #e50914; /* Red border on focus */
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ccc;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  flex: 1;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.btn-submit {
+  background: #e50914; /* Your Brand Red */
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  flex: 1;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-submit:hover {
+  background: #ff1f2c;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4);
+}

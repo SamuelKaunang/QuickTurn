@@ -89,3 +89,50 @@
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-overlay-fixed {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 2000;
+}
+.modal-box-modern {
+    background: #1a1a2e; width: 500px; max-width: 90%; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1); display: flex; flexDirection: column;
+}
+.modal-header-modern {
+    padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex; justify-content: space-between; align-items: center; color: white;
+}
+.btn-close-modern { background: none; border: none; color: #888; font-size: 20px; cursor: pointer; }
+.modal-body-scroll { padding: 20px; max-height: 60vh; overflow-y: auto; }
+
+.applicant-item {
+    background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;
+    margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+}
+.applicant-details h4 { margin: 0 0 5px 0; color: white; }
+.applicant-details p { margin: 0; color: #aaa; font-size: 13px; }
+.applicant-quote { font-style: italic; color: #888; margin-top: 5px; }
+
+.btn-accept-modern {
+    background: #46d369; color: white; border: none; padding: 8px 15px;
+    border-radius: 5px; cursor: pointer; font-weight: bold;
+    display: flex; align-items: center; gap: 5px;
+}
+.btn-accept-modern:hover { background: #3cc15e; }
+
+/* ✅ NEW REJECT BUTTON STYLE */
+.btn-reject-modern {
+    background: rgba(229, 9, 20, 0.2); 
+    color: #e50914; 
+    border: 1px solid #e50914; 
+    padding: 8px 15px;
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-weight: bold;
+    display: flex; align-items: center; gap: 5px;
+    transition: 0.3s;
+}
+.btn-reject-modern:hover {
+    background: #e50914;
+    color: white;
+}

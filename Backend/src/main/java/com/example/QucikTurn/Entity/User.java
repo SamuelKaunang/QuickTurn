@@ -42,6 +42,9 @@ public class User implements UserDetails {
     @Column(length = 20)
     private String phone;
 
+    private Double averageRating = 0.0;
+    private Integer totalReviews = 0;
+
     // UserDetails
     @Override public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_"+role.name()));
@@ -75,4 +78,8 @@ public class User implements UserDetails {
     public void setLocation(String location) { this.location = location; }
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+    public Double getAverageRating() { return averageRating; }
+    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
+    public Integer getTotalReviews() { return totalReviews; }
+    public void setTotalReviews(Integer totalReviews) { this.totalReviews = totalReviews; }
 }

@@ -3,14 +3,14 @@ package com.example.QucikTurn.Service;
 import com.example.QucikTurn.Entity.Application;
 import com.example.QucikTurn.Entity.Project;
 import com.example.QucikTurn.Entity.User;
-import com.example.QucikTurn.Entity.Contract; // ✅ IMPORT NEW ENTITY
+import com.example.QucikTurn.Entity.Contract;
 import com.example.QucikTurn.Entity.enums.ApplicationStatus;
 import com.example.QucikTurn.Entity.enums.ProjectStatus;
 import com.example.QucikTurn.Entity.enums.Role;
 import com.example.QucikTurn.Repository.ApplicationRepository;
 import com.example.QucikTurn.Repository.ProjectRepository;
 import com.example.QucikTurn.Repository.UserRepository;
-import com.example.QucikTurn.Repository.ContractRepository; // ✅ IMPORT NEW REPO
+import com.example.QucikTurn.Repository.ContractRepository;
 import com.example.QucikTurn.dto.ApplicantResponse;
 import com.example.QucikTurn.dto.ApplyProjectRequest;
 import com.example.QucikTurn.dto.ApplyProjectResponse;
@@ -28,7 +28,7 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepo;
     private final ProjectRepository projectRepo;
     private final UserRepository userRepo;
-    private final ContractRepository contractRepo; // ✅ Inject ContractRepo
+    private final ContractRepository contractRepo;
 
     public ApplicationService(
             ApplicationRepository applicationRepo,
@@ -68,17 +68,29 @@ public class ApplicationService {
 
     // --- LOGIC UMKM MELIHAT LIST PELAMAR ---
     public List<ApplicantResponse> getApplicantsForProject(Long ownerId, Long projectId) {
-        Project project = projectRepo.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
-        if (!project.getOwner().getId().equals(ownerId)) throw new RuntimeException("Unauthorized");
+        Project project = projectRepo.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        
+        if (!project.getOwner().getId().equals(ownerId)) {
+            throw new RuntimeException("Unauthorized");
+        }
 
         List<Application> apps = applicationRepo.findByProjectId(projectId);
+        
         return apps.stream().map(app -> new ApplicantResponse(
-                app.getId(), app.getStudent().getId(), app.getStudent().getNama(), app.getStudent().getEmail(),
-                app.getProposal(), app.getBidAmount(), app.getStatus().name(), app.getCreatedAt()
+                app.getId(), 
+                app.getStudent().getId(), 
+                app.getStudent().getNama(), 
+                app.getStudent().getEmail(),
+                app.getProposal(), 
+                app.getBidAmount(), 
+                app.getStatus().name(), 
+                app.getCreatedAt(),
+                app.getStudent().getAverageRating()
         )).collect(Collectors.toList());
     }
 
-    // --- LOGIC UMKM MENERIMA PELAMAR + BUAT KONTRAK (FR-08 & FR-09) ---
+    // --- LOGIC UMKM MENERIMA PELAMAR ---
     @Transactional
     public void acceptApplicant(Long ownerId, Long projectId, Long applicationId) {
         Project project = projectRepo.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
@@ -103,7 +115,7 @@ public class ApplicationService {
         projectRepo.save(project);
         applicationRepo.saveAll(allApps);
 
-        // ✅ FR-09: GENERATE DIGITAL CONTRACT
+        // GENERATE DIGITAL CONTRACT
         String contractText = generateContractText(project, acceptedApp);
         
         Contract contract = new Contract();
@@ -112,7 +124,28 @@ public class ApplicationService {
         contract.setStudent(acceptedApp.getStudent());
         contract.setContent(contractText);
         
-        contractRepo.save(contract); // Save to DB
+        contractRepo.save(contract);
+    }
+
+    // --- ✅ NEW: LOGIC UMKM TOLAK PELAMAR ---
+    @Transactional
+    public void rejectApplicant(Long ownerId, Long projectId, Long applicationId) {
+        Project project = projectRepo.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        
+        // Security Check
+        if (!project.getOwner().getId().equals(ownerId)) {
+            throw new RuntimeException("Unauthorized: Not your project");
+        }
+
+        Application app = applicationRepo.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+
+        if (app.getStatus() != ApplicationStatus.PENDING) {
+            throw new RuntimeException("Cannot reject non-pending application");
+        }
+
+        app.setStatus(ApplicationStatus.REJECTED);
+        applicationRepo.save(app);
     }
     
     // Helper to generate the text
@@ -140,7 +173,6 @@ public class ApplicationService {
         Contract contract = contractRepo.findByProjectId(projectId)
                 .orElseThrow(() -> new RuntimeException("Kontrak belum terbit"));
         
-        // Security check
         if(!contract.getUmkm().getId().equals(userId) && !contract.getStudent().getId().equals(userId)) {
              throw new RuntimeException("Unauthorized");
         }

@@ -10,12 +10,14 @@ import com.example.QucikTurn.Repository.ProjectRepository;
 import com.example.QucikTurn.Repository.UserRepository;
 import com.example.QucikTurn.Repository.ApplicationRepository;
 import com.example.QucikTurn.dto.CreateProjectRequest;
+import com.example.QucikTurn.dto.ProjectWithStatusResponse; 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -57,17 +59,60 @@ public class ProjectService {
         return projectRepo.findByOwnerId(ownerId);
     }
 
-    // --- GET ALL OPEN PROJECTS (For Browsing) ---
+    // --- GET ALL OPEN PROJECTS (For Browsing - Legacy) ---
     public List<Project> getAllOpenProjects() {
         return projectRepo.findByStatus(ProjectStatus.OPEN);
     }
 
-    // --- GET PROJECTS BY STUDENT (For My Projects Tab) ---
-    public List<Project> getProjectsByStudent(Long studentId) {
-        return projectRepo.findProjectsByStudentId(studentId);
+    // --- GET OPEN PROJECTS WITH STATUS (For Student Browsing) ---
+    public List<ProjectWithStatusResponse> getOpenProjectsWithStatus(Long studentId) {
+        List<Project> projects = projectRepo.findByStatus(ProjectStatus.OPEN);
+
+        return projects.stream().map(p -> {
+            String myStatus = null;
+            if (studentId != null) {
+                var app = applicationRepo.findByProjectIdAndStudentId(p.getId(), studentId);
+                if (app.isPresent()) {
+                    myStatus = app.get().getStatus().name();
+                }
+            }
+            return mapToDTO(p, myStatus);
+        }).collect(Collectors.toList());
     }
 
-    // --- MAHASISWA SUBMIT FINISHING (FR-07: Update Status to DONE) ---
+    // --- ✅ UPDATED: GET PROJECTS BY STUDENT (For Dashboard) ---
+    // Now returns DTOs containing the application status (Approved/Rejected/Pending)
+    public List<ProjectWithStatusResponse> getProjectsByStudent(Long studentId) {
+        List<Project> projects = projectRepo.findProjectsByStudentId(studentId);
+        
+        return projects.stream().map(p -> {
+            // Find the specific application for this student to get the status
+            String myStatus = applicationRepo.findByProjectIdAndStudentId(p.getId(), studentId)
+                    .map(app -> app.getStatus().name())
+                    .orElse(null);
+            
+            return mapToDTO(p, myStatus);
+        }).collect(Collectors.toList());
+    }
+
+    // --- HELPER: Map Entity to DTO ---
+    private ProjectWithStatusResponse mapToDTO(Project p, String myStatus) {
+        return new ProjectWithStatusResponse(
+                p.getId(),
+                p.getTitle(),
+                p.getDescription(),
+                p.getCategory(),
+                p.getBudget(),
+                p.getDeadline(),
+                p.getStatus().name(),
+                p.getOwner(),
+                myStatus,
+                p.getFinishingSubmittedAt(), // ✅ Added
+                p.getFinishedAt()            // ✅ Added
+        );
+    }
+
+    // --- MAHASISWA SUBMIT FINISHING ---
     @Transactional
     public void submitFinishing(Long projectId, Long studentId, String finishingLink) {
         Project project = projectRepo.findById(projectId)
@@ -82,20 +127,9 @@ public class ProjectService {
         
         User student = userRepo.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        if (student.getRole() != Role.MAHASISWA) {
-            throw new RuntimeException("Only mahasiswa can submit finishing");
-        }
         
         if (project.getStatus() != ProjectStatus.ONGOING) {
-            throw new RuntimeException("Project is not in ONGOING status for finishing");
-        }
-        
-        if (project.getFinishingLink() != null || project.getFinishingSubmittedAt() != null) {
-            throw new RuntimeException("Finishing has already been submitted for this project");
-        }
-        
-        if (application.getFinishingLink() != null || application.getFinishingSubmittedAt() != null) {
-            throw new RuntimeException("You have already submitted finishing for this project");
+            throw new RuntimeException("Project is not in ONGOING status");
         }
         
         application.setFinishingLink(finishingLink);
@@ -105,32 +139,21 @@ public class ProjectService {
         
         project.setFinishingLink(finishingLink);
         project.setFinishingSubmittedAt(LocalDateTime.now());
-        
-        // ✅ FR-07 UPDATE: Set status to DONE (Waiting for UMKM Review)
         project.setStatus(ProjectStatus.DONE);
         
         projectRepo.save(project);
     }
 
-    // --- UMKM CONFIRM FINISHING (FR-07: Check DONE Status) ---
+    // --- UMKM CONFIRM FINISHING ---
     @Transactional
     public void confirmFinishing(Long projectId, Long umkmId) {
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
         
-        if (!project.getOwner().getId().equals(umkmId)) {
-            throw new RuntimeException("Only project owner can confirm finishing");
-        }
+        if (!project.getOwner().getId().equals(umkmId)) throw new RuntimeException("Unauthorized");
         
-        User umkm = userRepo.findById(umkmId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        if (umkm.getRole() != Role.UMKM) {
-            throw new RuntimeException("Only UMKM can confirm finishing");
-        }
-        
-        // ✅ FR-07 UPDATE: Check if status is DONE (meaning student has submitted work)
         if (project.getStatus() != ProjectStatus.DONE) {
-            throw new RuntimeException("Student has not submitted the work yet (Status is not DONE)");
+            throw new RuntimeException("Student has not submitted the work yet");
         }
         
         project.setStatus(ProjectStatus.CLOSED);
@@ -144,26 +167,16 @@ public class ProjectService {
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
         
-        boolean isOwner = project.getOwner().getId().equals(userId);
-        boolean isApplicant = applicationRepo.findByProjectIdAndStudentId(projectId, userId).isPresent();
-        
-        if (!isOwner && !isApplicant) {
-            throw new RuntimeException("You are not authorized to view finishing status");
-        }
-        
         Map<String, Object> status = new HashMap<>();
         status.put("projectId", projectId);
         status.put("projectStatus", project.getStatus().name());
         status.put("finishingLink", project.getFinishingLink());
         status.put("finishingSubmittedAt", project.getFinishingSubmittedAt());
         status.put("finishedAt", project.getFinishedAt());
-        status.put("finishedByUmkmId", project.getFinishedByUmkmId());
         
         applicationRepo.findByProjectIdAndStudentId(projectId, userId).ifPresent(app -> {
             status.put("applicationStatus", app.getStatus().name());
             status.put("isFinishedByStudent", app.getIsFinishedByStudent());
-            status.put("applicationFinishingLink", app.getFinishingLink());
-            status.put("applicationFinishingSubmittedAt", app.getFinishingSubmittedAt());
         });
         
         return status;

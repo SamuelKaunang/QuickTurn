@@ -4,10 +4,13 @@ import com.example.QucikTurn.Entity.Project;
 import com.example.QucikTurn.Entity.User;
 import com.example.QucikTurn.Service.ApplicationService;
 import com.example.QucikTurn.Service.ProjectService;
+import com.example.QucikTurn.Service.ReviewService; 
 import com.example.QucikTurn.dto.ApiResponse;
 import com.example.QucikTurn.dto.ApplicantResponse;
 import com.example.QucikTurn.dto.CreateProjectRequest;
 import com.example.QucikTurn.dto.FinishProjectRequest;
+import com.example.QucikTurn.dto.ReviewRequest; 
+import com.example.QucikTurn.dto.ProjectWithStatusResponse; // ✅ Import new DTO
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,10 +24,12 @@ public class ProjectController {
 
     private final ProjectService projectSvc;
     private final ApplicationService applicationSvc;
+    private final ReviewService reviewService;
 
-    public ProjectController(ProjectService projectSvc, ApplicationService applicationSvc) {
+    public ProjectController(ProjectService projectSvc, ApplicationService applicationSvc, ReviewService reviewService) {
         this.projectSvc = projectSvc;
         this.applicationSvc = applicationSvc;
+        this.reviewService = reviewService;
     }
 
     // --- CREATE PROJECT ---
@@ -45,17 +50,24 @@ public class ProjectController {
         return ResponseEntity.ok(ApiResponse.ok("Projects retrieved", list));
     }
 
-    // --- GET ALL OPEN PROJECTS (For Students Browsing) ---
+    // --- ✅ UPDATED: GET ALL OPEN PROJECTS (Status Aware) ---
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Project>>> getAllProjects() {
-        List<Project> list = projectSvc.getAllOpenProjects(); 
+    public ResponseEntity<ApiResponse<List<ProjectWithStatusResponse>>> getAllProjects(
+            @AuthenticationPrincipal User user
+    ) {
+        // If user is a student, we pass their ID. If UMKM or null, we pass null.
+        Long studentId = (user != null && user.getRole().name().equals("MAHASISWA")) ? user.getId() : null;
+        
+        List<ProjectWithStatusResponse> list = projectSvc.getOpenProjectsWithStatus(studentId);
+        
         return ResponseEntity.ok(ApiResponse.ok("All open projects retrieved", list));
     }
 
-    // --- ✅ NEW: GET PROJECTS I'M PARTICIPATING IN (For Students Dashboard) ---
+    // --- GET PROJECTS I'M PARTICIPATING IN (For Students Dashboard) ---
     @GetMapping("/participating")
-    public ResponseEntity<ApiResponse<List<Project>>> getParticipatingProjects(@AuthenticationPrincipal User user) {
-        List<Project> list = projectSvc.getProjectsByStudent(user.getId());
+    public ResponseEntity<ApiResponse<List<ProjectWithStatusResponse>>> getParticipatingProjects(@AuthenticationPrincipal User user) {
+        // Now returns DTOs instead of raw Projects
+        List<ProjectWithStatusResponse> list = projectSvc.getProjectsByStudent(user.getId());
         return ResponseEntity.ok(ApiResponse.ok("Participating projects retrieved", list));
     }
 
@@ -78,6 +90,17 @@ public class ProjectController {
     ) {
         applicationSvc.acceptApplicant(user.getId(), projectId, appId);
         return ResponseEntity.ok(ApiResponse.ok("Pelamar diterima, project dimulai!", null));
+    }
+
+    // --- TOLAK PELAMAR ---
+    @PostMapping("/{projectId}/applicants/{appId}/reject")
+    public ResponseEntity<ApiResponse<String>> rejectApplicant(
+            @PathVariable Long projectId,
+            @PathVariable Long appId,
+            @AuthenticationPrincipal User user
+    ) {
+        applicationSvc.rejectApplicant(user.getId(), projectId, appId);
+        return ResponseEntity.ok(ApiResponse.ok("Pelamar berhasil ditolak.", null));
     }
 
     // --- MAHASISWA SUBMIT FINISHING ---
@@ -119,6 +142,7 @@ public class ProjectController {
             return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
         }
     }
+    
     // --- GET DIGITAL CONTRACT (FR-09) ---
     @GetMapping("/{projectId}/contract")
     public ResponseEntity<ApiResponse<String>> getContract(
@@ -128,6 +152,21 @@ public class ProjectController {
         try {
             String contractContent = applicationSvc.getContractByProject(projectId, user.getId());
             return ResponseEntity.ok(ApiResponse.ok("Contract retrieved", contractContent));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
+    }
+
+    // --- SUBMIT REVIEW (FR-10) ---
+    @PostMapping("/{projectId}/review")
+    public ResponseEntity<ApiResponse<String>> submitReview(
+            @PathVariable Long projectId,
+            @RequestBody ReviewRequest request,
+            @AuthenticationPrincipal User user
+    ) {
+        try {
+            reviewService.addReview(projectId, request, user.getEmail());
+            return ResponseEntity.ok(ApiResponse.ok("Review submitted successfully", null));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
         }
