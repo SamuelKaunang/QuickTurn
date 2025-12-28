@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  # MySQL Service
+  # --- DATABASE ZONE ---
   mysql:
     image: mysql:8.0
     container_name: quickturn-mysql
@@ -18,7 +18,6 @@ services:
     networks:
       - app-network
 
-  # MongoDB Service
   mongodb:
     image: mongo:latest
     container_name: quickturn-mongo
@@ -32,10 +31,13 @@ services:
     networks:
       - app-network
 
-  # Backend Spring Boot
+  # --- BACKEND ZONE ---
   backend:
-    build: .
+    build:
+      context: ./Backend  # Nunjuk langsung ke folder Backend
+      dockerfile: dockerfile # Sesuaikan sama nama file lu yang huruf kecil semua
     container_name: quickturn-backend
+    restart: always
     depends_on:
       - mysql
       - mongodb
@@ -47,29 +49,24 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     ports:
       - "8080:8080"
-    restart: always
     networks:
       - app-network
 
-  # [NEW] Frontend React App
+  # --- FRONTEND ZONE ---
   frontend:
     build:
-      context: ../Frontend/quickturn  # Points to your Frontend folder
+      context: ./Frontend/quickturn # Jalur baru dari Root
       dockerfile: Dockerfile
     container_name: quickturn-frontend
+    restart: always
     ports:
-      - "3000:3000"  # Access via http://localhost:3000
-    volumes:
-      - ../Frontend/quickturn:/app  # Hot-reloading: changes in VS Code show up in browser
-      - /app/node_modules       # Keep container node_modules separate from Windows
-    environment:
-      - WATCHPACK_POLLING=true  # Required for hot-reloading on Windows
+      - "80:80"
     depends_on:
       - backend
     networks:
       - app-network
 
-  # PHPMyAdmin
+  # --- GUI TOOLS ---
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:5.2.1
     container_name: quickturn-pma
@@ -84,7 +81,6 @@ services:
     networks:
       - app-network
 
-  # Mongo Express
   mongo-express:
     image: mongo-express
     container_name: mongo-express
