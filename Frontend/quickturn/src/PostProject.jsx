@@ -20,9 +20,9 @@ const PostProject = () => {
 
   // Load Token on Mount
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
+    const storedToken = sessionStorage.getItem("token");
     if (!storedToken) {
-        navigate("/login");
+      navigate("/login");
     }
     setToken(storedToken);
   }, [navigate]);
@@ -39,31 +39,31 @@ const PostProject = () => {
 
     // Basic Validation
     if (!formData.title || !formData.budget || !formData.deadline || !formData.description) {
-        setError("Mohon lengkapi semua data.");
-        setIsSubmitting(false);
-        return;
+      setError("Mohon lengkapi semua data.");
+      setIsSubmitting(false);
+      return;
     }
 
     try {
-        const response = await fetch("/api/projects", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(formData)
-        });
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (!response.ok) throw new Error(data.message || "Gagal memposting project");
+      if (!response.ok) throw new Error(data.message || "Gagal memposting project");
 
-        // Success! Redirect to Dashboard
-        navigate("/dashboardU");
-        
+      // Success! Redirect to Dashboard
+      navigate("/dashboardU");
+
     } catch (err) {
-        setError(err.message);
-        setIsSubmitting(false);
+      setError(err.message);
+      setIsSubmitting(false);
     }
   };
 
@@ -83,7 +83,7 @@ const PostProject = () => {
       </button>
 
       <div className="main-flex">
-        
+
         {/* === LEFT COLUMN: FORM WIZARD === */}
         <div className="form-column">
           <h1 className="form-header">Buat Project Baru</h1>
@@ -102,13 +102,13 @@ const PostProject = () => {
           </div>
 
           <div className="form-content">
-            {error && <div className="msg-error" style={{marginBottom: '1rem'}}>{error}</div>}
+            {error && <div className="msg-error" style={{ marginBottom: '1rem' }}>{error}</div>}
 
             {/* STEP 1: BASIC INFO */}
             {step === 1 && (
               <div className="animate-fadeIn space-y-4">
                 <h2 className="section-header">Dasar Project</h2>
-                
+
                 <div className="form-group">
                   <label className="input-label">Judul Project</label>
                   <input
@@ -137,7 +137,7 @@ const PostProject = () => {
                   </select>
                 </div>
 
-                <button 
+                <button
                   onClick={() => setStep(2)}
                   disabled={!formData.title}
                   className={`btn btn-main ${!formData.title ? 'btn-disabled' : ''}`}
@@ -149,7 +149,7 @@ const PostProject = () => {
 
             {/* STEP 2: DETAILS */}
             {step === 2 && (
-               <div className="animate-fadeIn space-y-4">
+              <div className="animate-fadeIn space-y-4">
                 <h2 className="section-header">Detail & Budget</h2>
 
                 <div className="form-group">
@@ -165,58 +165,58 @@ const PostProject = () => {
                 </div>
 
                 <div className="form-row">
-                    <div className="form-group half">
-                        <label className="input-label">Budget (Rp)</label>
-                        <input
-                            type="number"
-                            name="budget"
-                            value={formData.budget}
-                            onChange={handleInputChange}
-                            className="input-field"
-                            placeholder="1000000"
-                        />
-                    </div>
-                    <div className="form-group half">
-                        <label className="input-label">Deadline</label>
-                        <input
-                            type="date"
-                            name="deadline"
-                            value={formData.deadline}
-                            onChange={handleInputChange}
-                            className="input-field"
-                        />
-                    </div>
+                  <div className="form-group half">
+                    <label className="input-label">Budget (Rp)</label>
+                    <input
+                      type="number"
+                      name="budget"
+                      value={formData.budget}
+                      onChange={handleInputChange}
+                      className="input-field"
+                      placeholder="1000000"
+                    />
+                  </div>
+                  <div className="form-group half">
+                    <label className="input-label">Deadline</label>
+                    <input
+                      type="date"
+                      name="deadline"
+                      value={formData.deadline}
+                      onChange={handleInputChange}
+                      className="input-field"
+                    />
+                  </div>
                 </div>
 
                 <div className="btn-group">
-                    <button onClick={() => setStep(1)} className="btn btn-secondary">Kembali</button>
-                    <button onClick={() => setStep(3)} className="btn btn-main">Tinjau Project</button>
+                  <button onClick={() => setStep(1)} className="btn btn-secondary">Kembali</button>
+                  <button onClick={() => setStep(3)} className="btn btn-main">Tinjau Project</button>
                 </div>
               </div>
             )}
 
             {/* STEP 3: REVIEW */}
             {step === 3 && (
-               <div className="animate-fadeIn space-y-4">
+              <div className="animate-fadeIn space-y-4">
                 <h2 className="section-header">Tinjau & Posting</h2>
                 <p className="text-helper">Pastikan semua data sudah benar sebelum diposting.</p>
-                
+
                 <div className="review-box">
-                    <p><strong>Judul:</strong> {formData.title}</p>
-                    <p><strong>Kategori:</strong> {formData.category}</p>
-                    <p><strong>Budget:</strong> Rp {parseInt(formData.budget).toLocaleString()}</p>
-                    <p><strong>Deadline:</strong> {formData.deadline}</p>
+                  <p><strong>Judul:</strong> {formData.title}</p>
+                  <p><strong>Kategori:</strong> {formData.category}</p>
+                  <p><strong>Budget:</strong> Rp {parseInt(formData.budget).toLocaleString()}</p>
+                  <p><strong>Deadline:</strong> {formData.deadline}</p>
                 </div>
 
                 <div className="btn-group">
-                    <button onClick={() => setStep(2)} className="btn btn-secondary">Kembali</button>
-                    <button 
-                        onClick={handleSubmit} 
-                        disabled={isSubmitting}
-                        className="btn btn-main"
-                    >
-                        {isSubmitting ? "Memposting..." : "🚀 Posting Project Sekarang"}
-                    </button>
+                  <button onClick={() => setStep(2)} className="btn btn-secondary">Kembali</button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="btn btn-main"
+                  >
+                    {isSubmitting ? "Memposting..." : "🚀 Posting Project Sekarang"}
+                  </button>
                 </div>
               </div>
             )}
@@ -225,31 +225,31 @@ const PostProject = () => {
 
         {/* === RIGHT COLUMN: LIVE PREVIEW === */}
         <div className="preview-column">
-            <h3 className="preview-label">Live Preview</h3>
-            <div className="card-preview">
-                <div className="card-header" style={{background: getHeaderGradient(formData.category)}}>
-                    <i className="fas fa-briefcase" style={{fontSize: '40px', opacity: 0.3}}></i>
-                    <span className="card-header-new">NEW</span>
-                </div>
-                <div className="card-content">
-                    <div className="card-category">{formData.category}</div>
-                    <div className="card-title">{formData.title || "Judul Project Anda"}</div>
-                    <p className="card-description">
-                        {formData.description || "Deskripsi project akan muncul di sini..."}
-                    </p>
-                    <div className="card-footer">
-                        <div className="card-budget">
-                            {formData.budget ? `Rp ${parseInt(formData.budget).toLocaleString()}` : "Rp -"}
-                        </div>
-                        <div className="card-deadline">
-                            {formData.deadline || "Tgl Deadline"}
-                        </div>
-                    </div>
-                </div>
+          <h3 className="preview-label">Live Preview</h3>
+          <div className="card-preview">
+            <div className="card-header" style={{ background: getHeaderGradient(formData.category) }}>
+              <i className="fas fa-briefcase" style={{ fontSize: '40px', opacity: 0.3 }}></i>
+              <span className="card-header-new">NEW</span>
             </div>
-            <div className="preview-note">
-                <p>Ini adalah tampilan kartu project Anda yang akan dilihat oleh Mahasiswa.</p>
+            <div className="card-content">
+              <div className="card-category">{formData.category}</div>
+              <div className="card-title">{formData.title || "Judul Project Anda"}</div>
+              <p className="card-description">
+                {formData.description || "Deskripsi project akan muncul di sini..."}
+              </p>
+              <div className="card-footer">
+                <div className="card-budget">
+                  {formData.budget ? `Rp ${parseInt(formData.budget).toLocaleString()}` : "Rp -"}
+                </div>
+                <div className="card-deadline">
+                  {formData.deadline || "Tgl Deadline"}
+                </div>
+              </div>
             </div>
+          </div>
+          <div className="preview-note">
+            <p>Ini adalah tampilan kartu project Anda yang akan dilihat oleh Mahasiswa.</p>
+          </div>
         </div>
 
       </div>

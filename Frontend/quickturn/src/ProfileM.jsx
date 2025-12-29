@@ -4,8 +4,8 @@ import './ProfileM.css';
 
 const ProfileM = () => {
     const navigate = useNavigate();
-    const token = localStorage.getItem("token");
-    
+    const token = sessionStorage.getItem("token");
+
     const [formData, setFormData] = useState({
         nama: '', bio: '', skills: '', portfolioUrl: '', location: '', phone: ''
     });
@@ -14,7 +14,7 @@ const ProfileM = () => {
     // Redirect if not logged in
     useEffect(() => {
         if (!token) navigate('/login');
-        
+
         const fetchProfile = async () => {
             try {
                 const response = await fetch("/api/users/profile", {
@@ -31,7 +31,7 @@ const ProfileM = () => {
                         phone: data.data.phone || ''
                     });
                 }
-            } catch (err) { console.error(err); } 
+            } catch (err) { console.error(err); }
             finally { setLoading(false); }
         };
         fetchProfile();
@@ -60,8 +60,8 @@ const ProfileM = () => {
     };
 
     const handleLogout = () => {
-        if(window.confirm("Apakah Anda yakin ingin logout?")) {
-            localStorage.clear();
+        if (window.confirm("Apakah Anda yakin ingin logout?")) {
+            sessionStorage.clear();
             navigate('/login');
         }
     };

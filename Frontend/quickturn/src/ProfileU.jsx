@@ -4,7 +4,7 @@ import './ProfileU.css';
 
 const ProfileU = () => {
     const navigate = useNavigate();
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const [formData, setFormData] = useState({ nama: '', bio: '', location: '', portfolioUrl: '', phone: '' });
     const [loading, setLoading] = useState(true);
 
@@ -39,7 +39,7 @@ const ProfileU = () => {
     };
 
     const handleLogout = () => {
-        if(window.confirm("Yakin ingin logout?")) { localStorage.clear(); navigate('/login'); }
+        if (window.confirm("Yakin ingin logout?")) { sessionStorage.clear(); navigate('/login'); }
     };
 
     return (
@@ -47,7 +47,7 @@ const ProfileU = () => {
             <div className="profile-container-u">
                 <div className="profile-header-page-u">
                     <button onClick={() => navigate('/dashboardu')} className="btn-back-u">
-                         ⬅ Kembali ke Dashboard
+                        ⬅ Kembali ke Dashboard
                     </button>
                     <h2>Edit Profil UMKM</h2>
                 </div>

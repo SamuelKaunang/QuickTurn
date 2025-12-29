@@ -14,40 +14,40 @@ function LoginPage() {
       setMessage("Email dan password harus diisi");
       return;
     }
-  
+
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-  
+
       const responseJson = await response.json();
-  
+
       if (response.ok) {
         // Extract the data object from the response
         const data = responseJson.data;
 
-        // 1. Save Token and Role
-        localStorage.setItem('token', data.accessToken); 
-        
+        // 1. Save Token and Role (using sessionStorage for tab isolation)
+        sessionStorage.setItem('token', data.accessToken);
+
         // Ensure role is uppercase to match logic below
         const role = data.role ? data.role.toUpperCase() : "";
-        localStorage.setItem('role', role);
+        sessionStorage.setItem('role', role);
 
         // 2. Switch Page based on Role
         if (role === 'MAHASISWA') {
-            navigate('/dashboardm');
-        } 
+          navigate('/dashboardm');
+        }
         else if (role === 'UMKM' || role === 'UKM') {
-            navigate('/dashboardu');
-        } 
+          navigate('/dashboardu');
+        }
         else if (role === 'ADMIN') {
-            navigate('/dashboardu'); 
+          navigate('/dashboardu');
         }
         else {
-            // Fallback for unknown roles (defaults to Mahasiswa dashboard)
-            navigate('/dashboardm');
+          // Fallback for unknown roles (defaults to Mahasiswa dashboard)
+          navigate('/dashboardm');
         }
 
       } else {

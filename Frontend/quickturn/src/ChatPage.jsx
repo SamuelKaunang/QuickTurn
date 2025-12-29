@@ -6,9 +6,9 @@ import './ChatPage.css';
 
 const ChatPage = () => {
     const navigate = useNavigate();
-    const token = localStorage.getItem("token");
-    const [user, setUser] = useState(null); 
-    
+    const token = sessionStorage.getItem("token");
+    const [user, setUser] = useState(null);
+
     const [contacts, setContacts] = useState([]);
     const [activeChat, setActiveChat] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -33,34 +33,34 @@ const ChatPage = () => {
     // 2. Fetch Contacts
     useEffect(() => {
         if (user) fetchContacts();
-    }, [user]); 
+    }, [user]);
 
     // 3. Fetch History
     useEffect(() => {
         if (activeChat && user) {
             const targetId = activeChat.userId || activeChat.id;
-            
+
             fetch(`/api/chat/history?otherUserId=${targetId}`, {
                 headers: { "Authorization": `Bearer ${token}` }
             })
-            .then(res => res.json())
-            .then(data => {
-                console.log("HISTORY DATA:", data); // Check Console
-                
-                // Handle different data structures
-                let validMessages = [];
-                if (Array.isArray(data)) {
-                    validMessages = data;
-                } else if (data.data && Array.isArray(data.data)) {
-                    validMessages = data.data;
-                } else if (data.content && Array.isArray(data.content)) {
-                    validMessages = data.content;
-                }
-                
-                setMessages(validMessages);
-                scrollToBottom();
-            })
-            .catch(err => console.error("History fetch error:", err));
+                .then(res => res.json())
+                .then(data => {
+                    console.log("HISTORY DATA:", data); // Check Console
+
+                    // Handle different data structures
+                    let validMessages = [];
+                    if (Array.isArray(data)) {
+                        validMessages = data;
+                    } else if (data.data && Array.isArray(data.data)) {
+                        validMessages = data.data;
+                    } else if (data.content && Array.isArray(data.content)) {
+                        validMessages = data.content;
+                    }
+
+                    setMessages(validMessages);
+                    scrollToBottom();
+                })
+                .catch(err => console.error("History fetch error:", err));
         }
     }, [activeChat, user]);
 
@@ -74,10 +74,10 @@ const ChatPage = () => {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await res.json();
-            
+
             const fixedContacts = (data.data || [])
                 .map(c => ({ ...c, userId: c.userId || c.id }))
-                .filter(c => c.userId != user.id); 
+                .filter(c => c.userId != user.id);
 
             setContacts(fixedContacts);
         } catch (err) { console.error(err); }
@@ -85,7 +85,7 @@ const ChatPage = () => {
 
     const connectWebSocket = (myUserId) => {
         const client = Stomp.over(() => new SockJS('http://localhost:8080/ws'));
-        client.debug = () => {}; 
+        client.debug = () => { };
         const headers = { 'Authorization': `Bearer ${token}` };
 
         client.connect(headers, () => {
@@ -115,7 +115,7 @@ const ChatPage = () => {
         setInputMsg("");
     };
 
-    const getRole = () => localStorage.getItem("role");
+    const getRole = () => sessionStorage.getItem("role");
 
     return (
         <div className="chat-container">
@@ -128,8 +128,8 @@ const ChatPage = () => {
                 </div>
                 <div className="contacts-list">
                     {contacts.map(contact => (
-                        <div 
-                            key={contact.userId} 
+                        <div
+                            key={contact.userId}
                             className={`contact-item ${activeChat?.userId === contact.userId ? 'active' : ''}`}
                             onClick={() => setActiveChat(contact)}
                         >
@@ -153,7 +153,7 @@ const ChatPage = () => {
                         <div className="chat-messages">
                             {messages.map((msg, index) => {
                                 // ✅ FIX: NO FILTERING. If the backend sent it, we show it.
-                                
+
                                 // Determine "Is this me?"
                                 // We check both possible field names: senderId (camelCase) OR sender_id (snake_case)
                                 const sender = msg.senderId || msg.sender_id;
@@ -167,7 +167,7 @@ const ChatPage = () => {
                                             {/* <br/><small style={{fontSize:'8px', color:'gray'}}>{JSON.stringify(msg)}</small> */}
                                         </div>
                                         <div className="message-time">
-                                            {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
+                                            {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                         </div>
                                     </div>
                                 );
@@ -176,8 +176,8 @@ const ChatPage = () => {
                         </div>
 
                         <form className="chat-input-area" onSubmit={handleSendMessage}>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 value={inputMsg}
                                 onChange={(e) => setInputMsg(e.target.value)}
                                 placeholder="Ketik pesan..."
