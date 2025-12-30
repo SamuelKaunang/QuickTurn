@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from './Toast';
 import { api } from './utils/apiConfig';
+import { SkeletonProjectCard } from './Skeleton';
 import './ProjectsM.css';
 
 const ProjectsM = ({ token, limit, userCategory }) => {
@@ -211,7 +212,12 @@ const ProjectsM = ({ token, limit, userCategory }) => {
 
             <div className="projects-rowM">
                 {loading ? (
-                    <p style={{ color: '#64748b', padding: '20px' }}>Loading projects...</p>
+                    <>
+                        <SkeletonProjectCard />
+                        <SkeletonProjectCard />
+                        <SkeletonProjectCard />
+                        <SkeletonProjectCard />
+                    </>
                 ) : displayProjects.length === 0 ? (
                     <p style={{ color: '#64748b', padding: '20px' }}>No matching projects found.</p>
                 ) : (

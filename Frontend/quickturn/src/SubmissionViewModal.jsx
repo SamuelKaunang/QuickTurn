@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Download, ExternalLink, FileText, Image, Archive, Check, XCircle } from 'lucide-react';
+import { useToast } from './Toast';
 import { api } from './utils/apiConfig';
 import './SubmissionViewModal.css';
 
@@ -9,6 +10,7 @@ const SubmissionViewModal = ({ isOpen, onClose, projectId, token }) => {
     const [selectedSubmission, setSelectedSubmission] = useState(null);
     const [feedback, setFeedback] = useState('');
     const [reviewing, setReviewing] = useState(false);
+    const toast = useToast();
 
     useEffect(() => {
         if (isOpen && projectId) {
@@ -48,13 +50,13 @@ const SubmissionViewModal = ({ isOpen, onClose, projectId, token }) => {
             });
 
             if (response.ok) {
-                alert(`Submission ${status.toLowerCase()}!`);
+                toast.success(`Submission ${status.toLowerCase()} successfully!`, 'Review Complete');
                 fetchSubmissions();
                 setSelectedSubmission(null);
                 setFeedback('');
             }
         } catch (err) {
-            alert('Failed to review submission');
+            toast.error('Failed to review submission. Please try again.', 'Error');
         } finally {
             setReviewing(false);
         }

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    LayoutDashboard, Briefcase, MessageSquare, Settings,
-    LogOut, Search, Bell, ArrowUpRight, ArrowDownRight, Users,
-    CheckCircle, Send, UserSearch
+    LayoutDashboard, Briefcase, MessageSquare,
+    LogOut, Search, ArrowUpRight, ArrowDownRight, Users,
+    CheckCircle, Send
 } from 'lucide-react';
 import { api } from './utils/apiConfig';
 import './DashboardM.css';
@@ -237,13 +237,6 @@ const DashboardM = () => {
                     </nav>
 
                     <div className="sidebar-footer">
-                        <button
-                            className="nav-item settings-btn"
-                            onClick={() => navigate('/profile-mahasiswa')}
-                        >
-                            <Settings size={18} />
-                            <span>Settings</span>
-                        </button>
                         <button className="logout-btn" onClick={handleLogout}>
                             <LogOut size={18} />
                             <span>Logout</span>
@@ -266,10 +259,6 @@ const DashboardM = () => {
                     </div>
 
                     <div className="topbar-actions">
-                        <button className="notif-btn">
-                            <Bell size={20} />
-                            <span className="dot"></span>
-                        </button>
                         <div
                             className="profile-pill"
                             onClick={() => navigate('/profile-mahasiswa')}

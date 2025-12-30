@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Briefcase, MessageSquare, Settings,
-  LogOut, Search, Bell, Users, Plus,
-  CheckCircle, FolderOpen, FileText
+  LayoutDashboard, Briefcase, MessageSquare,
+  LogOut, Search, Users, Plus,
+  CheckCircle, FolderOpen
 } from 'lucide-react';
 import { api } from './utils/apiConfig';
 import './DashboardU.css';
@@ -14,6 +14,8 @@ import ApplicantsModalU from './ApplicantsModalU';
 import ContractModal from './ContractModal';
 import UserSearchModal from './UserSearchModal';
 import SubmissionViewModal from './SubmissionViewModal';
+import RecentActivities from './RecentActivities';
+import { SkeletonDashboard, SkeletonStatCard } from './Skeleton';
 
 // --- Sub-Components ---
 const GlassCard = ({ children, className = "" }) => (
@@ -48,13 +50,7 @@ const DashboardU = () => {
   const [showSubmissionViewModal, setShowSubmissionViewModal] = useState(false);
   const [submissionViewProjectId, setSubmissionViewProjectId] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
-
-  // Recent Activity
-  const [recentActivity] = useState([
-    { id: 1, text: "Posted new project", time: "2 hours ago", type: "post" },
-    { id: 2, text: "Accepted applicant for project", time: "1 day ago", type: "accept" },
-    { id: 3, text: "Project completed", time: "3 days ago", type: "done" },
-  ]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem("token");
@@ -105,6 +101,7 @@ const DashboardU = () => {
 
   const fetchProjects = async (authToken) => {
     try {
+      setLoading(true);
       const t = authToken || token;
       const response = await fetch(api("/api/projects/my-projects"), {
         headers: { "Authorization": `Bearer ${t}` }
@@ -112,6 +109,7 @@ const DashboardU = () => {
       const data = await response.json();
       if (response.ok) setProjects(data.data || []);
     } catch (err) { console.error(err); }
+    finally { setLoading(false); }
   };
 
   const handleLogout = () => {
@@ -207,13 +205,6 @@ const DashboardU = () => {
           </nav>
 
           <div className="sidebar-footer">
-            <button
-              className="nav-item settings-btn"
-              onClick={() => navigate('/profile-umkm')}
-            >
-              <Settings size={18} />
-              <span>Settings</span>
-            </button>
             <button className="logout-btn" onClick={handleLogout}>
               <LogOut size={18} />
               <span>Logout</span>
@@ -236,10 +227,6 @@ const DashboardU = () => {
           </div>
 
           <div className="topbar-actions">
-            <button className="notif-btn">
-              <Bell size={20} />
-              <span className="dot"></span>
-            </button>
             <div
               className="profile-pill"
               onClick={() => navigate('/profile-umkm')}
@@ -279,7 +266,15 @@ const DashboardU = () => {
               </div>
 
               <div className="stats-grid">
-                {stats.map((s, i) => <StatCard key={i} {...s} />)}
+                {loading ? (
+                  <>
+                    <SkeletonStatCard />
+                    <SkeletonStatCard />
+                    <SkeletonStatCard />
+                  </>
+                ) : (
+                  stats.map((s, i) => <StatCard key={i} {...s} />)
+                )}
               </div>
 
               <div className="grid-layout">
@@ -306,17 +301,9 @@ const DashboardU = () => {
 
                 <div className="activity-section">
                   <h3>Recent Activity</h3>
-                  <GlassCard className="activity-card">
-                    {recentActivity.map(log => (
-                      <div key={log.id} className="activity-item">
-                        <div className={`activity-dot ${log.type}`}></div>
-                        <div className="activity-info">
-                          <p>{log.text}</p>
-                          <span>{log.time}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </GlassCard>
+                  <div className="glass-card activity-card">
+                    <RecentActivities />
+                  </div>
                 </div>
               </div>
             </div>

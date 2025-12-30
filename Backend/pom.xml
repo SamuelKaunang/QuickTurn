@@ -110,6 +110,13 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- Azure Blob Storage SDK -->
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-storage-blob</artifactId>
+			<version>12.29.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

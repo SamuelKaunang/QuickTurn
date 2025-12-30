@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from './Toast';
 import { api } from './utils/apiConfig';
 import './LoginPage.css';
 import logoFull from './assets/logo/Logo full.png';
@@ -14,6 +15,7 @@ function RegistrationPageM() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleRoleToggle = (role) => {
     navigate(role === 'CLIENT' ? '/registeru' : '/registerm');
@@ -50,7 +52,7 @@ function RegistrationPageM() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        alert("Registrasi Berhasil! Silakan Login.");
+        toast.success('Registrasi berhasil! Silakan login.', 'Selamat!');
         navigate('/login');
       } else {
         setMessage(data.message || "Registrasi Gagal");

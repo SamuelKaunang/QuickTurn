@@ -4,6 +4,7 @@ import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 import { ArrowLeft, Send, MessageSquare, Paperclip, X, FileText, Download, Image } from 'lucide-react';
 import { api, wsEndpoint } from './utils/apiConfig';
+import { SkeletonChatContact, SkeletonChatMessage } from './Skeleton';
 import './ChatPage.css';
 
 const ChatPage = () => {
@@ -24,6 +25,8 @@ const ChatPage = () => {
     const [filePreview, setFilePreview] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState("");
+    const [loadingContacts, setLoadingContacts] = useState(true);
+    const [loadingMessages, setLoadingMessages] = useState(false);
 
     // Max file size 10MB
     const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -51,6 +54,7 @@ const ChatPage = () => {
     useEffect(() => {
         if (activeChat && user) {
             const targetId = activeChat.userId || activeChat.id;
+            setLoadingMessages(true);
 
             fetch(api(`/api/chat/history?otherUserId=${targetId}`), {
                 headers: { "Authorization": `Bearer ${token}` }
@@ -69,7 +73,8 @@ const ChatPage = () => {
                     setMessages(validMessages);
                     scrollToBottom();
                 })
-                .catch(err => console.error("History fetch error:", err));
+                .catch(err => console.error("History fetch error:", err))
+                .finally(() => setLoadingMessages(false));
         }
     }, [activeChat, user]);
 
@@ -79,6 +84,7 @@ const ChatPage = () => {
 
     const fetchContacts = async () => {
         try {
+            setLoadingContacts(true);
             const res = await fetch(api("/api/chat/contacts"), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -90,6 +96,7 @@ const ChatPage = () => {
 
             setContacts(fixedContacts);
         } catch (err) { console.error(err); }
+        finally { setLoadingContacts(false); }
     };
 
     const connectWebSocket = (myUserId) => {
@@ -267,7 +274,14 @@ const ChatPage = () => {
                     <h3>Messages</h3>
                 </div>
                 <div className="contacts-list">
-                    {contacts.length === 0 ? (
+                    {loadingContacts ? (
+                        <>
+                            <SkeletonChatContact />
+                            <SkeletonChatContact />
+                            <SkeletonChatContact />
+                            <SkeletonChatContact />
+                        </>
+                    ) : contacts.length === 0 ? (
                         <div className="no-contacts">
                             <p>No conversations yet</p>
                         </div>
@@ -350,24 +364,33 @@ const ChatPage = () => {
                         </div>
 
                         <div className="chat-messages">
-                            {messages.map((msg, index) => {
-                                const sender = msg.senderId || msg.sender_id;
-                                const isMe = sender == user?.id;
+                            {loadingMessages ? (
+                                <>
+                                    <SkeletonChatMessage />
+                                    <SkeletonChatMessage isOwn />
+                                    <SkeletonChatMessage />
+                                    <SkeletonChatMessage isOwn />
+                                </>
+                            ) : (
+                                messages.map((msg, index) => {
+                                    const sender = msg.senderId || msg.sender_id;
+                                    const isMe = sender == user?.id;
 
-                                return (
-                                    <div key={index} className={`message-bubble ${isMe ? 'my-message' : 'their-message'}`}>
-                                        {renderAttachment(msg)}
-                                        {msg.content && (
-                                            <div className="message-content">
-                                                {msg.content}
+                                    return (
+                                        <div key={index} className={`message-bubble ${isMe ? 'my-message' : 'their-message'}`}>
+                                            {renderAttachment(msg)}
+                                            {msg.content && (
+                                                <div className="message-content">
+                                                    {msg.content}
+                                                </div>
+                                            )}
+                                            <div className="message-time">
+                                                {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                             </div>
-                                        )}
-                                        <div className="message-time">
-                                            {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })
+                            )}
                             <div ref={messagesEndRef} />
                         </div>
 

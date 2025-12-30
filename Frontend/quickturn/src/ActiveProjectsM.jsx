@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ProjectsM.css';
 import ReviewModal from './ReviewModal';
 import WorkSubmissionModal from './WorkSubmissionModal';
+import { useToast } from './Toast';
 import { api } from './utils/apiConfig';
 
 const ActiveProjectsM = ({ token }) => {
@@ -18,6 +19,7 @@ const ActiveProjectsM = ({ token }) => {
 
     // --- Track reviewed projects: { projectId: { hasReviewed, rating, comment } }
     const [reviewedProjects, setReviewedProjects] = useState({});
+    const toast = useToast();
 
     const fetchMyActiveProjects = async () => {
         try {
@@ -99,7 +101,7 @@ const ActiveProjectsM = ({ token }) => {
                 body: JSON.stringify({ rating, comment })
             });
             if (response.ok) {
-                alert("Review submitted successfully! Thank you.");
+                toast.success('Review submitted successfully! Thank you.', 'Review Sent');
                 // Update local state to reflect the review
                 setReviewedProjects(prev => ({
                     ...prev,
@@ -109,11 +111,11 @@ const ActiveProjectsM = ({ token }) => {
                 setReviewProject(null);
             } else {
                 const err = await response.json();
-                alert(err.message || "Failed to submit review.");
+                toast.error(err.message || 'Failed to submit review.', 'Error');
             }
         } catch (error) {
             console.error(error);
-            alert("Connection error.");
+            toast.error('Connection error. Please try again.', 'Error');
         }
     };
 

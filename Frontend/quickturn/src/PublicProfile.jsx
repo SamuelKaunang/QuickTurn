@@ -5,6 +5,7 @@ import {
     Award, Phone, Globe, Linkedin, Github, GraduationCap, Clock
 } from 'lucide-react';
 import { api } from './utils/apiConfig';
+import { Skeleton, SkeletonAvatar, SkeletonText } from './Skeleton';
 import './PublicProfile.css';
 
 const PublicProfile = () => {
@@ -75,9 +76,65 @@ const PublicProfile = () => {
             <div className="public-profile-page">
                 <div className="bg-glow glow-1"></div>
                 <div className="bg-glow glow-2"></div>
-                <div className="loading-state">
-                    <div className="loading-spinner"></div>
-                    <p>Loading profile...</p>
+                <div className="profile-layout">
+                    {/* Skeleton Sidebar */}
+                    <div className="profile-sidebar">
+                        <button onClick={handleBack} className="btn-back">
+                            <ArrowLeft size={16} />
+                            Back
+                        </button>
+                        <div className="profile-picture-section">
+                            <div className="profile-picture-wrapper">
+                                <SkeletonAvatar size="120px" />
+                            </div>
+                        </div>
+                        <div className="sidebar-user-info">
+                            <Skeleton width="150px" height="24px" borderRadius="4px" />
+                            <Skeleton width="100px" height="16px" borderRadius="4px" style={{ marginTop: '8px' }} />
+                            <Skeleton width="80px" height="28px" borderRadius="14px" style={{ marginTop: '12px' }} />
+                        </div>
+                        <div className="sidebar-stats">
+                            <div className="skeleton-stat">
+                                <Skeleton width="40px" height="24px" borderRadius="4px" />
+                                <Skeleton width="50px" height="12px" borderRadius="4px" style={{ marginTop: '4px' }} />
+                            </div>
+                            <div className="skeleton-stat">
+                                <Skeleton width="40px" height="24px" borderRadius="4px" />
+                                <Skeleton width="50px" height="12px" borderRadius="4px" style={{ marginTop: '4px' }} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Skeleton Content */}
+                    <div className="profile-content">
+                        <div className="profile-header-section">
+                            <Skeleton width="100px" height="32px" borderRadius="4px" />
+                            <Skeleton width="250px" height="16px" borderRadius="4px" style={{ marginTop: '8px' }} />
+                        </div>
+                        <div className="info-card">
+                            <div className="info-card-header">
+                                <Skeleton width="20px" height="20px" borderRadius="4px" />
+                                <Skeleton width="80px" height="20px" borderRadius="4px" />
+                            </div>
+                            <div className="info-card-body">
+                                <SkeletonText lines={3} />
+                            </div>
+                        </div>
+                        <div className="info-card">
+                            <div className="info-card-header">
+                                <Skeleton width="20px" height="20px" borderRadius="4px" />
+                                <Skeleton width="120px" height="20px" borderRadius="4px" />
+                            </div>
+                            <div className="info-card-body">
+                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                    <Skeleton width="70px" height="28px" borderRadius="14px" />
+                                    <Skeleton width="90px" height="28px" borderRadius="14px" />
+                                    <Skeleton width="60px" height="28px" borderRadius="14px" />
+                                    <Skeleton width="80px" height="28px" borderRadius="14px" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
