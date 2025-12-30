@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { FileText, X, Printer } from 'lucide-react';
+import './ContractModal.css';
 
 const ContractModal = ({ projectId, token, onClose }) => {
     const [contractText, setContractText] = useState("Loading contract...");
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchContract = async () => {
@@ -14,54 +17,53 @@ const ContractModal = ({ projectId, token, onClose }) => {
                 if (response.ok) {
                     setContractText(data.data);
                 } else {
-                    setError(data.message || "Gagal memuat kontrak");
+                    setError(data.message || "Failed to load contract");
                 }
             } catch (err) {
                 setError("Network error");
+            } finally {
+                setLoading(false);
             }
         };
         fetchContract();
     }, [projectId, token]);
 
     return (
-        <div style={styles.overlay}>
-            <div style={styles.box}>
-                <div style={styles.header}>
-                    <h3>📄 Digital Contract</h3>
-                    <button onClick={onClose} style={styles.closeBtn}>✖</button>
+        <div className="contract-modal-overlay">
+            <div className="contract-modal-box">
+                <div className="contract-modal-header">
+                    <div className="contract-title">
+                        <FileText size={20} />
+                        <h3>Digital Contract</h3>
+                    </div>
+                    <button onClick={onClose} className="contract-close-btn">
+                        <X size={20} />
+                    </button>
                 </div>
-                <div style={styles.body}>
-                    {error ? (
-                        <p style={{color:'red'}}>{error}</p>
+                <div className="contract-modal-body">
+                    {loading ? (
+                        <div className="contract-loading">
+                            <div className="contract-spinner"></div>
+                            <p>Loading contract...</p>
+                        </div>
+                    ) : error ? (
+                        <p className="contract-error">{error}</p>
                     ) : (
-                        <pre style={styles.contractText}>{contractText}</pre>
+                        <pre className="contract-text">{contractText}</pre>
                     )}
                 </div>
-                <div style={styles.footer}>
-                    <button onClick={() => window.print()} style={styles.printBtn}>🖨️ Print / Save PDF</button>
+                <div className="contract-modal-footer">
+                    <button onClick={onClose} className="contract-btn-secondary">
+                        Close
+                    </button>
+                    <button onClick={() => window.print()} className="contract-btn-primary">
+                        <Printer size={16} />
+                        Print / Save PDF
+                    </button>
                 </div>
             </div>
         </div>
     );
-};
-
-const styles = {
-    overlay: {
-        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000
-    },
-    box: {
-        background: '#fff', color: '#000', width: '600px', maxWidth: '90%',
-        borderRadius: '10px', padding: '0', overflow: 'hidden'
-    },
-    header: {
-        padding: '15px 20px', borderBottom: '1px solid #ccc', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-    },
-    closeBtn: { background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' },
-    body: { padding: '20px', maxHeight: '60vh', overflowY: 'auto', background: '#f9f9f9' },
-    contractText: { whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '14px', lineHeight: '1.5' },
-    footer: { padding: '15px', borderTop: '1px solid #ccc', textAlign: 'right', background: '#fff' },
-    printBtn: { background: '#007bff', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer' }
 };
 
 export default ContractModal;

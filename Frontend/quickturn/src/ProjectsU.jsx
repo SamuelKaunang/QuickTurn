@@ -1,15 +1,59 @@
-import React, { useState } from 'react'; // ✅ Added useState
-import './ProjectsU.css'; 
-import ReviewModal from './ReviewModal'; // ✅ Import the Review Modal
+import React, { useState, useEffect } from 'react';
+import './ProjectsU.css';
+import ReviewModal from './ReviewModal';
+import { useToast } from './Toast';
 
-const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContract }) => {
-    
-    // --- Review Modal State (NEW) ---
+const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContract, onViewSubmissions }) => {
+    const toast = useToast();
+
+    // --- Review Modal State ---
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [reviewProject, setReviewProject] = useState(null);
 
+    // --- Track reviewed projects: { projectId: { hasReviewed, rating, comment } }
+    const [reviewedProjects, setReviewedProjects] = useState({});
+
+    // Fetch review status for all CLOSED projects
+    useEffect(() => {
+        const fetchReviewStatuses = async () => {
+            const closedProjects = projects.filter(p => p.status === 'CLOSED');
+
+            for (const project of closedProjects) {
+                // Skip if we already fetched this one
+                if (reviewedProjects[project.id] !== undefined) continue;
+
+                try {
+                    const response = await fetch(`/api/projects/${project.id}/my-review`, {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.data) {
+                        setReviewedProjects(prev => ({
+                            ...prev,
+                            [project.id]: data.data
+                        }));
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch review status for project", project.id, err);
+                }
+            }
+        };
+
+        if (token && projects.length > 0) {
+            fetchReviewStatuses();
+        }
+    }, [projects, token]);
+
     const handleCompleteProject = async (projectId) => {
-        if(!window.confirm("Apakah Anda yakin pekerjaan selesai dan sesuai? Project akan ditutup.")) return;
+        const confirmed = await toast.confirm({
+            title: 'Complete Project',
+            message: 'Are you sure the work is complete? This will close the project.',
+            confirmText: 'Complete',
+            cancelText: 'Cancel',
+            type: 'default'
+        });
+
+        if (!confirmed) return;
 
         try {
             const response = await fetch(`/api/projects/${projectId}/finish/confirm`, {
@@ -17,19 +61,19 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await response.json();
-            if(response.ok) {
-                alert("Project selesai! Status diubah menjadi CLOSED.");
-                if(onRefresh) onRefresh(); 
+            if (response.ok) {
+                toast.success("Project completed! Status changed to CLOSED.", "Success");
+                if (onRefresh) onRefresh();
             } else {
-                alert(data.message || "Gagal menyelesaikan project");
+                toast.error(data.message || "Failed to complete project", "Error");
             }
         } catch (err) {
             console.error(err);
-            alert("Terjadi kesalahan.");
+            toast.error("An error occurred.", "Error");
         }
     };
 
-    // --- ✅ SUBMIT REVIEW LOGIC (NEW) ---
+    // --- SUBMIT REVIEW LOGIC ---
     const handleSubmitReview = async (rating, comment) => {
         if (!reviewProject) return;
 
@@ -44,21 +88,26 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
             });
 
             if (response.ok) {
-                alert("Rating & Review berhasil dikirim untuk Mahasiswa!");
+                toast.success("Review submitted successfully!", "Success");
+                // Update local state to reflect the review
+                setReviewedProjects(prev => ({
+                    ...prev,
+                    [reviewProject.id]: { hasReviewed: true, rating, comment }
+                }));
                 setShowReviewModal(false);
                 setReviewProject(null);
             } else {
                 const err = await response.json();
-                alert(err.message || "Gagal mengirim review.");
+                toast.error(err.message || "Failed to submit review.", "Error");
             }
         } catch (error) {
             console.error(error);
-            alert("Terjadi kesalahan koneksi.");
+            toast.error("Connection error.", "Error");
         }
     };
 
     const getCategoryClass = (cat) => {
-        if (!cat) return "design"; 
+        if (!cat) return "design";
         if (cat.includes("IT")) return "it";
         if (cat.includes("Marketing")) return "marketing";
         return "design";
@@ -67,14 +116,13 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
     return (
         <div className="projects-rowU">
             {projects.length === 0 ? (
-                <p style={{color: '#888', padding: '20px'}}>Belum ada project.</p>
+                <p style={{ color: '#64748b', padding: '20px' }}>No projects yet.</p>
             ) : (
                 projects.map((p) => (
                     <div className="project-cardU" key={p.id}>
                         <div className={`card-headerU ${getCategoryClass(p.category)}`}>
-                            <i className="fas fa-briefcase"></i>
                             <span className={`card-statusU ${p.status.toLowerCase()}`}>
-                                ● {p.status}
+                                {p.status}
                             </span>
                         </div>
                         <div className="card-bodyU">
@@ -82,76 +130,82 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                             <div className="card-titleU">{p.title}</div>
                             <div className="card-metaU">
                                 <span className="card-budgetU">Rp {Number(p.budget).toLocaleString()}</span>
-                                <span className="card-deadlineU">📅 {p.deadline}</span>
+                                <span className="card-deadlineU">{p.deadline}</span>
                             </div>
 
-                            <div style={{marginTop: '15px', display:'flex', flexDirection:'column', gap:'10px'}}>
-                                
+                            <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
                                 {/* 1. OPEN: Show Applicants */}
                                 {p.status === 'OPEN' && (
-                                    <button 
+                                    <button
                                         className="btn-secondaryU"
-                                        style={{width: '100%', padding: '8px', cursor: 'pointer', background: 'rgba(255,255,255,0.1)', color:'white', border:'1px solid #555', borderRadius:'5px'}}
                                         onClick={() => onViewApplicants(p.id)}
                                     >
-                                        👥 Lihat Pelamar
+                                        View Applicants
                                     </button>
                                 )}
 
                                 {/* 2. ONGOING: Waiting for Student */}
                                 {p.status === 'ONGOING' && (
-                                     <div style={{textAlign:'center', color:'#ffc107', fontSize:'13px', background:'rgba(255, 193, 7, 0.1)', padding:'8px', borderRadius:'5px'}}>
-                                        ⏳ Menunggu Submit
+                                    <div className="status-waiting">
+                                        Waiting for Submission
                                     </div>
                                 )}
 
-                                {/* 3. DONE: Student Submitted -> UMKM Can Finish */}
+                                {/* 3. DONE: Student Submitted -> UMKM Can view submissions and Finish */}
                                 {p.status === 'DONE' && (
-                                    <button 
-                                        className="btn-primaryU" 
-                                        style={{width: '100%', fontSize: '14px', justifyContent:'center', background:'#e50914', color:'white', border:'none', padding:'10px', borderRadius:'5px', cursor:'pointer'}}
-                                        onClick={() => handleCompleteProject(p.id)}
-                                    >
-                                        ✅ Approve & Selesaikan
-                                    </button>
-                                )}
-                                
-                                {/* 4. CLOSED: Done -> ✅ RATE STUDENT (NEW) */}
-                                {p.status === 'CLOSED' && (
-                                    <div style={{display:'flex', flexDirection:'column', gap:'5px'}}>
-                                        <div style={{textAlign:'center', color:'#46d369', fontWeight:'bold', border:'1px solid #46d369', padding:'8px', borderRadius:'5px', fontSize:'12px'}}>
-                                            🎉 Project Selesai
-                                        </div>
-                                        <button 
-                                            onClick={() => {
-                                                setReviewProject(p);
-                                                setShowReviewModal(true);
-                                            }}
-                                            style={{
-                                                width: '100%', padding: '8px', 
-                                                background: 'linear-gradient(45deg, #ffc107, #ffdb58)', 
-                                                color: 'black', fontWeight:'bold', border: 'none', 
-                                                borderRadius: '5px', cursor: 'pointer'
-                                            }}
+                                    <>
+                                        <button
+                                            className="btn-secondaryU"
+                                            onClick={() => onViewSubmissions && onViewSubmissions(p.id)}
                                         >
-                                            ⭐ Rate Mahasiswa
+                                            View Submissions
                                         </button>
-                                    </div>
+                                        <button
+                                            className="btn-primaryU"
+                                            onClick={() => handleCompleteProject(p.id)}
+                                        >
+                                            Approve and Complete
+                                        </button>
+                                    </>
                                 )}
 
-                                {/* LIHAT KONTRAK BUTTON */}
+                                {/* 4. CLOSED: Done -> RATE TALENT */}
+                                {p.status === 'CLOSED' && (
+                                    <>
+                                        <div className="status-complete">
+                                            Project Completed
+                                        </div>
+
+                                        {/* Check if already reviewed */}
+                                        {reviewedProjects[p.id]?.hasReviewed ? (
+                                            <div className="rating-display">
+                                                <p className="rating-label">Your Rating</p>
+                                                <p className="rating-stars">
+                                                    {'★'.repeat(reviewedProjects[p.id].rating)}{'☆'.repeat(5 - reviewedProjects[p.id].rating)}
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => {
+                                                    setReviewProject(p);
+                                                    setShowReviewModal(true);
+                                                }}
+                                                className="btn-rate"
+                                            >
+                                                Rate Talent
+                                            </button>
+                                        )}
+                                    </>
+                                )}
+
+                                {/* VIEW CONTRACT BUTTON */}
                                 {(p.status === 'ONGOING' || p.status === 'DONE' || p.status === 'CLOSED') && (
-                                    <button 
+                                    <button
                                         onClick={() => onViewContract(p.id)}
-                                        style={{
-                                            width: '100%', padding: '8px', 
-                                            background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#aaa', 
-                                            borderRadius: '5px', cursor: 'pointer', fontSize:'13px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px'
-                                        }}
-                                        onMouseOver={(e) => {e.target.style.color='white'; e.target.style.borderColor='white'}}
-                                        onMouseOut={(e) => {e.target.style.color='#aaa'; e.target.style.borderColor='rgba(255,255,255,0.2)'}}
+                                        className="btn-outlineU"
                                     >
-                                        📄 Lihat Kontrak
+                                        View Contract
                                     </button>
                                 )}
 
@@ -161,8 +215,8 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                 ))
             )}
 
-            {/* ✅ MODAL REVIEW */}
-            <ReviewModal 
+            {/* MODAL REVIEW */}
+            <ReviewModal
                 isOpen={showReviewModal}
                 onClose={() => setShowReviewModal(false)}
                 onSubmit={handleSubmitReview}

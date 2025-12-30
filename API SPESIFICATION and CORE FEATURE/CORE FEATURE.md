@@ -40,14 +40,6 @@ Berikut adalah **7 core features** utama dari aplikasi ini:
 
 ---
 
-## 5. Payment & Transaction
-- **Payment Gateway Integration**: Midtrans, Xendit, GoPay, DANA.
-- **Escrow System**: UMKM bayar → dana ditahan → cair kalau project selesai.
-
-> 💰 **Analogi**: seperti Tokopedia → duit ditahan dulu biar aman, baru cair setelah barang (proyek) selesai.
-
----
-
 ## 6. Review & Rating
 - UMKM kasih **rating + review** mahasiswa setelah project.
 - Mahasiswa juga bisa menilai UMKM (two-way rating).

@@ -39,6 +39,22 @@ public class ChatService {
     }
 
     /**
+     * Save a chat message with attachment
+     */
+    public ChatMessage saveMessageWithAttachment(Long senderId, Long recipientId, String content,
+            String attachmentUrl, String attachmentType,
+            String originalFilename, Long fileSize) {
+        validateChatPermission(senderId, recipientId);
+
+        ChatMessage chat = new ChatMessage(senderId, recipientId, content);
+        chat.setAttachmentUrl(attachmentUrl);
+        chat.setAttachmentType(attachmentType);
+        chat.setOriginalFilename(originalFilename);
+        chat.setFileSize(fileSize);
+        return chatMessageRepository.save(chat);
+    }
+
+    /**
      * Get chat history between two users (non-paginated, sorted by timestamp)
      */
     public List<ChatResponseDTO> getChatHistory(Long userId1, Long userId2) {
@@ -146,12 +162,20 @@ public class ChatService {
         List<ChatResponseDTO> result = new ArrayList<>();
         for (ChatMessage chat : chats) {
             String name = userNames.getOrDefault(chat.getSenderId(), "Unknown");
-            result.add(new ChatResponseDTO(
+            ChatResponseDTO dto = new ChatResponseDTO(
                     chat.getId(),
                     chat.getSenderId(),
                     name,
                     chat.getContent(),
-                    chat.getTimestamp()));
+                    chat.getTimestamp());
+            // Add attachment info if present
+            if (chat.getAttachmentUrl() != null) {
+                dto.setAttachmentUrl(chat.getAttachmentUrl());
+                dto.setAttachmentType(chat.getAttachmentType());
+                dto.setOriginalFilename(chat.getOriginalFilename());
+                dto.setFileSize(chat.getFileSize());
+            }
+            result.add(dto);
         }
         return result;
     }

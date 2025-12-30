@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './RegistrationPageM.css';
+import './LoginPage.css';
+import logoFull from './assets/logo/Logo full.png';
 
 function RegistrationPageM() {
   const [email, setEmail] = useState('');
@@ -8,16 +9,18 @@ function RegistrationPageM() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [passwordMatch, setPasswordMatch] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRoleToggle = (role) => {
-      navigate(role === 'UMKM' ? '/registeru' : '/registerm');
+    navigate(role === 'CLIENT' ? '/registeru' : '/registerm');
   };
 
-  const handleRegistration = async () => {
+  const handleRegistration = async (e) => {
+    e.preventDefault();
+
     if (!name || !email || !password || !confirmPassword) {
       setMessage('Harap isi semua kolom.');
       return;
@@ -28,17 +31,18 @@ function RegistrationPageM() {
       return;
     }
 
+    setIsLoading(true);
+    setMessage('');
+
     try {
-      // 1. FIX: Use relative path (Proxy)
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // 2. FIX: Send the ROLE explicitly
-        body: JSON.stringify({ 
-            nama: name, 
-            email, 
-            password, 
-            role: 'MAHASISWA' 
+        body: JSON.stringify({
+          nama: name,
+          email,
+          password,
+          role: 'MAHASISWA'
         })
       });
 
@@ -53,78 +57,164 @@ function RegistrationPageM() {
     } catch (err) {
       setMessage('Terjadi kesalahan saat menghubungi server.');
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="registration-page">
-      <div className="registration-container">
-        <h2>Registrasi Mahasiswa</h2>
-        <input
-          type="text"
-          placeholder="Nama Lengkap"
-          className="registration-input-field"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          className="registration-input-field"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <div className="registration-password-wrapper">
-          <input
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Password"
-            className="registration-input-field"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button
-            type="button"
-            className="registration-toggle-password"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? '🚫' : '👁️'}
-          </button>
-        </div>
-        <div className="registration-confirm-password-wrapper">
-          <input
-            type={showConfirmPassword ? 'text' : 'password'}
-            placeholder="Konfirmasi Password"
-            className="registration-input-field"
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-              setPasswordMatch(e.target.value === password);
-            }}
-            style={{
-              borderColor: passwordMatch === true ? 'green' : passwordMatch === false ? 'red' : '#ccc',
-            }}
-          />
-          <button
-            type="button"
-            className="registration-toggle-confirm-password"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          >
-            {showConfirmPassword ? '🚫' : '👁️'}
-          </button>
-        </div>
+    <div className="login-wrapper">
+      {/* LEFT PANEL: Branding & Visual */}
+      <section className="left-panel">
+        <div className="left-content-bg"></div>
+        <div className="glass-overlay">
+          <div className="brand-header">
+            <img src={logoFull} alt="QuickTurn" className="brand-logo" />
+          </div>
 
-        <button className="registration-button" onClick={handleRegistration}>Buat Akun</button>
-        <p className="registration-message">{message}</p>
-        <p className="registration-login-text">
-          Sudah punya akun? <Link className="registration-login-link" to="/login">Login disini</Link>
-        </p>
-      </div>
-      
-      {/* Role Toggle at the bottom allows switching to UMKM */}
-      <div className="role-toggle">
-        <button className="role-btn" onClick={() => handleRoleToggle('UMKM')}>UMKM</button>
-        <button className="role-btn active" disabled>Mahasiswa</button>
-      </div>
+          <div className="hero-text-container">
+            <h1 className="hero-title">
+              Empowering your <br />
+              <span className="highlight-text">digital future.</span>
+            </h1>
+            <p className="hero-desc">
+              Platform workspace generasi terbaru. Aman, kenceng, dan didesain buat inovator kayak lo.
+            </p>
+
+            <div className="quote-block">
+              <p className="quote-text">
+                "Innovation distinguishes between a leader and a follower."
+              </p>
+              <p className="quote-author">STEVE JOBS</p>
+            </div>
+          </div>
+
+          <div className="left-footer">
+            <p>© 2025 QuickTurn Inc.</p>
+            <div className="footer-links">
+              <span>Privacy Policy</span>
+              <span>Terms of Service</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* RIGHT PANEL: Form */}
+      <section className="right-panel">
+        <div className="form-container">
+          <div className="form-header">
+            {message && <div className={`error-alert ${message.includes('Berhasil') ? 'success-alert' : ''}`}>{message}</div>}
+            <h2>Registrasi Talent</h2>
+            <p>Buat akun baru dan mulai perjalanan lo sebagai Talent.</p>
+          </div>
+
+          <form onSubmit={handleRegistration} className="auth-form">
+            <div className="input-group">
+              <label htmlFor="name">Nama Lengkap</label>
+              <div className="input-wrapper">
+                <span className="material-symbols-outlined icon-left">person</span>
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Masukkan nama lengkap lo"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="email">Email Address</label>
+              <div className="input-wrapper">
+                <span className="material-symbols-outlined icon-left">mail</span>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="name@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="password">Password</label>
+              <div className="input-wrapper">
+                <span className="material-symbols-outlined icon-left">lock</span>
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Masukkan password lo"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <span className="material-symbols-outlined">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="confirmPassword">Konfirmasi Password</label>
+              <div className="input-wrapper">
+                <span className="material-symbols-outlined icon-left">lock</span>
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Ulangi password lo"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  style={{
+                    borderColor: confirmPassword && (confirmPassword === password ? '#16a34a' : '#ef4444')
+                  }}
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  <span className="material-symbols-outlined">
+                    {showConfirmPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" className="submit-btn" disabled={isLoading}>
+              {isLoading ? (
+                <div className="loader-container">
+                  <div className="spinner"></div>
+                  <span>Creating...</span>
+                </div>
+              ) : (
+                'Buat Akun'
+              )}
+            </button>
+          </form>
+
+          <div className="register-cta">
+            <p>
+              Sudah punya akun? <Link to="/login">Login di sini</Link>
+            </p>
+          </div>
+
+          {/* Role Toggle */}
+          <div className="role-toggle">
+            <button className="role-btn" onClick={() => handleRoleToggle('CLIENT')}>Client</button>
+            <button className="role-btn active" disabled>Talent</button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

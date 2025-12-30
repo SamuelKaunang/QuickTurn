@@ -7,19 +7,22 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
-    
+
     // Cek apakah mahasiswa sudah pernah apply ke project tertentu
     boolean existsByProjectIdAndStudentId(Long projectId, Long studentId);
-    
+
     // Ambil semua aplikasi untuk satu project (UMKM lihat siapa saja yang apply)
     List<Application> findByProjectId(Long projectId);
-    
+
     // Ambil semua aplikasi dari seorang mahasiswa
     List<Application> findByStudentId(Long studentId);
-    
+
     // Ambil aplikasi spesifik berdasarkan project dan student
     Optional<Application> findByProjectIdAndStudentId(Long projectId, Long studentId);
-    
+
     // Ambil semua aplikasi untuk project milik UMKM tertentu
     List<Application> findByProject_Owner_Id(Long ownerId);
+
+    // Count applications for a project
+    int countByProjectId(Long projectId);
 }

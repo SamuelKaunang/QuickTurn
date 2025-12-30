@@ -33,7 +33,8 @@ public class ReviewService {
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
         // 2. Validate Status (Must be DONE or CLOSED)
-        // Note: Check your ProjectStatus enum if 'CLOSED' is the correct term for finished projects
+        // Note: Check your ProjectStatus enum if 'CLOSED' is the correct term for
+        // finished projects
         if (project.getStatus() != ProjectStatus.DONE && project.getStatus() != ProjectStatus.CLOSED) {
             throw new RuntimeException("You can only review completed projects.");
         }
@@ -48,7 +49,7 @@ public class ReviewService {
 
         // 5. Determine the Target (Who is being reviewed?)
         User targetUser;
-        
+
         // Data from Contract
         User student = contract.getStudent();
         User umkm = contract.getUmkm();
@@ -91,5 +92,31 @@ public class ReviewService {
         user.setAverageRating(newAvg);
         user.setTotalReviews(currentCount + 1);
         userRepository.save(user);
+    }
+
+    /**
+     * Get the user's review for a specific project (if exists)
+     */
+    public Review getMyReviewForProject(Long projectId, String userEmail) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return reviewRepository.findByProjectAndReviewer(project, user).orElse(null);
+    }
+
+    /**
+     * Check if user has already reviewed a project
+     */
+    public boolean hasUserReviewedProject(Long projectId, String userEmail) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return reviewRepository.existsByProjectAndReviewer(project, user);
     }
 }

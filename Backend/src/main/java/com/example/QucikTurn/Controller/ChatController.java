@@ -4,6 +4,7 @@ import com.example.QucikTurn.Entity.mongo.ChatMessage;
 import com.example.QucikTurn.Repository.ApplicationRepository;
 import com.example.QucikTurn.Repository.UserRepository;
 import com.example.QucikTurn.Service.ChatService;
+import com.example.QucikTurn.Service.FileStorageService;
 import com.example.QucikTurn.dto.ChatMessageDTO;
 import com.example.QucikTurn.dto.ChatResponseDTO;
 import com.example.QucikTurn.dto.ApiResponse;
@@ -18,8 +19,10 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.QucikTurn.Entity.User;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,6 +38,8 @@ public class ChatController {
     private UserRepository userRepository;
     @Autowired
     private ApplicationRepository applicationRepository;
+    @Autowired
+    private FileStorageService fileStorageService;
 
     // ========== WEBSOCKET ENDPOINTS ==========
 
@@ -48,11 +53,24 @@ public class ChatController {
             Long senderId = chatMessageDTO.getSenderId();
             Long recipientId = chatMessageDTO.getRecipientId();
 
-            // Validate and save message (validation in service)
-            ChatMessage saved = chatService.saveMessage(
-                    senderId,
-                    recipientId,
-                    chatMessageDTO.getContent());
+            ChatMessage saved;
+
+            // Check if message has attachment
+            if (chatMessageDTO.getAttachmentUrl() != null && !chatMessageDTO.getAttachmentUrl().isEmpty()) {
+                saved = chatService.saveMessageWithAttachment(
+                        senderId,
+                        recipientId,
+                        chatMessageDTO.getContent(),
+                        chatMessageDTO.getAttachmentUrl(),
+                        chatMessageDTO.getAttachmentType(),
+                        chatMessageDTO.getOriginalFilename(),
+                        chatMessageDTO.getFileSize());
+            } else {
+                saved = chatService.saveMessage(
+                        senderId,
+                        recipientId,
+                        chatMessageDTO.getContent());
+            }
 
             // Build response DTO
             ChatMessageDTO responseDTO = new ChatMessageDTO();
@@ -61,6 +79,14 @@ public class ChatController {
             responseDTO.setRecipientId(saved.getRecipientId());
             responseDTO.setContent(saved.getContent());
             responseDTO.setTimestamp(saved.getTimestamp());
+
+            // Include attachment info if present
+            if (saved.getAttachmentUrl() != null) {
+                responseDTO.setAttachmentUrl(saved.getAttachmentUrl());
+                responseDTO.setAttachmentType(saved.getAttachmentType());
+                responseDTO.setOriginalFilename(saved.getOriginalFilename());
+                responseDTO.setFileSize(saved.getFileSize());
+            }
 
             // Get sender name
             Long senderIdValue = saved.getSenderId();
@@ -189,6 +215,36 @@ public class ChatController {
     }
 
     /**
+     * Upload chat attachment (image or document)
+     * Returns file info that client will include in WebSocket message
+     */
+    @PostMapping("/api/chat/upload")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Map<String, Object>>> uploadChatAttachment(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("recipientId") Long recipientId,
+            @AuthenticationPrincipal User currentUser) {
+
+        try {
+            // Validate chat permission
+            if (!chatService.hasActiveContract(currentUser.getId(), recipientId)) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.fail("Cannot upload: No active contract with this user"));
+            }
+
+            // Upload file
+            Map<String, Object> fileInfo = fileStorageService.uploadChatAttachment(file, currentUser);
+            return ResponseEntity.ok(ApiResponse.ok("File uploaded successfully", fileInfo));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.fail("Failed to upload file: " + e.getMessage()));
+        }
+    }
+
+    /**
      * Get list of chat contacts (users with active contracts)
      */
     @GetMapping("/api/chat/contacts")
@@ -223,41 +279,75 @@ public class ChatController {
 
     private List<Map<String, Object>> getContactsForUser(User currentUser) {
         if (currentUser.getRole().name().equals("MAHASISWA")) {
-            // Mahasiswa: get UMKM from approved applications
-            return applicationRepository.findByStudentId(currentUser.getId())
+            // Mahasiswa: get UMKM from approved applications, deduplicated by userId
+            Map<Long, Map<String, Object>> contactsMap = new java.util.LinkedHashMap<>();
+
+            applicationRepository.findByStudentId(currentUser.getId())
                     .stream()
                     .filter(app -> app.getStatus().name().equals("APPROVED"))
-                    .map(app -> {
+                    .forEach(app -> {
                         User umkm = app.getProject().getOwner();
-                        Map<String, Object> contactMap = new java.util.HashMap<>();
-                        contactMap.put("userId", umkm.getId());
-                        contactMap.put("name", umkm.getNama());
-                        contactMap.put("email", umkm.getEmail());
-                        contactMap.put("role", umkm.getRole().name());
-                        contactMap.put("projectTitle", app.getProject().getTitle());
-                        contactMap.put("unreadCount", chatService.getUnreadCountFromSender(
-                                currentUser.getId(), umkm.getId()));
-                        return contactMap;
-                    })
-                    .collect(Collectors.toList());
+                        Long umkmId = umkm.getId();
+
+                        if (contactsMap.containsKey(umkmId)) {
+                            // User already exists, add project to list
+                            @SuppressWarnings("unchecked")
+                            java.util.List<String> projects = (java.util.List<String>) contactsMap.get(umkmId)
+                                    .get("projects");
+                            projects.add(app.getProject().getTitle());
+                        } else {
+                            // New user, create contact entry
+                            Map<String, Object> contactMap = new java.util.HashMap<>();
+                            contactMap.put("userId", umkmId);
+                            contactMap.put("name", umkm.getNama());
+                            contactMap.put("email", umkm.getEmail());
+                            contactMap.put("role", umkm.getRole().name());
+                            contactMap.put("profilePictureUrl", umkm.getProfilePictureUrl());
+                            contactMap.put("projectTitle", app.getProject().getTitle());
+                            contactMap.put("projects",
+                                    new java.util.ArrayList<>(java.util.List.of(app.getProject().getTitle())));
+                            contactMap.put("unreadCount", chatService.getUnreadCountFromSender(
+                                    currentUser.getId(), umkmId));
+                            contactsMap.put(umkmId, contactMap);
+                        }
+                    });
+
+            return new java.util.ArrayList<>(contactsMap.values());
         } else {
-            // UMKM: get students with approved applications
-            return applicationRepository.findByProject_Owner_Id(currentUser.getId())
+            // UMKM: get students with approved applications, deduplicated by userId
+            Map<Long, Map<String, Object>> contactsMap = new java.util.LinkedHashMap<>();
+
+            applicationRepository.findByProject_Owner_Id(currentUser.getId())
                     .stream()
                     .filter(app -> app.getStatus().name().equals("APPROVED"))
-                    .map(app -> {
+                    .forEach(app -> {
                         User mahasiswa = app.getStudent();
-                        Map<String, Object> contactMap = new java.util.HashMap<>();
-                        contactMap.put("userId", mahasiswa.getId());
-                        contactMap.put("name", mahasiswa.getNama());
-                        contactMap.put("email", mahasiswa.getEmail());
-                        contactMap.put("role", mahasiswa.getRole().name());
-                        contactMap.put("projectTitle", app.getProject().getTitle());
-                        contactMap.put("unreadCount", chatService.getUnreadCountFromSender(
-                                currentUser.getId(), mahasiswa.getId()));
-                        return contactMap;
-                    })
-                    .collect(Collectors.toList());
+                        Long mahasiswaId = mahasiswa.getId();
+
+                        if (contactsMap.containsKey(mahasiswaId)) {
+                            // User already exists, add project to list
+                            @SuppressWarnings("unchecked")
+                            java.util.List<String> projects = (java.util.List<String>) contactsMap.get(mahasiswaId)
+                                    .get("projects");
+                            projects.add(app.getProject().getTitle());
+                        } else {
+                            // New user, create contact entry
+                            Map<String, Object> contactMap = new java.util.HashMap<>();
+                            contactMap.put("userId", mahasiswaId);
+                            contactMap.put("name", mahasiswa.getNama());
+                            contactMap.put("email", mahasiswa.getEmail());
+                            contactMap.put("role", mahasiswa.getRole().name());
+                            contactMap.put("profilePictureUrl", mahasiswa.getProfilePictureUrl());
+                            contactMap.put("projectTitle", app.getProject().getTitle());
+                            contactMap.put("projects",
+                                    new java.util.ArrayList<>(java.util.List.of(app.getProject().getTitle())));
+                            contactMap.put("unreadCount", chatService.getUnreadCountFromSender(
+                                    currentUser.getId(), mahasiswaId));
+                            contactsMap.put(mahasiswaId, contactMap);
+                        }
+                    });
+
+            return new java.util.ArrayList<>(contactsMap.values());
         }
     }
 }

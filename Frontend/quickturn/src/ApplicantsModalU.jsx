@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import './ApplicantsModalU.css'; 
+import { useNavigate } from 'react-router-dom';
+import { useToast } from './Toast';
+import './ApplicantsModalU.css';
 
 const ApplicantsModalU = ({ projectId, onClose, onAcceptSuccess, token }) => {
+    const navigate = useNavigate();
+    const toast = useToast();
     const [applicants, setApplicants] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -25,81 +29,120 @@ const ApplicantsModalU = ({ projectId, onClose, onAcceptSuccess, token }) => {
     }, [projectId, token]);
 
     const handleAccept = async (appId) => {
-        if (!window.confirm("Terima mahasiswa ini? Project akan dimulai.")) return;
+        const confirmed = await toast.confirm({
+            title: 'Accept Applicant',
+            message: 'Accept this applicant? The project will begin.',
+            confirmText: 'Accept',
+            cancelText: 'Cancel',
+            type: 'default'
+        });
+
+        if (!confirmed) return;
+
         try {
             const response = await fetch(`/api/projects/${projectId}/applicants/${appId}/accept`, {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${token}` }
             });
             if (response.ok) {
+                toast.success("Applicant accepted! Project has started.", "Success");
                 onAcceptSuccess();
                 onClose();
             } else {
-                alert("Gagal menerima pelamar.");
+                toast.error("Failed to accept applicant.", "Error");
             }
-        } catch (err) { alert("Error koneksi."); }
+        } catch (err) { toast.error("Connection error.", "Error"); }
     };
 
-    // ✅ NEW: HANDLE REJECT
     const handleReject = async (appId) => {
-        if (!window.confirm("Yakin ingin menolak pelamar ini?")) return;
+        const confirmed = await toast.confirm({
+            title: 'Reject Applicant',
+            message: 'Are you sure you want to reject this applicant?',
+            confirmText: 'Reject',
+            cancelText: 'Cancel',
+            type: 'danger'
+        });
+
+        if (!confirmed) return;
+
         try {
             const response = await fetch(`/api/projects/${projectId}/applicants/${appId}/reject`, {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${token}` }
             });
             if (response.ok) {
-                // Refresh list to show updated status
-                fetchApplicants(); 
+                toast.info("Applicant rejected.");
+                fetchApplicants();
             } else {
-                alert("Gagal menolak pelamar.");
+                toast.error("Failed to reject applicant.", "Error");
             }
-        } catch (err) { alert("Error koneksi."); }
+        } catch (err) { toast.error("Connection error.", "Error"); }
+    };
+
+    const handleViewProfile = (studentId) => {
+        // Navigate to view the student's profile
+        navigate(`/profile/${studentId}`);
     };
 
     return (
         <div className="modal-overlay-fixed">
             <div className="modal-box-modern">
                 <div className="modal-header-modern">
-                    <h3>Daftar Pelamar</h3>
-                    <button onClick={onClose} className="btn-close-modern">✖</button>
+                    <h3>Applicants</h3>
+                    <button onClick={onClose} className="btn-close-modern">×</button>
                 </div>
 
                 <div className="modal-body-scroll">
-                    {loading ? <p style={{color:'#666', textAlign:'center'}}>Loading...</p> : 
-                     applicants.length === 0 ? <p style={{color:'#666', textAlign:'center'}}>Belum ada pelamar.</p> : 
-                     applicants.map((app) => (
-                        <div className="applicant-item" key={app.id}>
-                            <div className="applicant-details">
-                                <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-                                    <h4>{app.studentName}</h4>
-                                    <span style={{fontSize:'12px', background:'rgba(255, 193, 7, 0.2)', color:'#ffc107', padding:'2px 6px', borderRadius:'4px', display:'flex', alignItems:'center', gap:'4px'}}>
-                                        ⭐ {app.studentRating ? app.studentRating.toFixed(1) : 'New'}
-                                    </span>
+                    {loading ? (
+                        <p className="empty-state">Loading...</p>
+                    ) : applicants.length === 0 ? (
+                        <p className="empty-state">No applicants yet.</p>
+                    ) : (
+                        applicants.map((app) => (
+                            <div className="applicant-item" key={app.id}>
+                                <div className="applicant-details">
+                                    <div className="applicant-header">
+                                        <h4
+                                            className="applicant-name"
+                                            onClick={() => handleViewProfile(app.studentId)}
+                                        >
+                                            {app.studentName}
+                                        </h4>
+                                        <span className="rating-badge">
+                                            {app.studentRating ? app.studentRating.toFixed(1) : 'New'}
+                                        </span>
+                                    </div>
+                                    <p className="applicant-bid">
+                                        Bid: <span>Rp {app.bidAmount.toLocaleString()}</span>
+                                    </p>
+                                    <p className="applicant-quote">"{app.proposal}"</p>
+
+                                    {/* Status Badge if Rejected */}
+                                    {app.status === 'REJECTED' && (
+                                        <span className="status-rejected">Rejected</span>
+                                    )}
                                 </div>
-                                <p>Tawaran: <span style={{color:'#fff'}}>Rp {app.bidAmount.toLocaleString()}</span></p>
-                                <p className="applicant-quote">"{app.proposal}"</p>
-                                
-                                {/* Status Badge if Rejected */}
-                                {app.status === 'REJECTED' && (
-                                    <span style={{color:'#e50914', fontSize:'12px', fontWeight:'bold'}}>❌ Ditolak</span>
+
+                                {/* Buttons only for PENDING */}
+                                {app.status === 'PENDING' && (
+                                    <div className="applicant-actions">
+                                        <button
+                                            onClick={() => handleAccept(app.id)}
+                                            className="btn-accept-modern"
+                                        >
+                                            Accept
+                                        </button>
+                                        <button
+                                            onClick={() => handleReject(app.id)}
+                                            className="btn-reject-modern"
+                                        >
+                                            Reject
+                                        </button>
+                                    </div>
                                 )}
                             </div>
-
-                            {/* Buttons only for PENDING */}
-                            {app.status === 'PENDING' && (
-                                <div style={{display:'flex', flexDirection:'column', gap:'5px'}}>
-                                    <button onClick={() => handleAccept(app.id)} className="btn-accept-modern">
-                                        <i className="fas fa-check"></i> Terima
-                                    </button>
-                                    {/* ✅ NEW REJECT BUTTON */}
-                                    <button onClick={() => handleReject(app.id)} className="btn-reject-modern">
-                                        <i className="fas fa-times"></i> Tolak
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>

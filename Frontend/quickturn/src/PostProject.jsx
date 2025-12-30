@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Send, ChevronRight, Briefcase, DollarSign, Calendar, FileText } from 'lucide-react';
+import { useToast } from './Toast';
 import './PostProject.css';
 
 const PostProject = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [step, setStep] = useState(1);
   const [token, setToken] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // Form State
   const [formData, setFormData] = useState({
     title: '',
-    category: 'IT', // Default matching backend
+    category: 'IT / Web',
     budget: '',
     deadline: '',
     description: ''
   });
 
-  // Load Token on Mount
   useEffect(() => {
     const storedToken = sessionStorage.getItem("token");
     if (!storedToken) {
@@ -32,14 +33,13 @@ const PostProject = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // --- API SUBMISSION ---
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setError("");
 
-    // Basic Validation
     if (!formData.title || !formData.budget || !formData.deadline || !formData.description) {
-      setError("Mohon lengkapi semua data.");
+      toast.warning("Please complete all fields.");
+      setError("Please complete all fields.");
       setIsSubmitting(false);
       return;
     }
@@ -56,202 +56,269 @@ const PostProject = () => {
 
       const data = await response.json();
 
-      if (!response.ok) throw new Error(data.message || "Gagal memposting project");
+      if (!response.ok) throw new Error(data.message || "Failed to post project");
 
-      // Success! Redirect to Dashboard
+      toast.success('Project posted successfully!', 'Success');
       navigate("/dashboardU");
 
     } catch (err) {
+      toast.error(err.message, 'Error');
       setError(err.message);
       setIsSubmitting(false);
     }
   };
 
-  // Helper for UI
-  const getHeaderGradient = (cat) => {
-    if (cat.includes('IT')) return "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)";
-    if (cat.includes('Marketing')) return "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)";
-    if (cat.includes('Desain')) return "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
-    return "linear-gradient(135deg, #e50914 0%, #b20710 100%)";
+  const getCategoryClass = (cat) => {
+    if (cat.includes('IT')) return 'it';
+    if (cat.includes('Marketing')) return 'marketing';
+    if (cat.includes('Desain')) return 'design';
+    if (cat.includes('Video')) return 'video';
+    if (cat.includes('Writing') || cat.includes('Penulisan')) return 'writing';
+    return 'default';
   };
 
+  const stepLabels = ['Basics', 'Details', 'Review'];
+
   return (
-    <div className="container">
-      {/* Back Button */}
-      <button onClick={() => navigate('/dashboardU')} className="back-btn">
-        <span className="back-btn-icon">←</span> Kembali ke Dashboard
-      </button>
+    <div className="post-project-page">
+      <div className="bg-glow glow-1"></div>
+      <div className="bg-glow glow-2"></div>
+      <div className="bg-glow glow-3"></div>
 
-      <div className="main-flex">
+      <div className="post-project-container">
+        {/* Header */}
+        <div className="post-header">
+          <div className="post-header-left">
+            <button onClick={() => navigate('/dashboardU')} className="btn-back-post">
+              <ArrowLeft size={18} />
+              Back
+            </button>
+            <div>
+              <h1>Create New Project</h1>
+              <p>Find the perfect talent for your project</p>
+            </div>
+          </div>
+        </div>
 
-        {/* === LEFT COLUMN: FORM WIZARD === */}
-        <div className="form-column">
-          <h1 className="form-header">Buat Project Baru</h1>
-          <p className="form-subheading">Ikuti langkah mudah ini untuk menemukan talent terbaik.</p>
-
-          {/* Progress Steps */}
+        {/* Progress Steps */}
+        <div className="progress-steps-container">
           <div className="progress-steps">
-            {[1, 2, 3].map((s) => (
+            {[1, 2, 3].map((s, index) => (
               <div key={s} className="step">
                 <div className={`step-circle ${step >= s ? 'step-completed' : 'step-incomplete'}`}>
                   {s}
+                  <span className="step-label">{stepLabels[index]}</span>
                 </div>
                 {s < 3 && <div className={`step-line ${step > s ? 'step-line-active' : ''}`}></div>}
               </div>
             ))}
           </div>
-
-          <div className="form-content">
-            {error && <div className="msg-error" style={{ marginBottom: '1rem' }}>{error}</div>}
-
-            {/* STEP 1: BASIC INFO */}
-            {step === 1 && (
-              <div className="animate-fadeIn space-y-4">
-                <h2 className="section-header">Dasar Project</h2>
-
-                <div className="form-group">
-                  <label className="input-label">Judul Project</label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    placeholder="Contoh: Website Katalog Produk UMKM"
-                    className="input-field"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="input-label">Kategori</label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="input-field"
-                  >
-                    <option value="IT / Web">IT / Web</option>
-                    <option value="Desain">Desain</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Video">Video</option>
-                    <option value="Writing">Penulisan</option>
-                  </select>
-                </div>
-
-                <button
-                  onClick={() => setStep(2)}
-                  disabled={!formData.title}
-                  className={`btn btn-main ${!formData.title ? 'btn-disabled' : ''}`}
-                >
-                  Lanjut ke Detail
-                </button>
-              </div>
-            )}
-
-            {/* STEP 2: DETAILS */}
-            {step === 2 && (
-              <div className="animate-fadeIn space-y-4">
-                <h2 className="section-header">Detail & Budget</h2>
-
-                <div className="form-group">
-                  <label className="input-label">Deskripsi Lengkap</label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    placeholder="Jelaskan kebutuhan project Anda secara detail..."
-                    className="input-field textarea-field"
-                    rows="5"
-                  />
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group half">
-                    <label className="input-label">Budget (Rp)</label>
-                    <input
-                      type="number"
-                      name="budget"
-                      value={formData.budget}
-                      onChange={handleInputChange}
-                      className="input-field"
-                      placeholder="1000000"
-                    />
-                  </div>
-                  <div className="form-group half">
-                    <label className="input-label">Deadline</label>
-                    <input
-                      type="date"
-                      name="deadline"
-                      value={formData.deadline}
-                      onChange={handleInputChange}
-                      className="input-field"
-                    />
-                  </div>
-                </div>
-
-                <div className="btn-group">
-                  <button onClick={() => setStep(1)} className="btn btn-secondary">Kembali</button>
-                  <button onClick={() => setStep(3)} className="btn btn-main">Tinjau Project</button>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 3: REVIEW */}
-            {step === 3 && (
-              <div className="animate-fadeIn space-y-4">
-                <h2 className="section-header">Tinjau & Posting</h2>
-                <p className="text-helper">Pastikan semua data sudah benar sebelum diposting.</p>
-
-                <div className="review-box">
-                  <p><strong>Judul:</strong> {formData.title}</p>
-                  <p><strong>Kategori:</strong> {formData.category}</p>
-                  <p><strong>Budget:</strong> Rp {parseInt(formData.budget).toLocaleString()}</p>
-                  <p><strong>Deadline:</strong> {formData.deadline}</p>
-                </div>
-
-                <div className="btn-group">
-                  <button onClick={() => setStep(2)} className="btn btn-secondary">Kembali</button>
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="btn btn-main"
-                  >
-                    {isSubmitting ? "Memposting..." : "🚀 Posting Project Sekarang"}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* === RIGHT COLUMN: LIVE PREVIEW === */}
-        <div className="preview-column">
-          <h3 className="preview-label">Live Preview</h3>
-          <div className="card-preview">
-            <div className="card-header" style={{ background: getHeaderGradient(formData.category) }}>
-              <i className="fas fa-briefcase" style={{ fontSize: '40px', opacity: 0.3 }}></i>
-              <span className="card-header-new">NEW</span>
+        {/* Main Layout */}
+        <div className="post-main-layout">
+          {/* Form Section */}
+          <div className="form-section">
+            <div className="form-card">
+              {/* Step 1: Basics */}
+              {step === 1 && (
+                <>
+                  <div className="form-card-header">
+                    <h2>Project Basics</h2>
+                    <p>Start with the essential information</p>
+                  </div>
+                  <div className="form-card-body">
+                    {error && <div className="post-error">{error}</div>}
+
+                    <div className="form-group-post">
+                      <label className="form-label">
+                        Project Title <span>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        placeholder="e.g., E-commerce Website Development"
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div className="form-group-post">
+                      <label className="form-label">
+                        Category <span>*</span>
+                      </label>
+                      <select
+                        name="category"
+                        value={formData.category}
+                        onChange={handleInputChange}
+                        className="form-input form-select"
+                      >
+                        <option value="IT / Web">IT / Web Development</option>
+                        <option value="Desain">Design & Creative</option>
+                        <option value="Marketing">Digital Marketing</option>
+                        <option value="Video">Video Production</option>
+                        <option value="Writing">Content Writing</option>
+                      </select>
+                    </div>
+
+                    <div className="form-actions">
+                      <button
+                        onClick={() => setStep(2)}
+                        disabled={!formData.title}
+                        className="btn-post-primary"
+                      >
+                        Continue to Details
+                        <ChevronRight size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Step 2: Details */}
+              {step === 2 && (
+                <>
+                  <div className="form-card-header">
+                    <h2>Project Details</h2>
+                    <p>Provide more information about your project</p>
+                  </div>
+                  <div className="form-card-body">
+                    {error && <div className="post-error">{error}</div>}
+
+                    <div className="form-group-post">
+                      <label className="form-label">
+                        Description <span>*</span>
+                      </label>
+                      <textarea
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        placeholder="Describe your project requirements in detail..."
+                        className="form-input form-textarea"
+                        rows="5"
+                      />
+                    </div>
+
+                    <div className="form-row-post">
+                      <div className="form-group-post">
+                        <label className="form-label">
+                          Budget (Rp) <span>*</span>
+                        </label>
+                        <input
+                          type="number"
+                          name="budget"
+                          value={formData.budget}
+                          onChange={handleInputChange}
+                          placeholder="e.g., 5000000"
+                          className="form-input"
+                        />
+                      </div>
+                      <div className="form-group-post">
+                        <label className="form-label">
+                          Deadline <span>*</span>
+                        </label>
+                        <input
+                          type="date"
+                          name="deadline"
+                          value={formData.deadline}
+                          onChange={handleInputChange}
+                          className="form-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-actions">
+                      <button onClick={() => setStep(1)} className="btn-post-secondary">
+                        Back
+                      </button>
+                      <button onClick={() => setStep(3)} className="btn-post-primary">
+                        Review Project
+                        <ChevronRight size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Step 3: Review */}
+              {step === 3 && (
+                <>
+                  <div className="form-card-header">
+                    <h2>Review & Post</h2>
+                    <p>Make sure everything looks correct</p>
+                  </div>
+                  <div className="form-card-body">
+                    {error && <div className="post-error">{error}</div>}
+
+                    <div className="review-summary">
+                      <div className="review-item">
+                        <span className="review-item-label">Title</span>
+                        <span className="review-item-value">{formData.title}</span>
+                      </div>
+                      <div className="review-item">
+                        <span className="review-item-label">Category</span>
+                        <span className="review-item-value">{formData.category}</span>
+                      </div>
+                      <div className="review-item">
+                        <span className="review-item-label">Budget</span>
+                        <span className="review-item-value highlight">
+                          Rp {parseInt(formData.budget || 0).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="review-item">
+                        <span className="review-item-label">Deadline</span>
+                        <span className="review-item-value">{formData.deadline}</span>
+                      </div>
+                    </div>
+
+                    <div className="form-actions">
+                      <button onClick={() => setStep(2)} className="btn-post-secondary">
+                        Back
+                      </button>
+                      <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        className="btn-post-primary"
+                      >
+                        {isSubmitting ? 'Posting...' : 'Post Project'}
+                        <Send size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
-            <div className="card-content">
-              <div className="card-category">{formData.category}</div>
-              <div className="card-title">{formData.title || "Judul Project Anda"}</div>
-              <p className="card-description">
-                {formData.description || "Deskripsi project akan muncul di sini..."}
-              </p>
-              <div className="card-footer">
-                <div className="card-budget">
-                  {formData.budget ? `Rp ${parseInt(formData.budget).toLocaleString()}` : "Rp -"}
-                </div>
-                <div className="card-deadline">
-                  {formData.deadline || "Tgl Deadline"}
+          </div>
+
+          {/* Preview Section */}
+          <div className="preview-section">
+            <div className="preview-label">Live Preview</div>
+            <div className="preview-card">
+              <div className={`preview-card-header ${getCategoryClass(formData.category)}`}>
+                <span className="preview-badge">NEW</span>
+              </div>
+              <div className="preview-card-body">
+                <div className="preview-category">{formData.category}</div>
+                <div className="preview-title">{formData.title || "Your Project Title"}</div>
+                <p className="preview-description">
+                  {formData.description || "Project description will appear here..."}
+                </p>
+                <div className="preview-footer">
+                  <span className="preview-budget">
+                    {formData.budget ? `Rp ${parseInt(formData.budget).toLocaleString()}` : "Rp -"}
+                  </span>
+                  <span className="preview-deadline">
+                    {formData.deadline || "Deadline"}
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="preview-note">
-            <p>Ini adalah tampilan kartu project Anda yang akan dilihat oleh Mahasiswa.</p>
+            <div className="preview-note">
+              <p>This is how talents will see your project</p>
+            </div>
           </div>
         </div>
-
       </div>
     </div>
   );

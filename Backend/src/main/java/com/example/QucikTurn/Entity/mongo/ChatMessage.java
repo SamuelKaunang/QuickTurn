@@ -25,6 +25,12 @@ public class ChatMessage {
 
     private boolean isRead = false; // Track read status
 
+    // Attachment fields
+    private String attachmentUrl;
+    private String attachmentType; // IMAGE, DOCUMENT
+    private String originalFilename;
+    private Long fileSize;
+
     // Constructors
     public ChatMessage() {
     }
@@ -84,5 +90,38 @@ public class ChatMessage {
 
     public void setRead(boolean read) {
         isRead = read;
+    }
+
+    // Attachment getters and setters
+    public String getAttachmentUrl() {
+        return attachmentUrl;
+    }
+
+    public void setAttachmentUrl(String attachmentUrl) {
+        this.attachmentUrl = attachmentUrl;
+    }
+
+    public String getAttachmentType() {
+        return attachmentType;
+    }
+
+    public void setAttachmentType(String attachmentType) {
+        this.attachmentType = attachmentType;
+    }
+
+    public String getOriginalFilename() {
+        return originalFilename;
+    }
+
+    public void setOriginalFilename(String originalFilename) {
+        this.originalFilename = originalFilename;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
     }
 }

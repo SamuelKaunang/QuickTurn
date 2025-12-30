@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 // IMPORT THIS:
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher; 
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,7 +32,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public AuthenticationProvider authenticationProvider(UserDetailsService uds, PasswordEncoder enc) {
@@ -69,14 +71,14 @@ public class SecurityConfig {
                         // --- THE FIX: Use 'new AntPathRequestMatcher' ---
                         // This forces Spring to trust the URL string exactly as is.
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
-                        
+
                         .requestMatchers(new AntPathRequestMatcher("/actuator/health")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/ws/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/ws-raw/**")).permitAll()
-                        
+                        .requestMatchers(new AntPathRequestMatcher("/uploads/**")).permitAll()
+
                         // Block everything else
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .httpBasic(basic -> basic.disable());
 
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

@@ -1,4 +1,6 @@
 /* CSS Custom Properties for consistent theming */
+
+
 :root {
   --bg-primary: #0f0f19;
   --bg-secondary: #1a1a2e;
@@ -37,7 +39,12 @@ code {
   box-sizing: border-box;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-top: 0;
   font-weight: 600;
   color: var(--text-primary);
@@ -63,21 +70,43 @@ button {
   transition: var(--transition);
 }
 
-/* Subtle scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
+/* Global scrollbar styling */
+/* Hide scrollbar for all elements */
+*::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+  display: none;
 }
 
-::-webkit-scrollbar-track {
+* {
+  scrollbar-width: none;
+}
+
+/* Show scrollbar ONLY for main HTML/Body */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 8px;
+  display: block;
+}
+
+html,
+body {
+  scrollbar-width: auto;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
   background: var(--bg-secondary);
 }
 
-::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
   background: #333;
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 
