@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { api } from './utils/apiConfig';
 import { Timer, Shield, Sparkles, TrendingUp } from 'lucide-react';
 import './LoginPage.css';
 import logoFull from './assets/logo/Logo full.png';
@@ -28,7 +29,7 @@ const LoginPage = () => {
     setMessage("");
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(api('/api/auth/forgot-password'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: forgotEmail }),
@@ -55,7 +56,7 @@ const LoginPage = () => {
 
     try {
       // Verify code logic
-      const response = await fetch('/api/auth/verify-reset-code', {
+      const response = await fetch(api('/api/auth/verify-reset-code'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: forgotEmail, code: resetCode }), // Assuming API needs email too, checking DTO again... DTO only had code? Oh wait.
@@ -92,7 +93,7 @@ const LoginPage = () => {
     setMessage("");
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch(api('/api/auth/reset-password'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resetToken, newPassword }),
@@ -128,7 +129,7 @@ const LoginPage = () => {
     setMessage(""); // Reset message
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(api('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

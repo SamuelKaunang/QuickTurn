@@ -1,6 +1,5 @@
 package com.example.QucikTurn.Service;
 
-import com.example.QucikTurn.Config.FileStorageConfig;
 import com.example.QucikTurn.Entity.UploadedFile;
 import com.example.QucikTurn.Entity.User;
 import com.example.QucikTurn.Entity.enums.FileType;
@@ -11,263 +10,280 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+/**
+ * Service for handling file storage operations.
+ * Delegates actual storage to AzureBlobService and manages file metadata in
+ * database.
+ */
 @Service
 public class FileStorageService {
 
-    private final FileStorageConfig fileStorageConfig;
-    private final UploadedFileRepository fileRepository;
+    private final AzureBlobService azureBlobService;
+    private final UploadedFileRepository uploadedFileRepository;
     private final UserRepository userRepository;
 
-    // Allowed extensions for profile pictures
-    private static final List<String> ALLOWED_PROFILE_EXTENSIONS = Arrays.asList(
-            "jpg", "jpeg", "png", "gif", "webp");
+    // Allowed file types
+    private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
+            "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp");
 
-    // Allowed extensions for work submissions
-    private static final List<String> ALLOWED_SUBMISSION_EXTENSIONS = Arrays.asList(
-            "jpg", "jpeg", "png", "gif", "webp", "pdf", "doc", "docx", "zip", "rar", "7z");
+    private static final Set<String> ALLOWED_DOCUMENT_TYPES = Set.of(
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "text/plain",
+            "application/zip",
+            "application/x-rar-compressed",
+            "application/x-7z-compressed");
 
-    // Allowed extensions for chat attachments (images)
-    private static final List<String> ALLOWED_CHAT_IMAGE_EXTENSIONS = Arrays.asList(
-            "jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff", "svg", "ico", "heic", "heif");
+    private static final long MAX_PROFILE_PICTURE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final long MAX_ATTACHMENT_SIZE = 25 * 1024 * 1024; // 25MB
+    private static final long MAX_SUBMISSION_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
-    // Allowed extensions for chat attachments (documents)
-    private static final List<String> ALLOWED_CHAT_DOCUMENT_EXTENSIONS = Arrays.asList(
-            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "zip", "rar", "7z");
-
-    // Max file size: 50MB in bytes
-    private static final long MAX_FILE_SIZE = 50 * 1024 * 1024;
-
-    // Max chat attachment size: 10MB in bytes
-    private static final long MAX_CHAT_ATTACHMENT_SIZE = 10 * 1024 * 1024;
-
-    // Max files per submission
-    private static final int MAX_FILES_PER_SUBMISSION;
-
-    static {
-        MAX_FILES_PER_SUBMISSION = 10;
-    }
-
-    public FileStorageService(FileStorageConfig fileStorageConfig,
-            UploadedFileRepository fileRepository,
+    public FileStorageService(AzureBlobService azureBlobService,
+            UploadedFileRepository uploadedFileRepository,
             UserRepository userRepository) {
-        this.fileStorageConfig = fileStorageConfig;
-        this.fileRepository = fileRepository;
+        this.azureBlobService = azureBlobService;
+        this.uploadedFileRepository = uploadedFileRepository;
         this.userRepository = userRepository;
     }
 
     /**
-     * Upload profile picture
+     * Upload a profile picture for a user.
+     * Updates the user's profilePictureUrl in the database.
+     *
+     * @param file The image file
+     * @param user The user uploading the profile picture
+     * @return The UploadedFile entity with Azure URL
+     * @throws IOException If upload fails
      */
     @Transactional
     public UploadedFile uploadProfilePicture(MultipartFile file, User user) throws IOException {
-        // Validate file
-        validateFile(file, ALLOWED_PROFILE_EXTENSIONS, "profile picture");
+        // Validate file type - only images allowed
+        String contentType = file.getContentType();
+        if (!ALLOWED_IMAGE_TYPES.contains(contentType)) {
+            throw new IllegalArgumentException(
+                    "Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed for profile pictures.");
+        }
+
+        // Validate file size
+        if (file.getSize() > MAX_PROFILE_PICTURE_SIZE) {
+            throw new IllegalArgumentException(
+                    "File too large. Maximum profile picture size is 5MB.");
+        }
 
         // Generate unique filename
-        String originalFilename = file.getOriginalFilename();
-        String extension = getFileExtension(originalFilename);
-        String storedFilename = "profile_" + user.getId() + "_" + UUID.randomUUID().toString() + "." + extension;
+        String extension = azureBlobService.getFileExtension(file.getOriginalFilename());
+        String storedFilename = azureBlobService.generateUniqueFilename(extension);
 
-        // Save file to disk
-        String subDir = "profiles";
-        Path targetPath = saveFileToDisk(file, subDir, storedFilename);
+        // Upload to Azure Blob Storage
+        String blobUrl = azureBlobService.uploadFileWithName(file, "profiles", storedFilename);
 
-        // Create and save UploadedFile entity
+        // Delete old profile picture if exists
+        if (user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
+            azureBlobService.deleteFile(user.getProfilePictureUrl());
+            // Also delete old record from database
+            uploadedFileRepository.findByStoredFilename(extractFilename(user.getProfilePictureUrl()))
+                    .ifPresent(uploadedFileRepository::delete);
+        }
+
+        // Create UploadedFile record
         UploadedFile uploadedFile = new UploadedFile(
-                originalFilename,
+                file.getOriginalFilename(),
                 storedFilename,
-                "/uploads/" + subDir + "/" + storedFilename,
-                file.getContentType(),
+                blobUrl, // Store the Azure URL
+                contentType,
                 file.getSize(),
                 FileType.PROFILE_PICTURE,
                 user);
 
-        UploadedFile saved = fileRepository.save(uploadedFile);
+        uploadedFile = uploadedFileRepository.save(uploadedFile);
 
         // Update user's profile picture URL
-        user.setProfilePictureUrl(uploadedFile.getFilePath());
+        user.setProfilePictureUrl(blobUrl);
         userRepository.save(user);
 
-        return saved;
+        return uploadedFile;
     }
 
     /**
-     * Upload work submission files
+     * Upload files for a work submission.
+     *
+     * @param files     List of files to upload
+     * @param uploader  The user uploading
+     * @param projectId The project ID
+     * @return List of UploadedFile entities
+     * @throws IOException If upload fails
      */
     @Transactional
-    public List<UploadedFile> uploadSubmissionFiles(List<MultipartFile> files, User user, Long projectId)
+    public List<UploadedFile> uploadSubmissionFiles(List<MultipartFile> files, User uploader, Long projectId)
             throws IOException {
-        // Validate file count
-        if (files.size() > MAX_FILES_PER_SUBMISSION) {
-            throw new IllegalArgumentException("Maximum " + MAX_FILES_PER_SUBMISSION + " files allowed per submission");
-        }
-
-        // Validate and save each file
-        List<UploadedFile> uploadedFiles = new java.util.ArrayList<>();
+        List<UploadedFile> uploadedFiles = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            // Validate file
-            validateFile(file, ALLOWED_SUBMISSION_EXTENSIONS, "work submission");
+            if (file.isEmpty()) {
+                continue;
+            }
+
+            // Validate file type
+            String contentType = file.getContentType();
+            if (!isAllowedFileType(contentType)) {
+                throw new IllegalArgumentException(
+                        "Invalid file type: " + contentType + ". Please upload images or documents only.");
+            }
+
+            // Validate file size
+            if (file.getSize() > MAX_SUBMISSION_FILE_SIZE) {
+                throw new IllegalArgumentException(
+                        "File too large: " + file.getOriginalFilename() + ". Maximum size is 50MB.");
+            }
 
             // Generate unique filename
-            String originalFilename = file.getOriginalFilename();
-            String extension = getFileExtension(originalFilename);
-            String storedFilename = "submission_" + projectId + "_" + UUID.randomUUID().toString() + "." + extension;
+            String extension = azureBlobService.getFileExtension(file.getOriginalFilename());
+            String storedFilename = azureBlobService.generateUniqueFilename(extension);
 
-            // Save file to disk
-            String subDir = "submissions";
-            saveFileToDisk(file, subDir, storedFilename);
+            // Upload to Azure with project subdirectory
+            String subdirectory = "submissions/" + projectId;
+            String blobUrl = azureBlobService.uploadFileWithName(file, subdirectory, storedFilename);
 
-            // Create and save UploadedFile entity
+            // Determine file type
+            FileType fileType = ALLOWED_IMAGE_TYPES.contains(contentType)
+                    ? FileType.SUBMISSION_IMAGE
+                    : FileType.SUBMISSION_DOCUMENT;
+
+            // Create UploadedFile record
             UploadedFile uploadedFile = new UploadedFile(
-                    originalFilename,
+                    file.getOriginalFilename(),
                     storedFilename,
-                    "/uploads/" + subDir + "/" + storedFilename,
-                    file.getContentType(),
+                    blobUrl,
+                    contentType,
                     file.getSize(),
-                    FileType.WORK_SUBMISSION,
-                    user);
+                    fileType,
+                    uploader);
             uploadedFile.setProjectId(projectId);
 
-            uploadedFiles.add(fileRepository.save(uploadedFile));
+            uploadedFiles.add(uploadedFileRepository.save(uploadedFile));
         }
 
         return uploadedFiles;
     }
 
     /**
-     * Get submission files for a project
+     * Upload a chat attachment (image or document).
+     *
+     * @param file     The file to upload
+     * @param uploader The user uploading
+     * @return Map containing file info for chat message
+     * @throws IOException If upload fails
      */
-    public List<UploadedFile> getSubmissionFiles(Long projectId) {
-        return fileRepository.findByProjectId(projectId);
-    }
-
-    /**
-     * Upload chat attachment (image or document)
-     * Max size: 10MB
-     */
-    public Map<String, Object> uploadChatAttachment(MultipartFile file, User user) throws IOException {
-        // Validate file is not empty
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty");
-        }
-
-        // Validate file size (10MB max for chat)
-        if (file.getSize() > MAX_CHAT_ATTACHMENT_SIZE) {
-            throw new IllegalArgumentException("File size exceeds maximum limit of 10MB");
-        }
-
-        String originalFilename = file.getOriginalFilename();
-        String extension = getFileExtension(originalFilename).toLowerCase();
-
-        // Determine attachment type
-        String attachmentType;
-        if (ALLOWED_CHAT_IMAGE_EXTENSIONS.contains(extension)) {
-            attachmentType = "IMAGE";
-        } else if (ALLOWED_CHAT_DOCUMENT_EXTENSIONS.contains(extension)) {
-            attachmentType = "DOCUMENT";
-        } else {
+    public Map<String, Object> uploadChatAttachment(MultipartFile file, User uploader) throws IOException {
+        // Validate file type
+        String contentType = file.getContentType();
+        if (!isAllowedFileType(contentType)) {
             throw new IllegalArgumentException(
-                    "Invalid file type. Allowed images: " + String.join(", ", ALLOWED_CHAT_IMAGE_EXTENSIONS) +
-                            ". Allowed documents: " + String.join(", ", ALLOWED_CHAT_DOCUMENT_EXTENSIONS));
+                    "Invalid file type. Please upload images or documents only.");
+        }
+
+        // Validate file size
+        if (file.getSize() > MAX_ATTACHMENT_SIZE) {
+            throw new IllegalArgumentException(
+                    "File too large. Maximum attachment size is 25MB.");
         }
 
         // Generate unique filename
-        String storedFilename = "chat_" + user.getId() + "_" + UUID.randomUUID().toString() + "." + extension;
+        String extension = azureBlobService.getFileExtension(file.getOriginalFilename());
+        String storedFilename = azureBlobService.generateUniqueFilename(extension);
 
-        // Save file to disk
-        String subDir = "chat";
-        saveFileToDisk(file, subDir, storedFilename);
+        // Upload to Azure
+        String blobUrl = azureBlobService.uploadFileWithName(file, "chat", storedFilename);
 
-        // Build file path
-        String filePath = "/uploads/" + subDir + "/" + storedFilename;
+        // Determine attachment type
+        String attachmentType = ALLOWED_IMAGE_TYPES.contains(contentType) ? "IMAGE" : "DOCUMENT";
 
-        // Return file info (we don't need to persist to MySQL for chat files)
-        Map<String, Object> result = new java.util.HashMap<>();
-        result.put("attachmentUrl", filePath);
-        result.put("attachmentType", attachmentType);
-        result.put("originalFilename", originalFilename);
-        result.put("fileSize", file.getSize());
+        // Return file info for chat message (stored in MongoDB)
+        Map<String, Object> fileInfo = new HashMap<>();
+        fileInfo.put("attachmentUrl", blobUrl);
+        fileInfo.put("attachmentType", attachmentType);
+        fileInfo.put("originalFilename", file.getOriginalFilename());
+        fileInfo.put("fileSize", file.getSize());
+        fileInfo.put("contentType", contentType);
 
-        return result;
+        return fileInfo;
     }
 
     /**
-     * Delete file by ID
+     * Delete a file by ID.
+     *
+     * @param fileId The file ID
+     * @param user   The user requesting deletion (must be the uploader)
+     * @throws IOException If deletion fails
      */
     @Transactional
     public void deleteFile(Long fileId, User user) throws IOException {
-        UploadedFile file = fileRepository.findById(fileId)
+        UploadedFile uploadedFile = uploadedFileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
-        // Check authorization - only uploader can delete
-        if (!file.getUploader().getId().equals(user.getId())) {
-            throw new RuntimeException("Not authorized to delete this file");
+        // Check ownership
+        if (!uploadedFile.getUploader().getId().equals(user.getId())) {
+            throw new RuntimeException("You don't have permission to delete this file");
         }
 
-        // Delete from disk
-        Path filePath = Paths.get(fileStorageConfig.getUploadDir() + file.getFilePath().replace("/uploads", ""));
-        Files.deleteIfExists(filePath);
+        // Delete from Azure Blob Storage
+        String blobUrl = uploadedFile.getFilePath();
+        boolean deleted = azureBlobService.deleteFile(blobUrl);
+
+        if (!deleted) {
+            System.err.println("Warning: Could not delete file from Azure: " + blobUrl);
+        }
+
+        // If it's a profile picture, clear the user's profilePictureUrl
+        if (uploadedFile.getFileType() == FileType.PROFILE_PICTURE) {
+            user.setProfilePictureUrl(null);
+            userRepository.save(user);
+        }
 
         // Delete from database
-        fileRepository.delete(file);
+        uploadedFileRepository.delete(uploadedFile);
     }
 
-    // --- Private Helper Methods ---
-
-    private void validateFile(MultipartFile file, List<String> allowedExtensions, String type) {
-        if (file.isEmpty()) {
-            System.err.println("Validation failed: File is empty");
-            throw new IllegalArgumentException("File is empty");
-        }
-
-        if (file.getSize() > MAX_FILE_SIZE) {
-            System.err.println("Validation failed: File size " + file.getSize() + " exceeds limit " + MAX_FILE_SIZE);
-            throw new IllegalArgumentException("File size exceeds maximum limit of 50MB");
-        }
-
-        String originalName = file.getOriginalFilename();
-        String extension = getFileExtension(originalName).toLowerCase();
-
-        // Debug
-        System.out.println("Validating file: " + originalName + " (" + file.getSize() + " bytes), extension: "
-                + extension + ", type context: " + type);
-
-        if (!allowedExtensions.contains(extension)) {
-            System.err
-                    .println("Validation failed: Invalid extension '" + extension + "'. Allowed: " + allowedExtensions);
-            throw new IllegalArgumentException(
-                    "Invalid file type for " + type + ". Allowed: " + String.join(", ", allowedExtensions));
-        }
+    /**
+     * Get file by ID.
+     *
+     * @param fileId The file ID
+     * @return The UploadedFile entity
+     */
+    public UploadedFile getFileById(Long fileId) {
+        return uploadedFileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("File not found"));
     }
 
-    private String getFileExtension(String filename) {
-        if (filename == null || !filename.contains(".")) {
-            return "";
-        }
-        return filename.substring(filename.lastIndexOf(".") + 1);
+    /**
+     * Get all files uploaded by a user.
+     *
+     * @param userId The user ID
+     * @return List of UploadedFile entities
+     */
+    public List<UploadedFile> getUserFiles(Long userId) {
+        return uploadedFileRepository.findByUploaderId(userId);
     }
 
-    private Path saveFileToDisk(MultipartFile file, String subDir, String filename) throws IOException {
-        Path uploadPath = Paths.get(fileStorageConfig.getUploadDir(), subDir);
+    private boolean isAllowedFileType(String contentType) {
+        return ALLOWED_IMAGE_TYPES.contains(contentType) || ALLOWED_DOCUMENT_TYPES.contains(contentType);
+    }
 
-        // Create directory if it doesn't exist
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
+    private String extractFilename(String url) {
+        if (url == null || url.isEmpty()) {
+            return null;
         }
-
-        Path targetPath = uploadPath.resolve(filename);
-        Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-        return targetPath;
+        int lastSlash = url.lastIndexOf('/');
+        if (lastSlash >= 0 && lastSlash < url.length() - 1) {
+            return url.substring(lastSlash + 1);
+        }
+        return url;
     }
 }

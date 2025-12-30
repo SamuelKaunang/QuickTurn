@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from './Toast';
+import { api } from './utils/apiConfig';
 import './ApplicantsModalU.css';
 
 const ApplicantsModalU = ({ projectId, onClose, onAcceptSuccess, token }) => {
@@ -12,7 +13,7 @@ const ApplicantsModalU = ({ projectId, onClose, onAcceptSuccess, token }) => {
     // Fetch data
     const fetchApplicants = async () => {
         try {
-            const response = await fetch(`/api/projects/${projectId}/applicants`, {
+            const response = await fetch(api(`/api/projects/${projectId}/applicants`), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await response.json();
@@ -40,7 +41,7 @@ const ApplicantsModalU = ({ projectId, onClose, onAcceptSuccess, token }) => {
         if (!confirmed) return;
 
         try {
-            const response = await fetch(`/api/projects/${projectId}/applicants/${appId}/accept`, {
+            const response = await fetch(api(`/api/projects/${projectId}/applicants/${appId}/accept`), {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -66,7 +67,7 @@ const ApplicantsModalU = ({ projectId, onClose, onAcceptSuccess, token }) => {
         if (!confirmed) return;
 
         try {
-            const response = await fetch(`/api/projects/${projectId}/applicants/${appId}/reject`, {
+            const response = await fetch(api(`/api/projects/${projectId}/applicants/${appId}/reject`), {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${token}` }
             });

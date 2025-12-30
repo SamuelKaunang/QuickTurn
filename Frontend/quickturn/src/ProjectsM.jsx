@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from './Toast';
+import { api } from './utils/apiConfig';
+import { SkeletonProjectCard } from './Skeleton';
 import './ProjectsM.css';
 
 const ProjectsM = ({ token, limit, userCategory }) => {
@@ -24,7 +26,7 @@ const ProjectsM = ({ token, limit, userCategory }) => {
     // --- FETCH DATA ---
     const fetchProjects = async () => {
         try {
-            const response = await fetch("/api/projects", {
+            const response = await fetch(api("/api/projects"), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await response.json();
@@ -99,7 +101,7 @@ const ProjectsM = ({ token, limit, userCategory }) => {
 
         setIsSubmitting(true);
         try {
-            const response = await fetch(`/api/projects/${selectedProject.id}/apply`, {
+            const response = await fetch(api(`/api/projects/${selectedProject.id}/apply`), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -210,7 +212,12 @@ const ProjectsM = ({ token, limit, userCategory }) => {
 
             <div className="projects-rowM">
                 {loading ? (
-                    <p style={{ color: '#64748b', padding: '20px' }}>Loading projects...</p>
+                    <>
+                        <SkeletonProjectCard />
+                        <SkeletonProjectCard />
+                        <SkeletonProjectCard />
+                        <SkeletonProjectCard />
+                    </>
                 ) : displayProjects.length === 0 ? (
                     <p style={{ color: '#64748b', padding: '20px' }}>No matching projects found.</p>
                 ) : (

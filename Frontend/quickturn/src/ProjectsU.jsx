@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ProjectsU.css';
 import ReviewModal from './ReviewModal';
 import { useToast } from './Toast';
+import { api } from './utils/apiConfig';
 
 const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContract, onViewSubmissions }) => {
     const toast = useToast();
@@ -23,7 +24,7 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                 if (reviewedProjects[project.id] !== undefined) continue;
 
                 try {
-                    const response = await fetch(`/api/projects/${project.id}/my-review`, {
+                    const response = await fetch(api(`/api/projects/${project.id}/my-review`), {
                         headers: { "Authorization": `Bearer ${token}` }
                     });
                     const data = await response.json();
@@ -56,7 +57,7 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
         if (!confirmed) return;
 
         try {
-            const response = await fetch(`/api/projects/${projectId}/finish/confirm`, {
+            const response = await fetch(api(`/api/projects/${projectId}/finish/confirm`), {
                 method: "POST",
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -78,7 +79,7 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
         if (!reviewProject) return;
 
         try {
-            const response = await fetch(`/api/projects/${reviewProject.id}/review`, {
+            const response = await fetch(api(`/api/projects/${reviewProject.id}/review`), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

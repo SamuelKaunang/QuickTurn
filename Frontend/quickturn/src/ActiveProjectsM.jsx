@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './ProjectsM.css';
 import ReviewModal from './ReviewModal';
 import WorkSubmissionModal from './WorkSubmissionModal';
+import { useToast } from './Toast';
+import { api } from './utils/apiConfig';
 
 const ActiveProjectsM = ({ token }) => {
     const [activeProjects, setActiveProjects] = useState([]);
@@ -17,10 +19,11 @@ const ActiveProjectsM = ({ token }) => {
 
     // --- Track reviewed projects: { projectId: { hasReviewed, rating, comment } }
     const [reviewedProjects, setReviewedProjects] = useState({});
+    const toast = useToast();
 
     const fetchMyActiveProjects = async () => {
         try {
-            const response = await fetch("/api/projects/participating", {
+            const response = await fetch(api("/api/projects/participating"), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await response.json();
@@ -56,7 +59,7 @@ const ActiveProjectsM = ({ token }) => {
                 if (reviewedProjects[project.id] !== undefined) continue;
 
                 try {
-                    const response = await fetch(`/api/projects/${project.id}/my-review`, {
+                    const response = await fetch(api(`/api/projects/${project.id}/my-review`), {
                         headers: { "Authorization": `Bearer ${token}` }
                     });
                     const data = await response.json();
@@ -89,7 +92,7 @@ const ActiveProjectsM = ({ token }) => {
     const handleSubmitReview = async (rating, comment) => {
         if (!reviewProject) return;
         try {
-            const response = await fetch(`/api/projects/${reviewProject.id}/review`, {
+            const response = await fetch(api(`/api/projects/${reviewProject.id}/review`), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -98,7 +101,7 @@ const ActiveProjectsM = ({ token }) => {
                 body: JSON.stringify({ rating, comment })
             });
             if (response.ok) {
-                alert("Review submitted successfully! Thank you.");
+                toast.success('Review submitted successfully! Thank you.', 'Review Sent');
                 // Update local state to reflect the review
                 setReviewedProjects(prev => ({
                     ...prev,
@@ -108,11 +111,11 @@ const ActiveProjectsM = ({ token }) => {
                 setReviewProject(null);
             } else {
                 const err = await response.json();
-                alert(err.message || "Failed to submit review.");
+                toast.error(err.message || 'Failed to submit review.', 'Error');
             }
         } catch (error) {
             console.error(error);
-            alert("Connection error.");
+            toast.error('Connection error. Please try again.', 'Error');
         }
     };
 

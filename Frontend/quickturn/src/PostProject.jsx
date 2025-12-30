@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, ChevronRight, Briefcase, DollarSign, Calendar, FileText } from 'lucide-react';
 import { useToast } from './Toast';
+import { api } from './utils/apiConfig';
 import './PostProject.css';
 
 const PostProject = () => {
@@ -45,7 +46,7 @@ const PostProject = () => {
     }
 
     try {
-      const response = await fetch("/api/projects", {
+      const response = await fetch(api("/api/projects"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -3,7 +3,40 @@ import { useNavigate } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 import { ArrowLeft, Send, MessageSquare, Paperclip, X, FileText, Download, Image } from 'lucide-react';
+import { api, wsEndpoint } from './utils/apiConfig';
+import { SkeletonChatContact, SkeletonChatMessage } from './Skeleton';
 import './ChatPage.css';
+
+// Reusable Avatar Component
+const UserAvatar = ({ src, name, type }) => {
+    const [imgError, setImgError] = useState(false);
+
+    // Reset error state when src changes
+    useEffect(() => {
+        setImgError(false);
+    }, [src]);
+
+    const isHeader = type === 'header';
+    const containerClass = isHeader ? 'chat-header-avatar' : 'contact-avatar';
+    const imgClass = isHeader ? 'chat-header-avatar-img' : 'contact-avatar-img';
+
+    if (!src || imgError) {
+        return (
+            <div className={`${containerClass} avatar-red-circle`}>
+                {name?.charAt(0)?.toUpperCase()}
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={src}
+            alt={name}
+            className={imgClass}
+            onError={() => setImgError(true)}
+        />
+    );
+};
 
 const ChatPage = () => {
     const navigate = useNavigate();
@@ -23,6 +56,8 @@ const ChatPage = () => {
     const [filePreview, setFilePreview] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState("");
+    const [loadingContacts, setLoadingContacts] = useState(true);
+    const [loadingMessages, setLoadingMessages] = useState(false);
 
     // Max file size 10MB
     const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -30,7 +65,7 @@ const ChatPage = () => {
     // 1. Get My Profile
     useEffect(() => {
         if (!token) { navigate('/login'); return; }
-        fetch("/api/users/profile", { headers: { "Authorization": `Bearer ${token}` } })
+        fetch(api("/api/users/profile"), { headers: { "Authorization": `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => {
                 if (data.data) {
@@ -50,8 +85,9 @@ const ChatPage = () => {
     useEffect(() => {
         if (activeChat && user) {
             const targetId = activeChat.userId || activeChat.id;
+            setLoadingMessages(true);
 
-            fetch(`/api/chat/history?otherUserId=${targetId}`, {
+            fetch(api(`/api/chat/history?otherUserId=${targetId}`), {
                 headers: { "Authorization": `Bearer ${token}` }
             })
                 .then(res => res.json())
@@ -68,7 +104,8 @@ const ChatPage = () => {
                     setMessages(validMessages);
                     scrollToBottom();
                 })
-                .catch(err => console.error("History fetch error:", err));
+                .catch(err => console.error("History fetch error:", err))
+                .finally(() => setLoadingMessages(false));
         }
     }, [activeChat, user]);
 
@@ -78,7 +115,8 @@ const ChatPage = () => {
 
     const fetchContacts = async () => {
         try {
-            const res = await fetch("/api/chat/contacts", {
+            setLoadingContacts(true);
+            const res = await fetch(api("/api/chat/contacts"), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await res.json();
@@ -89,10 +127,11 @@ const ChatPage = () => {
 
             setContacts(fixedContacts);
         } catch (err) { console.error(err); }
+        finally { setLoadingContacts(false); }
     };
 
     const connectWebSocket = (myUserId) => {
-        const client = Stomp.over(() => new SockJS('http://localhost:8080/ws'));
+        const client = Stomp.over(() => new SockJS(wsEndpoint('/ws')));
         client.debug = () => { };
         const headers = { 'Authorization': `Bearer ${token}` };
 
@@ -159,7 +198,7 @@ const ChatPage = () => {
                 formData.append('file', selectedFile);
                 formData.append('recipientId', recipientId);
 
-                const uploadRes = await fetch('/api/chat/upload', {
+                const uploadRes = await fetch(api('/api/chat/upload'), {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
@@ -266,7 +305,14 @@ const ChatPage = () => {
                     <h3>Messages</h3>
                 </div>
                 <div className="contacts-list">
-                    {contacts.length === 0 ? (
+                    {loadingContacts ? (
+                        <>
+                            <SkeletonChatContact />
+                            <SkeletonChatContact />
+                            <SkeletonChatContact />
+                            <SkeletonChatContact />
+                        </>
+                    ) : contacts.length === 0 ? (
                         <div className="no-contacts">
                             <p>No conversations yet</p>
                         </div>
@@ -282,15 +328,11 @@ const ChatPage = () => {
                                     onClick={(e) => navigateToProfile(contact.userId, e)}
                                     title="View profile"
                                 >
-                                    {contact.profilePictureUrl ? (
-                                        <img
-                                            src={contact.profilePictureUrl}
-                                            alt={contact.name}
-                                            className="contact-avatar-img"
-                                        />
-                                    ) : (
-                                        <div className="contact-avatar">{contact.name?.charAt(0).toUpperCase()}</div>
-                                    )}
+                                    <UserAvatar
+                                        src={contact.profilePictureUrl}
+                                        name={contact.name}
+                                        type="sidebar"
+                                    />
                                 </div>
                                 <div className="contact-info">
                                     <h4
@@ -321,17 +363,11 @@ const ChatPage = () => {
                                 onClick={(e) => navigateToProfile(activeChat.userId, e)}
                                 title="View profile"
                             >
-                                {activeChat.profilePictureUrl ? (
-                                    <img
-                                        src={activeChat.profilePictureUrl}
-                                        alt={activeChat.name}
-                                        className="chat-header-avatar-img"
-                                    />
-                                ) : (
-                                    <div className="chat-header-avatar">
-                                        {activeChat.name?.charAt(0).toUpperCase()}
-                                    </div>
-                                )}
+                                <UserAvatar
+                                    src={activeChat.profilePictureUrl}
+                                    name={activeChat.name}
+                                    type="header"
+                                />
                             </div>
                             <div className="chat-header-info">
                                 <h2
@@ -349,24 +385,33 @@ const ChatPage = () => {
                         </div>
 
                         <div className="chat-messages">
-                            {messages.map((msg, index) => {
-                                const sender = msg.senderId || msg.sender_id;
-                                const isMe = sender == user?.id;
+                            {loadingMessages ? (
+                                <>
+                                    <SkeletonChatMessage />
+                                    <SkeletonChatMessage isOwn />
+                                    <SkeletonChatMessage />
+                                    <SkeletonChatMessage isOwn />
+                                </>
+                            ) : (
+                                messages.map((msg, index) => {
+                                    const sender = msg.senderId || msg.sender_id;
+                                    const isMe = sender == user?.id;
 
-                                return (
-                                    <div key={index} className={`message-bubble ${isMe ? 'my-message' : 'their-message'}`}>
-                                        {renderAttachment(msg)}
-                                        {msg.content && (
-                                            <div className="message-content">
-                                                {msg.content}
+                                    return (
+                                        <div key={index} className={`message-bubble ${isMe ? 'my-message' : 'their-message'}`}>
+                                            {renderAttachment(msg)}
+                                            {msg.content && (
+                                                <div className="message-content">
+                                                    {msg.content}
+                                                </div>
+                                            )}
+                                            <div className="message-time">
+                                                {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                             </div>
-                                        )}
-                                        <div className="message-time">
-                                            {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })
+                            )}
                             <div ref={messagesEndRef} />
                         </div>
 
@@ -440,8 +485,8 @@ const ChatPage = () => {
                         <p>Choose a contact from the sidebar to start chatting</p>
                     </div>
                 )}
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

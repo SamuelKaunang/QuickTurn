@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
     Clock, CheckCircle, XCircle, FileText, Send, Briefcase, ChevronRight
 } from 'lucide-react';
+import { api } from './utils/apiConfig';
+import { SkeletonActivityItem } from './Skeleton';
 import './RecentActivities.css';
 
 const RecentActivities = () => {
@@ -20,7 +22,7 @@ const RecentActivities = () => {
     const fetchActivities = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/activities/recent?limit=5', {
+            const response = await fetch(api('/api/activities/recent?limit=5'), {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -64,7 +66,14 @@ const RecentActivities = () => {
     };
 
     if (loading) {
-        return <div className="activities-loading">Loading activities...</div>;
+        return (
+            <div className="recent-activities-list">
+                <SkeletonActivityItem />
+                <SkeletonActivityItem />
+                <SkeletonActivityItem />
+                <SkeletonActivityItem />
+            </div>
+        );
     }
 
     if (activities.length === 0) {

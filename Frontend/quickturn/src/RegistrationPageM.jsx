@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from './Toast';
+import { api } from './utils/apiConfig';
 import { Timer, Shield, Sparkles, TrendingUp } from 'lucide-react';
 import './LoginPage.css';
 import logoFull from './assets/logo/Logo full.png';
-import { useToast } from './Toast';
 
 function RegistrationPageM() {
   const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ function RegistrationPageM() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { success } = useToast();
+  const toast = useToast();
 
   const handleRoleToggle = (role) => {
     navigate(role === 'CLIENT' ? '/registeru' : '/registerm');
@@ -38,7 +39,7 @@ function RegistrationPageM() {
     setMessage('');
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(api('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -52,7 +53,7 @@ function RegistrationPageM() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        success("Registrasi Berhasil! Silakan Login.", "Sign Up Success");
+        toast.success('Registrasi berhasil! Silakan login.', 'Selamat!');
         navigate('/login');
       } else {
         setMessage(data.message || "Registrasi Gagal");

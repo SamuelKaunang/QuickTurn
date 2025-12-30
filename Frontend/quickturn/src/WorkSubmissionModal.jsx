@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Upload, Link, FileText, Image, Archive, Trash2 } from 'lucide-react';
 import { useToast } from './Toast';
+import { api } from './utils/apiConfig';
 import './WorkSubmissionModal.css';
 
 const WorkSubmissionModal = ({ isOpen, onClose, projectId, token, onSubmitSuccess }) => {
@@ -86,7 +87,7 @@ const WorkSubmissionModal = ({ isOpen, onClose, projectId, token, onSubmitSucces
         });
 
         try {
-            const response = await fetch(`/api/files/submission/${projectId}`, {
+            const response = await fetch(api(`/api/files/submission/${projectId}`), {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData

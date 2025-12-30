@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, X, Printer } from 'lucide-react';
+import { api } from './utils/apiConfig';
 import './ContractModal.css';
 
 const ContractModal = ({ projectId, token, onClose }) => {
@@ -10,7 +11,7 @@ const ContractModal = ({ projectId, token, onClose }) => {
     useEffect(() => {
         const fetchContract = async () => {
             try {
-                const response = await fetch(`/api/projects/${projectId}/contract`, {
+                const response = await fetch(api(`/api/projects/${projectId}/contract`), {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 const data = await response.json();
