@@ -766,3 +766,17 @@
         max-width: 100%;
     }
 }
+
+/* Red Circle Avatar for Empty/Error Profiles */
+.contact-avatar.avatar-red-circle,
+.chat-header-avatar.avatar-red-circle {
+    border-radius: 50%;
+    background: #fff1f2 !important;
+    color: #e11d48 !important;
+    border: 2px solid #e11d48 !important;
+}
+
+.contact-item.active .contact-avatar.avatar-red-circle {
+    background: #ffe4e6 !important;
+    border-color: #be123c !important;
+}

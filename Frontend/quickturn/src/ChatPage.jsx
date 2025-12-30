@@ -7,6 +7,37 @@ import { api, wsEndpoint } from './utils/apiConfig';
 import { SkeletonChatContact, SkeletonChatMessage } from './Skeleton';
 import './ChatPage.css';
 
+// Reusable Avatar Component
+const UserAvatar = ({ src, name, type }) => {
+    const [imgError, setImgError] = useState(false);
+
+    // Reset error state when src changes
+    useEffect(() => {
+        setImgError(false);
+    }, [src]);
+
+    const isHeader = type === 'header';
+    const containerClass = isHeader ? 'chat-header-avatar' : 'contact-avatar';
+    const imgClass = isHeader ? 'chat-header-avatar-img' : 'contact-avatar-img';
+
+    if (!src || imgError) {
+        return (
+            <div className={`${containerClass} avatar-red-circle`}>
+                {name?.charAt(0)?.toUpperCase()}
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={src}
+            alt={name}
+            className={imgClass}
+            onError={() => setImgError(true)}
+        />
+    );
+};
+
 const ChatPage = () => {
     const navigate = useNavigate();
     const token = sessionStorage.getItem("token");
@@ -297,15 +328,11 @@ const ChatPage = () => {
                                     onClick={(e) => navigateToProfile(contact.userId, e)}
                                     title="View profile"
                                 >
-                                    {contact.profilePictureUrl ? (
-                                        <img
-                                            src={contact.profilePictureUrl}
-                                            alt={contact.name}
-                                            className="contact-avatar-img"
-                                        />
-                                    ) : (
-                                        <div className="contact-avatar">{contact.name?.charAt(0).toUpperCase()}</div>
-                                    )}
+                                    <UserAvatar
+                                        src={contact.profilePictureUrl}
+                                        name={contact.name}
+                                        type="sidebar"
+                                    />
                                 </div>
                                 <div className="contact-info">
                                     <h4
@@ -336,17 +363,11 @@ const ChatPage = () => {
                                 onClick={(e) => navigateToProfile(activeChat.userId, e)}
                                 title="View profile"
                             >
-                                {activeChat.profilePictureUrl ? (
-                                    <img
-                                        src={activeChat.profilePictureUrl}
-                                        alt={activeChat.name}
-                                        className="chat-header-avatar-img"
-                                    />
-                                ) : (
-                                    <div className="chat-header-avatar">
-                                        {activeChat.name?.charAt(0).toUpperCase()}
-                                    </div>
-                                )}
+                                <UserAvatar
+                                    src={activeChat.profilePictureUrl}
+                                    name={activeChat.name}
+                                    type="header"
+                                />
                             </div>
                             <div className="chat-header-info">
                                 <h2
@@ -464,8 +485,8 @@ const ChatPage = () => {
                         <p>Choose a contact from the sidebar to start chatting</p>
                     </div>
                 )}
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 
