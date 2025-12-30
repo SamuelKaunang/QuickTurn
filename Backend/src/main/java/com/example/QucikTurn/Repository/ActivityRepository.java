@@ -22,4 +22,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     // Count activities by type for a user
     @Query("SELECT COUNT(a) FROM Activity a WHERE a.user.id = :userId AND a.type = :type")
     Long countByUserIdAndType(@Param("userId") Long userId, @Param("type") String type);
+
+    // Get activities by related entity (e.g., all activities for a specific PROJECT)
+    List<Activity> findByRelatedEntityTypeAndRelatedEntityIdOrderByCreatedAtDesc(String relatedEntityType, Long relatedEntityId);
 }

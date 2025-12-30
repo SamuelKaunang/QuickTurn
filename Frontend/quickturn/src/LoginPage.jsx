@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Timer, Shield, Sparkles, TrendingUp } from 'lucide-react';
 import './LoginPage.css';
 import logoFull from './assets/logo/Logo full.png';
 
@@ -103,6 +104,7 @@ const LoginPage = () => {
         setForgotStep(null); // Back to login
         setPassword('');
         setEmail(forgotEmail); // Auto fill email
+        setIsLoading(false);
       } else {
         setMessage(data.message || "Gagal reset password.");
       }
@@ -145,8 +147,10 @@ const LoginPage = () => {
         // 2. Redirect based on Role (Logic lo yang tadi)
         if (role === 'MAHASISWA') {
           navigate('/dashboardm');
-        } else if (role === 'UMKM' || role === 'UKM' || role === 'ADMIN') {
+        } else if (role === 'UMKM' || role === 'UKM') {
           navigate('/dashboardu');
+        } else if (role === 'ADMIN') {
+          navigate('/admin/dashboard');
         } else {
           navigate('/dashboardm');
         }
@@ -167,10 +171,6 @@ const LoginPage = () => {
       <section className="left-panel">
         <div className="left-content-bg"></div>
         <div className="glass-overlay">
-          <div className="brand-header">
-            <img src={logoFull} alt="QuickTurn" className="brand-logo" />
-          </div>
-
           <div className="hero-text-container">
             <h1 className="hero-title">
               Empowering your <br />
@@ -185,6 +185,45 @@ const LoginPage = () => {
                 "Innovation distinguishes between a leader and a follower."
               </p>
               <p className="quote-author">STEVE JOBS</p>
+            </div>
+
+            <div className="login-feature-grid">
+              <div className="login-feature-card red">
+                <div className="feature-icon">
+                  <Timer size={24} />
+                </div>
+                <div className="feature-content">
+                  <h4>Quick Start</h4>
+                  <p>Get matched with projects in minutes.</p>
+                </div>
+              </div>
+              <div className="login-feature-card purple">
+                <div className="feature-icon">
+                  <Shield size={24} />
+                </div>
+                <div className="feature-content">
+                  <h4>Verified Talents</h4>
+                  <p>All talents are vetted/reviewed.</p>
+                </div>
+              </div>
+              <div className="login-feature-card blue">
+                <div className="feature-icon">
+                  <Sparkles size={24} />
+                </div>
+                <div className="feature-content">
+                  <h4>Real Impact</h4>
+                  <p>Work on actual projects.</p>
+                </div>
+              </div>
+              <div className="login-feature-card green">
+                <div className="feature-icon">
+                  <TrendingUp size={24} />
+                </div>
+                <div className="feature-content">
+                  <h4>Grow Together</h4>
+                  <p>Build your portfolio.</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -203,6 +242,10 @@ const LoginPage = () => {
         <div className="form-container">
           <div className="form-header">
             {message && <div className={`error-alert ${message.includes('berhasil') || message.includes('dikirim') ? 'success-alert' : ''}`}>{message}</div>}
+
+            <div className="brand-logo-container">
+              <img src={logoFull} alt="QuickTurn" className="brand-logo" />
+            </div>
 
             {!forgotStep ? (
               <>

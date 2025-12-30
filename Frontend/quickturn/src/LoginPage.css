@@ -90,6 +90,12 @@
   height: 60px;
   width: auto;
   object-fit: contain;
+  filter: none;
+}
+
+.brand-logo-container {
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
 .hero-title {
@@ -106,9 +112,10 @@
 
 .hero-desc {
   font-size: 1.25rem;
-  color: #d1d5db;
+  color: white;
   max-width: 32rem;
   margin-bottom: 3rem;
+  opacity: 0.9;
 }
 
 .quote-block {
@@ -133,6 +140,121 @@
   font-weight: 900;
 }
 
+/* Login Feature Cards (Adapted from Landing Page) */
+.login-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-feature-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  text-align: left;
+}
+
+.login-feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: white;
+  /* Fallback */
+  opacity: 0.8;
+}
+
+.login-feature-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+}
+
+.login-feature-card .feature-icon {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Removed margin-bottom since it's now horizontal */
+}
+
+.feature-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 2.5rem;
+}
+
+.login-feature-card h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.25rem 0;
+}
+
+.login-feature-card p {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Card Variants (Icon Colors & Gradients) */
+.login-feature-card.red::before {
+  background: linear-gradient(90deg, #e11d48, #be123c);
+}
+
+.login-feature-card.red .feature-icon {
+  background: rgba(225, 29, 72, 0.1);
+  color: #fb7185;
+}
+
+.login-feature-card.purple::before {
+  background: linear-gradient(90deg, #7c3aed, #6d28d9);
+}
+
+.login-feature-card.purple .feature-icon {
+  background: rgba(124, 58, 237, 0.1);
+  color: #a78bfa;
+}
+
+.login-feature-card.blue::before {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.login-feature-card.blue .feature-icon {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+}
+
+.login-feature-card.green::before {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.login-feature-card.green .feature-icon {
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+}
+
 /* Right Panel Styling */
 .right-panel {
   width: 100%;
@@ -150,6 +272,10 @@
   width: 100%;
   max-width: 420px;
   margin: 0 auto;
+}
+
+.form-header {
+  text-align: center;
 }
 
 .form-header h2 {

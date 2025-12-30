@@ -14,6 +14,7 @@ import com.example.QucikTurn.Entity.WorkSubmission;
 import com.example.QucikTurn.dto.CreateProjectRequest;
 import com.example.QucikTurn.dto.ProjectWithStatusResponse;
 import com.example.QucikTurn.dto.UmkmProjectResponse;
+import com.example.QucikTurn.Service.ActivityService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -29,13 +30,15 @@ public class ProjectService {
     private final UserRepository userRepo;
     private final ApplicationRepository applicationRepo;
     private final WorkSubmissionRepository workSubmissionRepo;
+    private final ActivityService activityService;
 
     public ProjectService(ProjectRepository projectRepo, UserRepository userRepo,
-            ApplicationRepository applicationRepo, WorkSubmissionRepository workSubmissionRepo) {
+            ApplicationRepository applicationRepo, WorkSubmissionRepository workSubmissionRepo, ActivityService activityService) {
         this.projectRepo = projectRepo;
         this.userRepo = userRepo;
         this.applicationRepo = applicationRepo;
         this.workSubmissionRepo = workSubmissionRepo;
+        this.activityService = activityService;
     }
 
     // --- UMKM: Post Project ---
@@ -57,7 +60,12 @@ public class ProjectService {
         p.setDeadline(req.deadline());
         p.setStatus(ProjectStatus.OPEN);
 
-        return projectRepo.save(p);
+        Project savedProject = projectRepo.save(p);
+
+        // Log activity
+        activityService.logActivity(owner, ActivityService.TYPE_PROJECT_POSTED, "Posted new project: " + savedProject.getTitle(), "PROJECT", savedProject.getId());
+
+        return savedProject;
     }
 
     // --- GET PROJECTS BY OWNER (UMKM) with applicant count ---
@@ -89,6 +97,11 @@ public class ProjectService {
     // --- GET ALL OPEN PROJECTS (For Browsing - Legacy) ---
     public List<Project> getAllOpenProjects() {
         return projectRepo.findByStatus(ProjectStatus.OPEN);
+    }
+
+    // --- GET ALL PROJECTS (For Admin) ---
+    public List<Project> getAllProjects() {
+        return projectRepo.findAll();
     }
 
     // --- GET OPEN PROJECTS WITH STATUS (For Student Browsing) ---

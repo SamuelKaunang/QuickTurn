@@ -77,6 +77,11 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/ws-raw/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/uploads/**")).permitAll()
 
+                        // --- ADMIN & ANNOUNCEMENTS ---
+                        .requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/api/announcements", "GET")).authenticated()
+                        .requestMatchers(new AntPathRequestMatcher("/api/announcements/**")).hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+
                         // Block everything else
                         .anyRequest().authenticated())
                 .httpBasic(basic -> basic.disable());

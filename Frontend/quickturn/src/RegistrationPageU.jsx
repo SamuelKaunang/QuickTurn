@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Timer, Shield, Sparkles, TrendingUp } from 'lucide-react';
 import './LoginPage.css';
 import logoFull from './assets/logo/Logo full.png';
+import { useToast } from './Toast';
 
 function RegistrationPageU() {
   const [email, setEmail] = useState('');
@@ -13,6 +15,7 @@ function RegistrationPageU() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { success } = useToast();
 
   const handleRoleToggle = (role) => {
     navigate(role === 'CLIENT' ? '/registeru' : '/registerm');
@@ -49,7 +52,7 @@ function RegistrationPageU() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        alert("Registrasi Client Berhasil! Silakan Login.");
+        success("Registrasi Client Berhasil! Silakan Login.", "Sign Up Success");
         navigate('/login');
       } else {
         setMessage(data.message || "Registrasi Gagal");
@@ -68,10 +71,6 @@ function RegistrationPageU() {
       <section className="left-panel">
         <div className="left-content-bg"></div>
         <div className="glass-overlay">
-          <div className="brand-header">
-            <img src={logoFull} alt="QuickTurn" className="brand-logo" />
-          </div>
-
           <div className="hero-text-container">
             <h1 className="hero-title">
               Empowering your <br />
@@ -86,6 +85,45 @@ function RegistrationPageU() {
                 "Innovation distinguishes between a leader and a follower."
               </p>
               <p className="quote-author">STEVE JOBS</p>
+            </div>
+
+            <div className="login-feature-grid">
+              <div className="login-feature-card red">
+                <div className="feature-icon">
+                  <Timer size={24} />
+                </div>
+                <div className="feature-content">
+                  <h4>Quick Start</h4>
+                  <p>Get matched with projects in minutes.</p>
+                </div>
+              </div>
+              <div className="login-feature-card purple">
+                <div className="feature-icon">
+                  <Shield size={24} />
+                </div>
+                <div className="feature-content">
+                  <h4>Verified Talents</h4>
+                  <p>All talents are vetted/reviewed.</p>
+                </div>
+              </div>
+              <div className="login-feature-card blue">
+                <div className="feature-icon">
+                  <Sparkles size={24} />
+                </div>
+                <div className="feature-content">
+                  <h4>Real Impact</h4>
+                  <p>Work on actual projects.</p>
+                </div>
+              </div>
+              <div className="login-feature-card green">
+                <div className="feature-icon">
+                  <TrendingUp size={24} />
+                </div>
+                <div className="feature-content">
+                  <h4>Grow Together</h4>
+                  <p>Build your portfolio.</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -102,6 +140,9 @@ function RegistrationPageU() {
       {/* RIGHT PANEL: Form */}
       <section className="right-panel">
         <div className="form-container">
+          <div className="brand-logo-container">
+            <img src={logoFull} alt="QuickTurn" className="brand-logo" />
+          </div>
           <div className="form-header">
             {message && <div className={`error-alert ${message.includes('Berhasil') ? 'success-alert' : ''}`}>{message}</div>}
             <h2>Registrasi Client</h2>

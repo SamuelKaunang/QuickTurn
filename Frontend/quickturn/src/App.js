@@ -12,6 +12,8 @@ import ProfileM from './ProfileM';
 import ProfileU from './ProfileU';
 import ChatPage from './ChatPage';
 import PublicProfile from './PublicProfile';
+import AdminDashboard from './AdminDashboard';
+
 
 function App() {
   return (
@@ -37,6 +39,9 @@ function App() {
           <Route path="/profile/:userId" element={<PublicProfile />} />
 
           <Route path="/chat" element={<ChatPage />} />
+
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
           {/* Feature Routes */}
           <Route path="/post-project" element={<PostProject />} />

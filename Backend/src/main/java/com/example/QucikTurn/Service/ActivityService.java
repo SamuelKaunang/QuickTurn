@@ -61,4 +61,11 @@ public class ActivityService {
     public static final String TYPE_PROJECT_POSTED = "PROJECT_POSTED";
     public static final String TYPE_CONTRACT_SIGNED = "CONTRACT_SIGNED";
     public static final String TYPE_PROJECT_COMPLETED = "PROJECT_COMPLETED";
+
+    /**
+     * Get activities for a specific project
+     */
+    public List<Activity> getActivitiesByProject(Long projectId) {
+        return activityRepository.findByRelatedEntityTypeAndRelatedEntityIdOrderByCreatedAtDesc("PROJECT", projectId);
+    }
 }

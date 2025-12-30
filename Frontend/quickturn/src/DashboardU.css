@@ -404,37 +404,7 @@
     gap: 16px;
 }
 
-.notif-btn {
-    position: relative;
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    border: 1px solid var(--slate-200);
-    background: var(--glass);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--slate-500);
-    transition: all 0.25s ease;
-}
 
-.notif-btn:hover {
-    background: white;
-    color: var(--slate-700);
-    box-shadow: 0 4px 12px var(--shadow-md);
-}
-
-.notif-btn .dot {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 8px;
-    height: 8px;
-    background: var(--brand);
-    border-radius: 50%;
-    border: 2px solid white;
-}
 
 .profile-pill {
     display: flex;

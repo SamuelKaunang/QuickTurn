@@ -135,4 +135,14 @@ public class UserService {
         user.setBidang(bidang);
         return userRepo.save(user);
     }
+
+    // --- ADMIN ACTIONS ---
+
+    public void deleteUser(Long id) {
+        userRepo.deleteById(id);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepo.findAll();
+    }
 }

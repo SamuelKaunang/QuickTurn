@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, Briefcase, MessageSquare, Settings,
-    LogOut, Search, Bell, ArrowUpRight, ArrowDownRight, Users,
+    LogOut, Search, ArrowUpRight, ArrowDownRight, Users,
     CheckCircle, Send, UserSearch
 } from 'lucide-react';
 import './DashboardM.css';
@@ -43,6 +43,7 @@ const DashboardM = () => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
+    const [announcements, setAnnouncements] = useState([]);
 
     // Stats from backend
     const [availableProjectsCount, setAvailableProjectsCount] = useState(0);
@@ -73,11 +74,24 @@ const DashboardM = () => {
             fetchStudentStats(storedToken);
             fetchUserProfile(storedToken);
             fetchUnreadCount(storedToken);
+            fetchAnnouncements(storedToken);
             // Poll for unread messages every 30 seconds
             const interval = setInterval(() => fetchUnreadCount(storedToken), 30000);
             return () => clearInterval(interval);
         }
     }, [navigate]);
+
+    const fetchAnnouncements = async (authToken) => {
+        try {
+            const res = await fetch("/api/announcements", {
+                headers: { "Authorization": `Bearer ${authToken}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setAnnouncements(data.data || []);
+            }
+        } catch (err) { console.error("Failed to fetch announcements", err); }
+    };
 
     const fetchUserProfile = async (authToken) => {
         try {
@@ -265,10 +279,7 @@ const DashboardM = () => {
                     </div>
 
                     <div className="topbar-actions">
-                        <button className="notif-btn">
-                            <Bell size={20} />
-                            <span className="dot"></span>
-                        </button>
+
                         <div
                             className="profile-pill"
                             onClick={() => navigate('/profile-mahasiswa')}
@@ -305,6 +316,31 @@ const DashboardM = () => {
                                     <Search size={18} />
                                     Find Work
                                 </button>
+                            </div>
+
+                            {/* Announcements Section - Positioned between welcome banner and stats */}
+                            <div className="announcements-section">
+                                <h3 className="text-lg font-bold mb-3" style={{ color: 'var(--slate-900)' }}>Latest Announcements</h3>
+                                <GlassCard className="p-4">
+                                    {announcements.length === 0 ? (
+                                        <p className="text-sm text-slate-500">No new announcements.</p>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {announcements.slice(0, 3).map(a => (
+                                                <div key={a.id} className="pb-3 border-b border-slate-200 last:border-0 last:pb-0">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="w-2 h-2 rounded-full bg-brand"></span>
+                                                        <h4 className="font-semibold text-sm" style={{ color: 'var(--slate-800)' }}>{a.title}</h4>
+                                                    </div>
+                                                    <p className="text-xs text-slate-600 line-clamp-2">{a.content}</p>
+                                                    <span className="text-[10px] text-slate-400 mt-1 block">
+                                                        {new Date(a.createdAt).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </GlassCard>
                             </div>
 
                             <div className="stats-grid">
