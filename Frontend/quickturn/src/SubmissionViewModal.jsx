@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Download, ExternalLink, FileText, Image, Archive, Check, XCircle } from 'lucide-react';
+import { api } from './utils/apiConfig';
 import './SubmissionViewModal.css';
 
 const SubmissionViewModal = ({ isOpen, onClose, projectId, token }) => {
@@ -18,7 +19,7 @@ const SubmissionViewModal = ({ isOpen, onClose, projectId, token }) => {
     const fetchSubmissions = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/files/submissions/${projectId}`, {
+            const response = await fetch(api(`/api/files/submissions/${projectId}`), {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -37,7 +38,7 @@ const SubmissionViewModal = ({ isOpen, onClose, projectId, token }) => {
 
         setReviewing(true);
         try {
-            const response = await fetch(`/api/files/submission/${selectedSubmission.id}/review`, {
+            const response = await fetch(api(`/api/files/submission/${selectedSubmission.id}/review`), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

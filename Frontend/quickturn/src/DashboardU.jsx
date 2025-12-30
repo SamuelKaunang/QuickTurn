@@ -5,6 +5,7 @@ import {
   LogOut, Search, Bell, Users, Plus,
   CheckCircle, FolderOpen, FileText
 } from 'lucide-react';
+import { api } from './utils/apiConfig';
 import './DashboardU.css';
 import logoQ from './assets/logo/logo Q.png';
 import logoText from './assets/logo/logo text.png';
@@ -76,7 +77,7 @@ const DashboardU = () => {
 
   const fetchUserProfile = async (authToken) => {
     try {
-      const response = await fetch("/api/users/profile", {
+      const response = await fetch(api("/api/users/profile"), {
         headers: { "Authorization": `Bearer ${authToken}` }
       });
       const data = await response.json();
@@ -92,7 +93,7 @@ const DashboardU = () => {
 
   const fetchUnreadCount = async (authToken) => {
     try {
-      const response = await fetch("/api/chat/unread", {
+      const response = await fetch(api("/api/chat/unread"), {
         headers: { "Authorization": `Bearer ${authToken}` }
       });
       const data = await response.json();
@@ -105,7 +106,7 @@ const DashboardU = () => {
   const fetchProjects = async (authToken) => {
     try {
       const t = authToken || token;
-      const response = await fetch("/api/projects/my-projects", {
+      const response = await fetch(api("/api/projects/my-projects"), {
         headers: { "Authorization": `Bearer ${t}` }
       });
       const data = await response.json();

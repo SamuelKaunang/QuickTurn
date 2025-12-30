@@ -4,6 +4,7 @@ import { Camera, ArrowLeft, LogOut, Save, User, X, RotateCw, ZoomIn, Briefcase, 
 import Cropper from 'react-easy-crop';
 import getCroppedImg from './canvasUtils';
 import { useToast } from './Toast';
+import { api } from './utils/apiConfig';
 import './ProfileM.css';
 
 const ProfileM = () => {
@@ -33,7 +34,7 @@ const ProfileM = () => {
 
         const fetchProfile = async () => {
             try {
-                const response = await fetch("/api/users/profile", {
+                const response = await fetch(api("/api/users/profile"), {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 const data = await response.json();
@@ -64,7 +65,7 @@ const ProfileM = () => {
 
         const fetchStats = async () => {
             try {
-                const response = await fetch("/api/applications/my-applications", {
+                const response = await fetch(api("/api/applications/my-applications"), {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 const data = await response.json();
@@ -146,7 +147,7 @@ const ProfileM = () => {
             const formDataUpload = new FormData();
             formDataUpload.append('file', file);
 
-            const response = await fetch('/api/files/profile-picture', {
+            const response = await fetch(api('/api/files/profile-picture'), {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formDataUpload
@@ -171,7 +172,7 @@ const ProfileM = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("/api/users/profile", {
+            const response = await fetch(api("/api/users/profile"), {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

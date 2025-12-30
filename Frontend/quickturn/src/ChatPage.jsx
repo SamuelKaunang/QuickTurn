@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 import { ArrowLeft, Send, MessageSquare, Paperclip, X, FileText, Download, Image } from 'lucide-react';
+import { api, wsEndpoint } from './utils/apiConfig';
 import './ChatPage.css';
 
 const ChatPage = () => {
@@ -30,7 +31,7 @@ const ChatPage = () => {
     // 1. Get My Profile
     useEffect(() => {
         if (!token) { navigate('/login'); return; }
-        fetch("/api/users/profile", { headers: { "Authorization": `Bearer ${token}` } })
+        fetch(api("/api/users/profile"), { headers: { "Authorization": `Bearer ${token}` } })
             .then(res => res.json())
             .then(data => {
                 if (data.data) {
@@ -51,7 +52,7 @@ const ChatPage = () => {
         if (activeChat && user) {
             const targetId = activeChat.userId || activeChat.id;
 
-            fetch(`/api/chat/history?otherUserId=${targetId}`, {
+            fetch(api(`/api/chat/history?otherUserId=${targetId}`), {
                 headers: { "Authorization": `Bearer ${token}` }
             })
                 .then(res => res.json())
@@ -78,7 +79,7 @@ const ChatPage = () => {
 
     const fetchContacts = async () => {
         try {
-            const res = await fetch("/api/chat/contacts", {
+            const res = await fetch(api("/api/chat/contacts"), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await res.json();
@@ -92,7 +93,7 @@ const ChatPage = () => {
     };
 
     const connectWebSocket = (myUserId) => {
-        const client = Stomp.over(() => new SockJS('http://localhost:8080/ws'));
+        const client = Stomp.over(() => new SockJS(wsEndpoint('/ws')));
         client.debug = () => { };
         const headers = { 'Authorization': `Bearer ${token}` };
 
@@ -159,7 +160,7 @@ const ChatPage = () => {
                 formData.append('file', selectedFile);
                 formData.append('recipientId', recipientId);
 
-                const uploadRes = await fetch('/api/chat/upload', {
+                const uploadRes = await fetch(api('/api/chat/upload'), {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData

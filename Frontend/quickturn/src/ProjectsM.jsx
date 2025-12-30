@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from './Toast';
+import { api } from './utils/apiConfig';
 import './ProjectsM.css';
 
 const ProjectsM = ({ token, limit, userCategory }) => {
@@ -24,7 +25,7 @@ const ProjectsM = ({ token, limit, userCategory }) => {
     // --- FETCH DATA ---
     const fetchProjects = async () => {
         try {
-            const response = await fetch("/api/projects", {
+            const response = await fetch(api("/api/projects"), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await response.json();
@@ -99,7 +100,7 @@ const ProjectsM = ({ token, limit, userCategory }) => {
 
         setIsSubmitting(true);
         try {
-            const response = await fetch(`/api/projects/${selectedProject.id}/apply`, {
+            const response = await fetch(api(`/api/projects/${selectedProject.id}/apply`), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

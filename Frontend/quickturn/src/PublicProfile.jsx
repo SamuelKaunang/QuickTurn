@@ -4,6 +4,7 @@ import {
     ArrowLeft, User, MapPin, Star, Briefcase, ExternalLink,
     Award, Phone, Globe, Linkedin, Github, GraduationCap, Clock
 } from 'lucide-react';
+import { api } from './utils/apiConfig';
 import './PublicProfile.css';
 
 const PublicProfile = () => {
@@ -35,11 +36,11 @@ const PublicProfile = () => {
 
             let response;
             if (username) {
-                response = await fetch(`/api/users/profile/username/${username}`, {
+                response = await fetch(api(`/api/users/profile/username/${username}`), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
             } else {
-                response = await fetch(`/api/users/profile/${userId}`, {
+                response = await fetch(api(`/api/users/profile/${userId}`), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
             }

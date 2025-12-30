@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, User, Star, Briefcase } from 'lucide-react';
+import { api } from './utils/apiConfig';
 import './UserSearchModal.css';
 
 const UserSearchModal = ({ isOpen, onClose }) => {
@@ -25,7 +26,7 @@ const UserSearchModal = ({ isOpen, onClose }) => {
                 url += `&role=${roleFilter}`;
             }
 
-            const response = await fetch(url, {
+            const response = await fetch(api(url), {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 

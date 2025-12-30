@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ProjectsM.css';
 import ReviewModal from './ReviewModal';
 import WorkSubmissionModal from './WorkSubmissionModal';
+import { api } from './utils/apiConfig';
 
 const ActiveProjectsM = ({ token }) => {
     const [activeProjects, setActiveProjects] = useState([]);
@@ -20,7 +21,7 @@ const ActiveProjectsM = ({ token }) => {
 
     const fetchMyActiveProjects = async () => {
         try {
-            const response = await fetch("/api/projects/participating", {
+            const response = await fetch(api("/api/projects/participating"), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await response.json();
@@ -56,7 +57,7 @@ const ActiveProjectsM = ({ token }) => {
                 if (reviewedProjects[project.id] !== undefined) continue;
 
                 try {
-                    const response = await fetch(`/api/projects/${project.id}/my-review`, {
+                    const response = await fetch(api(`/api/projects/${project.id}/my-review`), {
                         headers: { "Authorization": `Bearer ${token}` }
                     });
                     const data = await response.json();
@@ -89,7 +90,7 @@ const ActiveProjectsM = ({ token }) => {
     const handleSubmitReview = async (rating, comment) => {
         if (!reviewProject) return;
         try {
-            const response = await fetch(`/api/projects/${reviewProject.id}/review`, {
+            const response = await fetch(api(`/api/projects/${reviewProject.id}/review`), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

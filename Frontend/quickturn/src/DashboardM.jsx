@@ -5,6 +5,7 @@ import {
     LogOut, Search, Bell, ArrowUpRight, ArrowDownRight, Users,
     CheckCircle, Send, UserSearch
 } from 'lucide-react';
+import { api } from './utils/apiConfig';
 import './DashboardM.css';
 import logoQ from './assets/logo/logo Q.png';
 import logoText from './assets/logo/logo text.png';
@@ -81,7 +82,7 @@ const DashboardM = () => {
 
     const fetchUserProfile = async (authToken) => {
         try {
-            const response = await fetch("/api/users/profile", {
+            const response = await fetch(api("/api/users/profile"), {
                 headers: { "Authorization": `Bearer ${authToken}` }
             });
             const data = await response.json();
@@ -97,7 +98,7 @@ const DashboardM = () => {
 
     const fetchUnreadCount = async (authToken) => {
         try {
-            const response = await fetch("/api/chat/unread", {
+            const response = await fetch(api("/api/chat/unread"), {
                 headers: { "Authorization": `Bearer ${authToken}` }
             });
             const data = await response.json();
@@ -109,7 +110,7 @@ const DashboardM = () => {
 
     const fetchAvailableProjects = async (authToken) => {
         try {
-            const response = await fetch("/api/projects", {
+            const response = await fetch(api("/api/projects"), {
                 headers: { "Authorization": `Bearer ${authToken}` }
             });
             const data = await response.json();
@@ -121,7 +122,7 @@ const DashboardM = () => {
 
     const fetchStudentStats = async (authToken) => {
         try {
-            const response = await fetch("/api/projects/participating", {
+            const response = await fetch(api("/api/projects/participating"), {
                 headers: { "Authorization": `Bearer ${authToken}` }
             });
             const data = await response.json();
