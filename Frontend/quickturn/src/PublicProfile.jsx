@@ -7,6 +7,7 @@ import {
 import { api } from './utils/apiConfig';
 import { Skeleton, SkeletonAvatar, SkeletonText } from './Skeleton';
 import './PublicProfile.css';
+import UserAvatar from './UserAvatar';
 
 const PublicProfile = () => {
     const { userId } = useParams();
@@ -177,13 +178,12 @@ const PublicProfile = () => {
                     {/* Profile Picture */}
                     <div className="profile-picture-section">
                         <div className="profile-picture-wrapper">
-                            {profile?.profilePictureUrl ? (
-                                <img src={profile.profilePictureUrl} alt={profile.nama} className="profile-picture" />
-                            ) : (
-                                <div className="profile-picture-placeholder">
-                                    <User size={56} />
-                                </div>
-                            )}
+                            <UserAvatar
+                                src={profile?.profilePictureUrl}
+                                name={profile?.nama}
+                                size="xxl"
+                                className="profile-picture"
+                            />
                         </div>
                     </div>
 

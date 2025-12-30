@@ -1,0 +1,51 @@
+/* Shared UserAvatar Styles */
+
+.user-avatar-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    border-radius: 50%;
+    background: #fff1f2;
+    color: #e11d48;
+    border: 2px solid #e11d48;
+    user-select: none;
+}
+
+.user-avatar-img {
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Sizes */
+.size-default {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+}
+
+.size-small {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+}
+
+.size-large {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+}
+
+.size-xl {
+    width: 120px;
+    height: 120px;
+    font-size: 3rem;
+    border-width: 4px;
+}
+
+.size-xxl {
+    width: 160px;
+    height: 160px;
+    font-size: 4rem;
+    border-width: 4px;
+}
