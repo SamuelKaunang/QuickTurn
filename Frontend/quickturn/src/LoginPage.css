@@ -546,3 +546,151 @@
   cursor: default;
   pointer-events: none;
 }
+
+/* =========================================
+   FORM VALIDATION FEEDBACK STYLES
+========================================= */
+
+/* Validation feedback message */
+.validation-feedback {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.validation-feedback.error {
+  color: #ef4444;
+}
+
+.validation-feedback.success {
+  color: #22c55e;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Input state styling */
+.input-wrapper.input-error input {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.input-wrapper.input-error input:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.input-wrapper.input-valid input {
+  border-color: #22c55e;
+  background-color: #f0fdf4;
+}
+
+.input-wrapper.input-valid input:focus {
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+/* Validation icon inside input */
+.validation-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.validation-icon.valid {
+  color: #22c55e;
+}
+
+.validation-icon.error {
+  color: #ef4444;
+}
+
+/* Password strength indicator */
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 70px;
+  text-align: right;
+}
+
+/* Adjust toggle password button position for validated inputs */
+.input-wrapper.input-valid .toggle-password {
+  right: 38px;
+}
+
+/* Helper text below input */
+.input-helper {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+/* Form validation requirements list */
+.validation-requirements {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.validation-requirements p {
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin: 0 0 6px 0;
+  font-weight: 600;
+}
+
+.validation-requirements ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.validation-requirements li {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  margin-bottom: 2px;
+}
+
+.validation-requirements li.met {
+  color: #22c55e;
+}
+
+.validation-requirements li.met::marker {
+  content: '✓ ';
+  color: #22c55e;
+}

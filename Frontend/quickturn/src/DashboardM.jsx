@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { performLogout } from './RouteGuards';
 import {
     LayoutDashboard, Briefcase, MessageSquare, Settings,
     LogOut, Search, ArrowUpRight, ArrowDownRight, Users,
@@ -159,8 +160,7 @@ const DashboardM = () => {
     };
 
     const handleLogout = () => {
-        sessionStorage.clear();
-        navigate("/login");
+        performLogout(navigate);
     };
 
     const stats = [
@@ -312,56 +312,75 @@ const DashboardM = () => {
                                 </button>
                             </div>
 
-                            {/* Announcements Section - Positioned between welcome banner and stats */}
-                            <div className="announcements-section">
-                                <h3 className="text-lg font-bold mb-3" style={{ color: 'var(--slate-900)' }}>Latest Announcements</h3>
-                                <GlassCard className="p-4">
-                                    {announcements.length === 0 ? (
-                                        <p className="text-sm text-slate-500">No new announcements.</p>
-                                    ) : (
-                                        <div className="space-y-4">
-                                            {announcements.slice(0, 3).map(a => (
-                                                <div key={a.id} className="pb-3 border-b border-slate-200 last:border-0 last:pb-0">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <span className="w-2 h-2 rounded-full bg-brand"></span>
-                                                        <h4 className="font-semibold text-sm" style={{ color: 'var(--slate-800)' }}>{a.title}</h4>
-                                                    </div>
-                                                    <p className="text-xs text-slate-600 line-clamp-2">{a.content}</p>
-                                                    <span className="text-[10px] text-slate-400 mt-1 block">
-                                                        {new Date(a.createdAt).toLocaleDateString()}
-                                                    </span>
-                                                </div>
-                                            ))}
+                            {/* Top Row: Announcements (Left) + Recent Activity (Right) */}
+                            <div className="top-info-grid">
+                                {/* Announcements Section */}
+                                <div className="announcements-section">
+                                    <div className="section-header-alt">
+                                        <div className="section-icon announcement-icon">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0" />
+                                            </svg>
                                         </div>
-                                    )}
-                                </GlassCard>
+                                        <h3>Latest Announcements</h3>
+                                    </div>
+                                    <div className="glass-card announcement-card">
+                                        {announcements.length === 0 ? (
+                                            <div className="empty-state">
+                                                <p>No new announcements.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="announcement-list">
+                                                {announcements.slice(0, 3).map((a, index) => (
+                                                    <div key={a.id} className={`announcement-item ${index === 0 ? 'featured' : ''}`}>
+                                                        <div className="announcement-dot"></div>
+                                                        <div className="announcement-content">
+                                                            <h4>{a.title}</h4>
+                                                            <p>{a.content}</p>
+                                                            <span className="announcement-date">
+                                                                {new Date(a.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Recent Activity Section */}
+                                <div className="activity-section-top">
+                                    <div className="section-header-alt">
+                                        <div className="section-icon activity-icon">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                            </svg>
+                                        </div>
+                                        <h3>Recent Activity</h3>
+                                    </div>
+                                    <div className="glass-card activity-card-top">
+                                        <RecentActivities />
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="stats-grid">
                                 {stats.map((s, i) => <StatCard key={i} {...s} />)}
                             </div>
 
-                            <div className="grid-layout">
-                                <div className="projects-section">
-                                    <div className="section-header">
-                                        <h3>Recommended Projects</h3>
-                                        <button
-                                            className="text-link"
-                                            onClick={() => setActiveTab('browse')}
-                                        >
-                                            View All
-                                        </button>
-                                    </div>
-                                    <div className="project-list-wrapper">
-                                        <ProjectsM token={token} limit={4} userCategory={userCategory} />
-                                    </div>
+                            {/* Full Width Projects Section */}
+                            <div className="projects-section-full">
+                                <div className="section-header">
+                                    <h3>Recommended Projects</h3>
+                                    <button
+                                        className="text-link"
+                                        onClick={() => setActiveTab('browse')}
+                                    >
+                                        View All
+                                    </button>
                                 </div>
-
-                                <div className="activity-section">
-                                    <h3>Recent Activity</h3>
-                                    <div className="glass-card activity-card-wrapper">
-                                        <RecentActivities />
-                                    </div>
+                                <div className="project-grid-wrapper">
+                                    <ProjectsM token={token} limit={6} userCategory={userCategory} />
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,7 @@
 package com.example.QucikTurn.Entity;
 
 import com.example.QucikTurn.Entity.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,6 +23,8 @@ public class User implements UserDetails {
     private String email;
     @Column(unique = true, length = 50)
     private String username; // For profile search
+
+    @JsonIgnore // SECURITY: Never expose password hash in API responses
     @Column(name = "password_hash", nullable = false, length = 100)
     private String passwordHash;
 
@@ -88,12 +91,14 @@ public class User implements UserDetails {
     @Column(length = 200)
     private String githubUrl;
 
-    // UserDetails
+    // UserDetails - All security methods are hidden from JSON serialization
+    @JsonIgnore // SECURITY: Hide authorities from API responses
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
+    @JsonIgnore // SECURITY: Never expose password in API responses
     @Override
     public String getPassword() {
         return passwordHash;
@@ -145,6 +150,7 @@ public class User implements UserDetails {
         this.email = email;
     }
 
+    @JsonIgnore // SECURITY: Never expose password hash
     public String getPasswordHash() {
         return passwordHash;
     }

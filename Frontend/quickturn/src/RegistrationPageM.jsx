@@ -1,10 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from './Toast';
 import { api } from './utils/apiConfig';
-import { Timer, Shield, Sparkles, TrendingUp } from 'lucide-react';
+import { validators, getPasswordStrength } from './utils/validators';
+import { Timer, Shield, Sparkles, TrendingUp, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import './LoginPage.css';
 import logoFull from './assets/logo/Logo full.png';
+
+// Validation feedback component
+const ValidationFeedback = ({ validation, show }) => {
+  if (!show || validation.valid) return null;
+  return (
+    <div className="validation-feedback error">
+      <XCircle size={14} />
+      <span>{validation.message}</span>
+    </div>
+  );
+};
+
+// Password strength indicator component
+const PasswordStrengthIndicator = ({ password }) => {
+  const strength = getPasswordStrength(password);
+  if (!password) return null;
+
+  return (
+    <div className="password-strength">
+      <div className="strength-bar">
+        <div
+          className="strength-fill"
+          style={{
+            width: `${(strength.strength / 7) * 100}%`,
+            backgroundColor: strength.color
+          }}
+        />
+      </div>
+      <span className="strength-label" style={{ color: strength.color }}>
+        {strength.label}
+      </span>
+    </div>
+  );
+};
 
 function RegistrationPageM() {
   const [email, setEmail] = useState('');
@@ -15,8 +50,32 @@ function RegistrationPageM() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Track which fields have been touched (for showing validation)
+  const [touched, setTouched] = useState({
+    name: false,
+    email: false,
+    password: false,
+    confirmPassword: false
+  });
+
   const navigate = useNavigate();
   const toast = useToast();
+
+  // Real-time validation
+  const validations = useMemo(() => ({
+    name: validators.name(name),
+    email: validators.email(email),
+    password: validators.password(password),
+    confirmPassword: validators.confirmPassword(confirmPassword, password)
+  }), [name, email, password, confirmPassword]);
+
+  // Check if form is valid
+  const isFormValid = Object.values(validations).every(v => v.valid);
+
+  const handleBlur = (field) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
 
   const handleRoleToggle = (role) => {
     navigate(role === 'CLIENT' ? '/registeru' : '/registerm');
@@ -25,13 +84,19 @@ function RegistrationPageM() {
   const handleRegistration = async (e) => {
     e.preventDefault();
 
-    if (!name || !email || !password || !confirmPassword) {
-      setMessage('Harap isi semua kolom.');
-      return;
-    }
+    // Mark all fields as touched to show validation
+    setTouched({
+      name: true,
+      email: true,
+      password: true,
+      confirmPassword: true
+    });
 
-    if (password !== confirmPassword) {
-      setMessage('Password dan konfirmasi password tidak cocok.');
+    // Check validations
+    if (!isFormValid) {
+      // Find first error and show it
+      const firstError = Object.values(validations).find(v => !v.valid);
+      setMessage(firstError?.message || 'Harap perbaiki error di form.');
       return;
     }
 
@@ -43,8 +108,8 @@ function RegistrationPageM() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          nama: name,
-          email,
+          nama: name.trim(),
+          email: email.trim().toLowerCase(),
           password,
           role: 'MAHASISWA'
         })
@@ -60,7 +125,6 @@ function RegistrationPageM() {
       }
     } catch (err) {
       setMessage('Terjadi kesalahan saat menghubungi server.');
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -153,7 +217,7 @@ function RegistrationPageM() {
           <form onSubmit={handleRegistration} className="auth-form">
             <div className="input-group">
               <label htmlFor="name">Nama Lengkap</label>
-              <div className="input-wrapper">
+              <div className={`input-wrapper ${touched.name && !validations.name.valid ? 'input-error' : ''} ${touched.name && validations.name.valid ? 'input-valid' : ''}`}>
                 <span className="material-symbols-outlined icon-left">person</span>
                 <input
                   id="name"
@@ -161,14 +225,18 @@ function RegistrationPageM() {
                   placeholder="Masukkan nama lengkap lo"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  required
+                  onBlur={() => handleBlur('name')}
                 />
+                {touched.name && validations.name.valid && (
+                  <CheckCircle size={18} className="validation-icon valid" />
+                )}
               </div>
+              <ValidationFeedback validation={validations.name} show={touched.name} />
             </div>
 
             <div className="input-group">
               <label htmlFor="email">Email Address</label>
-              <div className="input-wrapper">
+              <div className={`input-wrapper ${touched.email && !validations.email.valid ? 'input-error' : ''} ${touched.email && validations.email.valid ? 'input-valid' : ''}`}>
                 <span className="material-symbols-outlined icon-left">mail</span>
                 <input
                   id="email"
@@ -176,22 +244,26 @@ function RegistrationPageM() {
                   placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                  onBlur={() => handleBlur('email')}
                 />
+                {touched.email && validations.email.valid && (
+                  <CheckCircle size={18} className="validation-icon valid" />
+                )}
               </div>
+              <ValidationFeedback validation={validations.email} show={touched.email} />
             </div>
 
             <div className="input-group">
               <label htmlFor="password">Password</label>
-              <div className="input-wrapper">
+              <div className={`input-wrapper ${touched.password && !validations.password.valid ? 'input-error' : ''} ${touched.password && validations.password.valid ? 'input-valid' : ''}`}>
                 <span className="material-symbols-outlined icon-left">lock</span>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Masukkan password lo"
+                  placeholder="Minimal 6 karakter (huruf + angka)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  onBlur={() => handleBlur('password')}
                 />
                 <button
                   type="button"
@@ -203,11 +275,13 @@ function RegistrationPageM() {
                   </span>
                 </button>
               </div>
+              <PasswordStrengthIndicator password={password} />
+              <ValidationFeedback validation={validations.password} show={touched.password} />
             </div>
 
             <div className="input-group">
               <label htmlFor="confirmPassword">Konfirmasi Password</label>
-              <div className="input-wrapper">
+              <div className={`input-wrapper ${touched.confirmPassword && !validations.confirmPassword.valid ? 'input-error' : ''} ${touched.confirmPassword && validations.confirmPassword.valid ? 'input-valid' : ''}`}>
                 <span className="material-symbols-outlined icon-left">lock</span>
                 <input
                   id="confirmPassword"
@@ -215,10 +289,7 @@ function RegistrationPageM() {
                   placeholder="Ulangi password lo"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  style={{
-                    borderColor: confirmPassword && (confirmPassword === password ? '#16a34a' : '#ef4444')
-                  }}
+                  onBlur={() => handleBlur('confirmPassword')}
                 />
                 <button
                   type="button"
@@ -229,7 +300,11 @@ function RegistrationPageM() {
                     {showConfirmPassword ? 'visibility_off' : 'visibility'}
                   </span>
                 </button>
+                {touched.confirmPassword && validations.confirmPassword.valid && (
+                  <CheckCircle size={18} className="validation-icon valid" style={{ right: '48px' }} />
+                )}
               </div>
+              <ValidationFeedback validation={validations.confirmPassword} show={touched.confirmPassword} />
             </div>
 
             <button type="submit" className="submit-btn" disabled={isLoading}>

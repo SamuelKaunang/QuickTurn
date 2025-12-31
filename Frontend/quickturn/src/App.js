@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastProvider } from './Toast';
+import { ProtectedRoute, AuthRoute } from './RouteGuards';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import RegistrationPageU from './RegistrationPageU';
@@ -20,31 +21,77 @@ function App() {
     <ToastProvider>
       <BrowserRouter>
         <Routes>
-          {/* Landing Page - Default */}
+          {/* Landing Page - Public */}
           <Route path="/" element={<LandingPage />} />
 
-          {/* Auth Routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/registeru" element={<RegistrationPageU />} />
-          <Route path="/registerm" element={<RegistrationPageM />} />
+          {/* Auth Routes - Redirect to dashboard if already logged in */}
+          <Route path="/login" element={
+            <AuthRoute>
+              <LoginPage />
+            </AuthRoute>
+          } />
+          <Route path="/registeru" element={
+            <AuthRoute>
+              <RegistrationPageU />
+            </AuthRoute>
+          } />
+          <Route path="/registerm" element={
+            <AuthRoute>
+              <RegistrationPageM />
+            </AuthRoute>
+          } />
 
-          {/* Dashboard Routes */}
-          <Route path="/dashboardu" element={<DashboardU />} />
-          <Route path="/dashboardm" element={<DashboardM />} />
+          {/* Protected Dashboard Routes */}
+          <Route path="/dashboardu" element={
+            <ProtectedRoute allowedRoles={['UMKM', 'UKM']}>
+              <DashboardU />
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboardm" element={
+            <ProtectedRoute allowedRoles={['MAHASISWA']}>
+              <DashboardM />
+            </ProtectedRoute>
+          } />
 
-          <Route path="/profile-mahasiswa" element={<ProfileM />} />
-          <Route path="/profile-umkm" element={<ProfileU />} />
+          {/* Protected Profile Routes */}
+          <Route path="/profile-mahasiswa" element={
+            <ProtectedRoute allowedRoles={['MAHASISWA']}>
+              <ProfileM />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile-umkm" element={
+            <ProtectedRoute allowedRoles={['UMKM', 'UKM']}>
+              <ProfileU />
+            </ProtectedRoute>
+          } />
 
-          {/* Public Profile Route */}
-          <Route path="/profile/:userId" element={<PublicProfile />} />
+          {/* Public Profile Route - Protected but any role can access */}
+          <Route path="/profile/:userId" element={
+            <ProtectedRoute>
+              <PublicProfile />
+            </ProtectedRoute>
+          } />
 
-          <Route path="/chat" element={<ChatPage />} />
+          {/* Protected Chat Route */}
+          <Route path="/chat" element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          } />
 
           {/* Admin Routes */}
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
 
-          {/* Feature Routes */}
-          <Route path="/post-project" element={<PostProject />} />
+          {/* Protected Feature Routes */}
+          <Route path="/post-project" element={
+            <ProtectedRoute allowedRoles={['UMKM', 'UKM']}>
+              <PostProject />
+            </ProtectedRoute>
+          } />
 
           {/* Fallback - Landing Page */}
           <Route path="*" element={<LandingPage />} />

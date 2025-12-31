@@ -6,6 +6,7 @@ import com.example.QucikTurn.Service.UserService;
 import com.example.QucikTurn.dto.ApiResponse;
 import com.example.QucikTurn.dto.PublicProfileResponse;
 import com.example.QucikTurn.dto.UpdateProfileRequest;
+import com.example.QucikTurn.dto.UserProfileResponse;
 import com.example.QucikTurn.dto.UserSearchResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,19 +27,20 @@ public class UserController {
 
     // --- GET MY PROFILE ---
     @GetMapping("/profile")
-    public ResponseEntity<ApiResponse<User>> getMyProfile(@AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> getMyProfile(@AuthenticationPrincipal User user) {
         // Fetch fresh data from DB to ensure we have latest bio/skills
         User freshUser = userSvc.getUserById(user.getId());
-        return ResponseEntity.ok(ApiResponse.ok("Profile data", freshUser));
+        // Return DTO without sensitive data
+        return ResponseEntity.ok(ApiResponse.ok("Profile data", UserProfileResponse.fromUser(freshUser)));
     }
 
     // --- UPDATE PROFILE (FR-03) ---
     @PutMapping("/profile")
-    public ResponseEntity<ApiResponse<User>> updateProfile(
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateProfile(
             @AuthenticationPrincipal User user,
             @RequestBody UpdateProfileRequest req) {
         User updated = userSvc.updateProfile(user.getId(), req);
-        return ResponseEntity.ok(ApiResponse.ok("Profile updated successfully", updated));
+        return ResponseEntity.ok(ApiResponse.ok("Profile updated successfully", UserProfileResponse.fromUser(updated)));
     }
 
     // --- SEARCH USERS ---
@@ -80,7 +82,7 @@ public class UserController {
 
     // --- UPDATE USERNAME ---
     @PutMapping("/username")
-    public ResponseEntity<ApiResponse<User>> updateUsername(
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateUsername(
             @AuthenticationPrincipal User user,
             @RequestBody Map<String, String> request) {
         String newUsername = request.get("username");
@@ -97,7 +99,8 @@ public class UserController {
 
         try {
             User updated = userSvc.updateUsername(user.getId(), newUsername.toLowerCase());
-            return ResponseEntity.ok(ApiResponse.ok("Username updated successfully", updated));
+            return ResponseEntity
+                    .ok(ApiResponse.ok("Username updated successfully", UserProfileResponse.fromUser(updated)));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
@@ -105,11 +108,11 @@ public class UserController {
 
     // --- UPDATE BIDANG/CATEGORY ---
     @PutMapping("/bidang")
-    public ResponseEntity<ApiResponse<User>> updateBidang(
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateBidang(
             @AuthenticationPrincipal User user,
             @RequestBody Map<String, String> request) {
         String bidang = request.get("bidang");
         User updated = userSvc.updateBidang(user.getId(), bidang);
-        return ResponseEntity.ok(ApiResponse.ok("Bidang updated successfully", updated));
+        return ResponseEntity.ok(ApiResponse.ok("Bidang updated successfully", UserProfileResponse.fromUser(updated)));
     }
 }

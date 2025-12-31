@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { performLogout } from './RouteGuards';
 import {
     LayoutDashboard, Users, Megaphone, LogOut,
     Shield, Trash2, PlusCircle, Search,
@@ -64,7 +65,7 @@ const AdminDashboard = () => {
                 setUsers(data.data || []);
                 setStats(prev => ({ ...prev, totalUsers: (data.data || []).length }));
             }
-        } catch (err) { console.error("Failed to fetch users", err); }
+        } catch (err) { /* Silently handle error */ }
     };
 
     const fetchAnnouncements = async (authToken) => {
@@ -77,7 +78,7 @@ const AdminDashboard = () => {
                 setAnnouncements(data.data || []);
                 setStats(prev => ({ ...prev, totalAnnouncements: (data.data || []).length }));
             }
-        } catch (err) { console.error("Failed to fetch announcements", err); }
+        } catch (err) { /* Silently handle error */ }
     }
 
     const fetchProjects = async (authToken) => {
@@ -90,7 +91,7 @@ const AdminDashboard = () => {
                 setProjects(data.data || []);
                 setStats(prev => ({ ...prev, totalProjects: (data.data || []).length }));
             }
-        } catch (err) { console.error("Failed to fetch projects", err); }
+        } catch (err) { /* Silently handle error */ }
     }
 
     const handleViewLogs = async (project) => {
@@ -105,7 +106,7 @@ const AdminDashboard = () => {
             if (res.ok) {
                 setProjectLogs(data.data || []);
             }
-        } catch (err) { console.error("Failed to fetch logs", err); }
+        } catch (err) { /* Silently handle error */ }
     }
 
     const handleDeleteUser = async (userId) => {
@@ -119,7 +120,7 @@ const AdminDashboard = () => {
                 alert("User deleted");
                 fetchUsers(token);
             }
-        } catch (err) { console.error(err); }
+        } catch (err) { /* Silently handle error */ }
     }
 
     const handleDeleteAnnouncement = async (id) => {
@@ -132,7 +133,7 @@ const AdminDashboard = () => {
             if (res.ok) {
                 fetchAnnouncements(token);
             }
-        } catch (err) { console.error(err); }
+        } catch (err) { /* Silently handle error */ }
     }
 
     const handlePostAnnouncement = async (e) => {
@@ -151,12 +152,11 @@ const AdminDashboard = () => {
                 fetchAnnouncements(token);
                 alert("Announcement Posted!");
             }
-        } catch (err) { console.error(err); }
+        } catch (err) { /* Silently handle error */ }
     }
 
     const handleLogout = () => {
-        sessionStorage.clear();
-        navigate("/login");
+        performLogout(navigate);
     };
 
     return (

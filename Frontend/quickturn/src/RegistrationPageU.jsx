@@ -1,10 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from './Toast';
 import { api } from './utils/apiConfig';
-import { Timer, Shield, Sparkles, TrendingUp } from 'lucide-react';
+import { validators, getPasswordStrength } from './utils/validators';
+import { Timer, Shield, Sparkles, TrendingUp, CheckCircle, XCircle } from 'lucide-react';
 import './LoginPage.css';
 import logoFull from './assets/logo/Logo full.png';
+
+// Validation feedback component
+const ValidationFeedback = ({ validation, show }) => {
+  if (!show || validation.valid) return null;
+  return (
+    <div className="validation-feedback error">
+      <XCircle size={14} />
+      <span>{validation.message}</span>
+    </div>
+  );
+};
+
+// Password strength indicator component
+const PasswordStrengthIndicator = ({ password }) => {
+  const strength = getPasswordStrength(password);
+  if (!password) return null;
+
+  return (
+    <div className="password-strength">
+      <div className="strength-bar">
+        <div
+          className="strength-fill"
+          style={{
+            width: `${(strength.strength / 7) * 100}%`,
+            backgroundColor: strength.color
+          }}
+        />
+      </div>
+      <span className="strength-label" style={{ color: strength.color }}>
+        {strength.label}
+      </span>
+    </div>
+  );
+};
 
 function RegistrationPageU() {
   const [email, setEmail] = useState('');
@@ -15,23 +50,53 @@ function RegistrationPageU() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Track which fields have been touched (for showing validation)
+  const [touched, setTouched] = useState({
+    name: false,
+    email: false,
+    password: false,
+    confirmPassword: false
+  });
+
   const navigate = useNavigate();
   const toast = useToast();
 
+  // Real-time validation
+  const validations = useMemo(() => ({
+    name: validators.name(name),
+    email: validators.email(email),
+    password: validators.password(password),
+    confirmPassword: validators.confirmPassword(confirmPassword, password)
+  }), [name, email, password, confirmPassword]);
+
+  // Check if form is valid
+  const isFormValid = Object.values(validations).every(v => v.valid);
+
+  const handleBlur = (field) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
+
   const handleRoleToggle = (role) => {
-    navigate(role === 'CLIENT' ? '/registeru' : '/registerm');
+    navigate(role === 'TALENT' ? '/registerm' : '/registeru');
   };
 
   const handleRegistration = async (e) => {
     e.preventDefault();
 
-    if (!name || !email || !password || !confirmPassword) {
-      setMessage('Harap isi semua kolom.');
-      return;
-    }
+    // Mark all fields as touched to show validation
+    setTouched({
+      name: true,
+      email: true,
+      password: true,
+      confirmPassword: true
+    });
 
-    if (password !== confirmPassword) {
-      setMessage('Password dan konfirmasi password tidak cocok.');
+    // Check validations
+    if (!isFormValid) {
+      // Find first error and show it
+      const firstError = Object.values(validations).find(v => !v.valid);
+      setMessage(firstError?.message || 'Harap perbaiki error di form.');
       return;
     }
 
@@ -43,8 +108,8 @@ function RegistrationPageU() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          nama: name,
-          email,
+          nama: name.trim(),
+          email: email.trim().toLowerCase(),
           password,
           role: 'UMKM'
         })
@@ -53,14 +118,13 @@ function RegistrationPageU() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success('Registrasi Client berhasil! Silakan login.', 'Selamat!');
+        toast.success('Registrasi berhasil! Silakan login.', 'Selamat!');
         navigate('/login');
       } else {
         setMessage(data.message || "Registrasi Gagal");
       }
     } catch (err) {
       setMessage('Terjadi kesalahan saat menghubungi server.');
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -147,28 +211,32 @@ function RegistrationPageU() {
           <div className="form-header">
             {message && <div className={`error-alert ${message.includes('Berhasil') ? 'success-alert' : ''}`}>{message}</div>}
             <h2>Registrasi Client</h2>
-            <p>Buat akun baru dan temukan Talent terbaik untuk bisnis lo.</p>
+            <p>Buat akun baru dan mulai posting project untuk bisnis lo.</p>
           </div>
 
           <form onSubmit={handleRegistration} className="auth-form">
             <div className="input-group">
-              <label htmlFor="name">Nama Lengkap / Nama Bisnis</label>
-              <div className="input-wrapper">
+              <label htmlFor="name">Nama Bisnis / Perusahaan</label>
+              <div className={`input-wrapper ${touched.name && !validations.name.valid ? 'input-error' : ''} ${touched.name && validations.name.valid ? 'input-valid' : ''}`}>
                 <span className="material-symbols-outlined icon-left">business</span>
                 <input
                   id="name"
                   type="text"
-                  placeholder="Masukkan nama lengkap atau nama bisnis"
+                  placeholder="Masukkan nama bisnis/perusahaan lo"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  required
+                  onBlur={() => handleBlur('name')}
                 />
+                {touched.name && validations.name.valid && (
+                  <CheckCircle size={18} className="validation-icon valid" />
+                )}
               </div>
+              <ValidationFeedback validation={validations.name} show={touched.name} />
             </div>
 
             <div className="input-group">
               <label htmlFor="email">Email Address</label>
-              <div className="input-wrapper">
+              <div className={`input-wrapper ${touched.email && !validations.email.valid ? 'input-error' : ''} ${touched.email && validations.email.valid ? 'input-valid' : ''}`}>
                 <span className="material-symbols-outlined icon-left">mail</span>
                 <input
                   id="email"
@@ -176,22 +244,26 @@ function RegistrationPageU() {
                   placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                  onBlur={() => handleBlur('email')}
                 />
+                {touched.email && validations.email.valid && (
+                  <CheckCircle size={18} className="validation-icon valid" />
+                )}
               </div>
+              <ValidationFeedback validation={validations.email} show={touched.email} />
             </div>
 
             <div className="input-group">
               <label htmlFor="password">Password</label>
-              <div className="input-wrapper">
+              <div className={`input-wrapper ${touched.password && !validations.password.valid ? 'input-error' : ''} ${touched.password && validations.password.valid ? 'input-valid' : ''}`}>
                 <span className="material-symbols-outlined icon-left">lock</span>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Masukkan password lo"
+                  placeholder="Minimal 6 karakter (huruf + angka)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  onBlur={() => handleBlur('password')}
                 />
                 <button
                   type="button"
@@ -203,11 +275,13 @@ function RegistrationPageU() {
                   </span>
                 </button>
               </div>
+              <PasswordStrengthIndicator password={password} />
+              <ValidationFeedback validation={validations.password} show={touched.password} />
             </div>
 
             <div className="input-group">
               <label htmlFor="confirmPassword">Konfirmasi Password</label>
-              <div className="input-wrapper">
+              <div className={`input-wrapper ${touched.confirmPassword && !validations.confirmPassword.valid ? 'input-error' : ''} ${touched.confirmPassword && validations.confirmPassword.valid ? 'input-valid' : ''}`}>
                 <span className="material-symbols-outlined icon-left">lock</span>
                 <input
                   id="confirmPassword"
@@ -215,10 +289,7 @@ function RegistrationPageU() {
                   placeholder="Ulangi password lo"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  style={{
-                    borderColor: confirmPassword && (confirmPassword === password ? '#16a34a' : '#ef4444')
-                  }}
+                  onBlur={() => handleBlur('confirmPassword')}
                 />
                 <button
                   type="button"
@@ -229,7 +300,11 @@ function RegistrationPageU() {
                     {showConfirmPassword ? 'visibility_off' : 'visibility'}
                   </span>
                 </button>
+                {touched.confirmPassword && validations.confirmPassword.valid && (
+                  <CheckCircle size={18} className="validation-icon valid" style={{ right: '48px' }} />
+                )}
               </div>
+              <ValidationFeedback validation={validations.confirmPassword} show={touched.confirmPassword} />
             </div>
 
             <button type="submit" className="submit-btn" disabled={isLoading}>

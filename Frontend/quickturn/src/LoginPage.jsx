@@ -160,7 +160,6 @@ const LoginPage = () => {
       }
     } catch (err) {
       setMessage("Server lagi mogok, coba lagi nanti ya!");
-      console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }
