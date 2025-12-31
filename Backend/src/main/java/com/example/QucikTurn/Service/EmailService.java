@@ -50,7 +50,7 @@ public class EmailService {
             helper.setTo(toEmail);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
-            helper.setFrom("qucikturn.bot@gmail.com");
+            helper.setFrom("quickturn.main@gmail.com");
 
             mailSender.send(message);
             System.out.println("✅ Verification code berhasil dikirim ke: " + toEmail);

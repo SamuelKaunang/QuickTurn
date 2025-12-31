@@ -64,9 +64,10 @@ public class AuthService {
         claims.put("role", user.getRole().name());
 
         String token = jwtService.generateToken(user.getEmail(), claims);
-        
+
         // FIXED: Added user.getRole().name() to the response
-        return new AuthResponse(true, "Registration successful", token, "Bearer", (int) jwtService.getExpires(), user.getRole().name());
+        return new AuthResponse(true, "Registration successful", token, "Bearer", (int) jwtService.getExpires(),
+                user.getRole().name());
     }
 
     // -------- LOGIN --------
@@ -87,19 +88,38 @@ public class AuthService {
         String token = jwtService.generateToken(user.getEmail(), claims);
 
         // FIXED: Added user.getRole().name() to the response
-        return new AuthResponse(true, "Login successful", token, "Bearer", (int) jwtService.getExpires(), user.getRole().name());
+        return new AuthResponse(true, "Login successful", token, "Bearer", (int) jwtService.getExpires(),
+                user.getRole().name());
     }
 
     // -------- STEP 1: FORGOT PASSWORD (Kirim verification code ke email) --------
     public void processForgotPassword(ForgotPasswordRequest req) {
-        userRepository.findByEmail(req.getEmail()).ifPresent(user -> {
+        User user = userRepository.findByEmail(req.getEmail()).orElse(null);
+
+        if (user == null) {
+            // For security, we don't reveal if user doesn't exist
+            System.out.println("⚠️ Forgot password request for non-existent email: " + req.getEmail());
+            return;
+        }
+
+        try {
+            // Delete any existing token for this user
             tokenRepo.findByUser(user).ifPresent(tokenRepo::delete);
 
+            // Create and save new token
             PasswordResetToken token = new PasswordResetToken(user);
             tokenRepo.save(token);
 
+            // Send email with verification code
+            System.out.println("📧 Attempting to send verification code to: " + user.getEmail());
             emailService.sendVerificationCodeEmail(user.getEmail(), token.getVerificationCode());
-        });
+            System.out.println("✅ Verification code sent successfully to: " + user.getEmail());
+
+        } catch (Exception e) {
+            System.err.println("❌ Failed to send verification email to: " + user.getEmail());
+            e.printStackTrace();
+            throw new RuntimeException("Gagal mengirim email. Silakan coba lagi nanti.");
+        }
     }
 
     // -------- STEP 2: VERIFY CODE (Validasi code, return reset token) --------
