@@ -731,6 +731,21 @@
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 28px;
+    align-items: start;
+    /* Prevent children from stretching */
+}
+
+/* Projects Section - Fixed height with scroll */
+.projects-section {
+    min-height: 0;
+    /* Allow flex/grid shrinking */
+}
+
+.projects-section .project-list-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 8px;
 }
 
 .section-header {
@@ -775,13 +790,30 @@
 }
 
 /* =========================================
-   ACTIVITY SECTION
+   ACTIVITY SECTION - Fixed position, won't be pushed
 ========================================= */
+.activity-section {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 100px;
+    /* Align with topbar */
+    align-self: start;
+    /* Prevent stretching to match sibling height */
+    height: fit-content;
+    z-index: 5;
+}
+
 .activity-section h3 {
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--slate-900);
     margin-bottom: 18px;
+}
+
+.activity-card-wrapper {
+    max-height: 450px;
+    overflow-y: auto;
+    border-radius: 10px;
 }
 
 .activity-card {

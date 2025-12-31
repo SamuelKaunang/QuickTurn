@@ -711,13 +711,19 @@
     background: var(--brand-light);
 }
 
+/* Projects Section - Fixed height container */
+.projects-section {
+    min-height: 0;
+    /* Allow flex/grid shrinking */
+}
+
 .project-list-wrapper {
     margin-top: 8px;
-    height: calc(100vh - 280px);
-    /* Fixed height to keep layout stable */
+    max-height: 500px;
+    /* Fixed max-height to prevent pushing activity */
     overflow-y: auto;
     overflow-x: hidden;
-    padding-right: 5px;
+    padding-right: 8px;
     padding-bottom: 20px;
 }
 
@@ -726,17 +732,15 @@
 }
 
 /* =========================================
-   ACTIVITY SECTION - Sticky positioning
+   ACTIVITY SECTION - Sticky positioning, won't be pushed
 ========================================= */
 .activity-section {
     position: -webkit-sticky;
-    /* Safari */
     position: sticky;
-    top: 110px;
-    /* Adjust based on header height + padding */
+    top: 100px;
     align-self: start;
     /* Prevent stretching */
-    z-index: 20;
+    z-index: 5;
     height: fit-content;
 }
 
@@ -747,17 +751,15 @@
     margin-bottom: 18px;
 }
 
+.activity-card-wrapper {
+    max-height: 450px;
+    overflow-y: auto;
+    border-radius: 10px;
+}
+
 .activity-card {
     padding: 0;
     overflow: hidden;
-    max-height: calc(100vh - 200px);
-    /* Ensure it fits in viewport */
-    overflow-y: auto;
-    background: var(--glass);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    box-shadow: 0 4px 6px var(--shadow-sm);
 }
 
 .activity-item {

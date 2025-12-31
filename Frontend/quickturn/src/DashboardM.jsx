@@ -359,7 +359,7 @@ const DashboardM = () => {
 
                                 <div className="activity-section">
                                     <h3>Recent Activity</h3>
-                                    <div className="activity-card-wrapper">
+                                    <div className="glass-card activity-card-wrapper">
                                         <RecentActivities />
                                     </div>
                                 </div>

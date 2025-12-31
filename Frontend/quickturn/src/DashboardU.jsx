@@ -341,7 +341,7 @@ const DashboardU = () => {
 
                 <div className="activity-section">
                   <h3>Recent Activity</h3>
-                  <div className="glass-card activity-card">
+                  <div className="glass-card activity-card-wrapper">
                     <RecentActivities />
                   </div>
                 </div>
