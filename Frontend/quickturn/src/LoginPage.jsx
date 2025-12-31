@@ -37,10 +37,10 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("Kode verifikasi udah dikirim ke email lo!");
+        setMessage("Verification code has been sent to your email!");
         setForgotStep('VERIFY');
       } else {
-        setMessage(data.message || "Gagal kirim email.");
+        setMessage(data.message || "Failed to send email.");
       }
     } catch (err) {
       setMessage("Error sending email.");
@@ -75,10 +75,10 @@ const LoginPage = () => {
 
       if (response.ok && data.data) {
         setResetToken(data.data.resetToken); // Store token for next step
-        setMessage("Kode valid! Silakan reset password.");
+        setMessage("Code verified! Please reset your password.");
         setForgotStep('RESET');
       } else {
-        setMessage(data.message || "Kode salah atau expired.");
+        setMessage(data.message || "Invalid or expired code.");
       }
     } catch (err) {
       setMessage("Error verifying code.");
@@ -101,13 +101,13 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("Password berhasil diubah! Yuk login.");
+        setMessage("Password changed successfully! Please log in.");
         setForgotStep(null); // Back to login
         setPassword('');
         setEmail(forgotEmail); // Auto fill email
         setIsLoading(false);
       } else {
-        setMessage(data.message || "Gagal reset password.");
+        setMessage(data.message || "Failed to reset password.");
       }
     } catch (err) {
       setMessage("Error resetting password.");
@@ -121,7 +121,7 @@ const LoginPage = () => {
     e.preventDefault(); // Biar gak reload page
 
     if (!email || !password) {
-      setMessage("Email dan password harus diisi, ya!");
+      setMessage("Email and password are required!");
       return;
     }
 
@@ -156,10 +156,10 @@ const LoginPage = () => {
           navigate('/dashboardm');
         }
       } else {
-        setMessage(responseJson.message || "Waduh, login gagal nih.");
+        setMessage(responseJson.message || "Oops, login failed.");
       }
     } catch (err) {
-      setMessage("Server lagi mogok, coba lagi nanti ya!");
+      setMessage("Server is currently unavailable, please try again later!");
     } finally {
       setIsLoading(false);
     }
@@ -177,7 +177,7 @@ const LoginPage = () => {
               <span className="highlight-text">digital future.</span>
             </h1>
             <p className="hero-desc">
-              Platform workspace generasi terbaru. Aman, kenceng, dan didesain buat inovator kayak lo.
+              The next-generation workspace platform. Secure, fast, and designed for innovators like you.
             </p>
 
             <div className="quote-block">
@@ -250,22 +250,22 @@ const LoginPage = () => {
             {!forgotStep ? (
               <>
                 <h2>Welcome Back</h2>
-                <p>Masukkan detail akun lo buat masuk ke workspace.</p>
+                <p>Enter your account details to access your workspace.</p>
               </>
             ) : forgotStep === 'EMAIL' ? (
               <>
-                <h2>Lupa Password?</h2>
-                <p>Masukin email lo, nanti kita kirim kode verifikasi.</p>
+                <h2>Forgot Password?</h2>
+                <p>Enter your email and we'll send you a verification code.</p>
               </>
             ) : forgotStep === 'VERIFY' ? (
               <>
-                <h2>Verifikasi Kode</h2>
-                <p>Cek email lo dan masukin kode 6 digit di sini.</p>
+                <h2>Verify Code</h2>
+                <p>Check your email and enter the 6-digit code here.</p>
               </>
             ) : (
               <>
                 <h2>Reset Password</h2>
-                <p>Saatnya bikin password baru yang lebih aman!</p>
+                <p>Time to create a new, more secure password!</p>
               </>
             )}
           </div>
@@ -293,14 +293,14 @@ const LoginPage = () => {
                   <button type="button" onClick={() => {
                     setForgotStep('EMAIL');
                     setMessage('');
-                  }} className="forgot-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Lupa password?</button>
+                  }} className="forgot-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Forgot password?</button>
                 </div>
                 <div className="input-wrapper">
                   <span className="material-symbols-outlined icon-left">lock</span>
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Masukkan password lo"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -347,9 +347,9 @@ const LoginPage = () => {
                 </div>
               </div>
               <div className="button-group" style={{ display: 'flex', gap: '1rem' }}>
-                <button type="button" onClick={() => setForgotStep(null)} className="submit-btn" style={{ background: '#374151' }}>Batal</button>
+                <button type="button" onClick={() => setForgotStep(null)} className="submit-btn" style={{ background: '#374151' }}>Cancel</button>
                 <button type="submit" className="submit-btn" disabled={isLoading}>
-                  {isLoading ? 'Sending...' : 'Kirim Kode'}
+                  {isLoading ? 'Sending...' : 'Send Code'}
                 </button>
               </div>
             </form>
@@ -358,7 +358,7 @@ const LoginPage = () => {
           {forgotStep === 'VERIFY' && (
             <form onSubmit={handleVerifyCode} className="auth-form">
               <div className="input-group">
-                <label htmlFor="verify-code">Kode Verifikasi</label>
+                <label htmlFor="verify-code">Verification Code</label>
                 <div className="input-wrapper">
                   <span className="material-symbols-outlined icon-left">key</span>
                   <input
@@ -375,7 +375,7 @@ const LoginPage = () => {
               <div className="button-group" style={{ display: 'flex', gap: '1rem' }}>
                 <button type="button" onClick={() => setForgotStep('EMAIL')} className="submit-btn" style={{ background: '#374151' }}>Back</button>
                 <button type="submit" className="submit-btn" disabled={isLoading}>
-                  {isLoading ? 'Verifying...' : 'Verifikasi'}
+                  {isLoading ? 'Verifying...' : 'Verify'}
                 </button>
               </div>
             </form>
@@ -384,13 +384,13 @@ const LoginPage = () => {
           {forgotStep === 'RESET' && (
             <form onSubmit={handleResetPassword} className="auth-form">
               <div className="input-group">
-                <label htmlFor="new-password">Password Baru</label>
+                <label htmlFor="new-password">New Password</label>
                 <div className="input-wrapper">
                   <span className="material-symbols-outlined icon-left">lock</span>
                   <input
                     id="new-password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Password baru lo"
+                    placeholder="Enter your new password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -408,14 +408,14 @@ const LoginPage = () => {
                 </div>
               </div>
               <button type="submit" className="submit-btn" disabled={isLoading}>
-                {isLoading ? 'Saving...' : 'Ubah Password'}
+                {isLoading ? 'Saving...' : 'Change Password'}
               </button>
             </form>
           )}
 
           <div className="register-cta">
             <p>
-              Belum punya akun? <Link to="/registerm">Daftar di sini</Link>
+              Don't have an account? <Link to="/registerm">Register here</Link>
             </p>
           </div>
         </div>

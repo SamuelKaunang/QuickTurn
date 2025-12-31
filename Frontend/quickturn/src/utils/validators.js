@@ -8,11 +8,11 @@ export const validators = {
     // Email validation
     email: (value) => {
         if (!value || !value.trim()) {
-            return { valid: false, message: 'Email wajib diisi' };
+            return { valid: false, message: 'Email is required' };
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) {
-            return { valid: false, message: 'Format email tidak valid (contoh: nama@email.com)' };
+            return { valid: false, message: 'Invalid email format (e.g., name@email.com)' };
         }
         return { valid: true, message: '' };
     },
@@ -20,13 +20,13 @@ export const validators = {
     // Name validation
     name: (value) => {
         if (!value || !value.trim()) {
-            return { valid: false, message: 'Nama wajib diisi' };
+            return { valid: false, message: 'Name is required' };
         }
         if (value.trim().length < 2) {
-            return { valid: false, message: 'Nama minimal 2 karakter' };
+            return { valid: false, message: 'Name must be at least 2 characters' };
         }
         if (value.trim().length > 100) {
-            return { valid: false, message: 'Nama maksimal 100 karakter' };
+            return { valid: false, message: 'Name must not exceed 100 characters' };
         }
         return { valid: true, message: '' };
     },
@@ -34,19 +34,19 @@ export const validators = {
     // Password validation
     password: (value) => {
         if (!value) {
-            return { valid: false, message: 'Password wajib diisi' };
+            return { valid: false, message: 'Password is required' };
         }
         if (value.length < 6) {
-            return { valid: false, message: 'Password minimal 6 karakter' };
+            return { valid: false, message: 'Password must be at least 6 characters' };
         }
         if (value.length > 50) {
-            return { valid: false, message: 'Password maksimal 50 karakter' };
+            return { valid: false, message: 'Password must not exceed 50 characters' };
         }
         // Check for at least one letter and one number (recommended)
         const hasLetter = /[a-zA-Z]/.test(value);
         const hasNumber = /\d/.test(value);
         if (!hasLetter || !hasNumber) {
-            return { valid: false, message: 'Password harus mengandung huruf dan angka' };
+            return { valid: false, message: 'Password must contain letters and numbers' };
         }
         return { valid: true, message: '' };
     },
@@ -54,10 +54,10 @@ export const validators = {
     // Password confirmation
     confirmPassword: (value, originalPassword) => {
         if (!value) {
-            return { valid: false, message: 'Konfirmasi password wajib diisi' };
+            return { valid: false, message: 'Password confirmation is required' };
         }
         if (value !== originalPassword) {
-            return { valid: false, message: 'Password tidak cocok' };
+            return { valid: false, message: 'Passwords do not match' };
         }
         return { valid: true, message: '' };
     },
@@ -65,17 +65,17 @@ export const validators = {
     // Username validation
     username: (value) => {
         if (!value || !value.trim()) {
-            return { valid: false, message: 'Username wajib diisi' };
+            return { valid: false, message: 'Username is required' };
         }
         if (value.length < 3) {
-            return { valid: false, message: 'Username minimal 3 karakter' };
+            return { valid: false, message: 'Username must be at least 3 characters' };
         }
         if (value.length > 30) {
-            return { valid: false, message: 'Username maksimal 30 karakter' };
+            return { valid: false, message: 'Username must not exceed 30 characters' };
         }
         const usernameRegex = /^[a-zA-Z0-9_]+$/;
         if (!usernameRegex.test(value)) {
-            return { valid: false, message: 'Username hanya boleh huruf, angka, dan underscore (_)' };
+            return { valid: false, message: 'Username can only contain letters, numbers, and underscores (_)' };
         }
         return { valid: true, message: '' };
     },
@@ -87,10 +87,10 @@ export const validators = {
         }
         const phoneRegex = /^[0-9+\-\s()]+$/;
         if (!phoneRegex.test(value)) {
-            return { valid: false, message: 'Format nomor telepon tidak valid' };
+            return { valid: false, message: 'Invalid phone number format' };
         }
         if (value.replace(/\D/g, '').length < 10) {
-            return { valid: false, message: 'Nomor telepon minimal 10 digit' };
+            return { valid: false, message: 'Phone number must be at least 10 digits' };
         }
         return { valid: true, message: '' };
     },
@@ -104,14 +104,14 @@ export const validators = {
             new URL(value);
             return { valid: true, message: '' };
         } catch {
-            return { valid: false, message: 'Format URL tidak valid (harus dimulai dengan http:// atau https://)' };
+            return { valid: false, message: 'Invalid URL format (must start with http:// or https://)' };
         }
     },
 
     // Required field
     required: (value, fieldName = 'Field') => {
         if (!value || (typeof value === 'string' && !value.trim())) {
-            return { valid: false, message: `${fieldName} wajib diisi` };
+            return { valid: false, message: `${fieldName} is required` };
         }
         return { valid: true, message: '' };
     },
@@ -119,7 +119,7 @@ export const validators = {
     // Min length
     minLength: (value, min, fieldName = 'Field') => {
         if (value && value.length < min) {
-            return { valid: false, message: `${fieldName} minimal ${min} karakter` };
+            return { valid: false, message: `${fieldName} must be at least ${min} characters` };
         }
         return { valid: true, message: '' };
     },
@@ -127,7 +127,7 @@ export const validators = {
     // Max length
     maxLength: (value, max, fieldName = 'Field') => {
         if (value && value.length > max) {
-            return { valid: false, message: `${fieldName} maksimal ${max} karakter` };
+            return { valid: false, message: `${fieldName} must not exceed ${max} characters` };
         }
         return { valid: true, message: '' };
     }
@@ -150,10 +150,10 @@ export const getPasswordStrength = (password) => {
     if (/\d/.test(password)) strength += 1;
     if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 1;
 
-    if (strength <= 2) return { strength, label: 'Lemah', color: '#ef4444' };
-    if (strength <= 4) return { strength, label: 'Sedang', color: '#f59e0b' };
-    if (strength <= 5) return { strength, label: 'Kuat', color: '#22c55e' };
-    return { strength, label: 'Sangat Kuat', color: '#16a34a' };
+    if (strength <= 2) return { strength, label: 'Weak', color: '#ef4444' };
+    if (strength <= 4) return { strength, label: 'Medium', color: '#f59e0b' };
+    if (strength <= 5) return { strength, label: 'Strong', color: '#22c55e' };
+    return { strength, label: 'Very Strong', color: '#16a34a' };
 };
 
 export default validators;

@@ -264,14 +264,9 @@ const AdminDashboard = () => {
                     {activeTab === 'announcements' && (
                         <div className="fade-in grid gap-8">
                             <GlassCard className="p-8">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-3 rounded-lg bg-pink-500/10 text-pink-500">
-                                        <Megaphone size={24} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-bold" style={{ color: 'var(--slate-900)' }}>Post New Announcement</h3>
-                                        <p className="text-sm text-slate-500">Broadcast updates to all users</p>
-                                    </div>
+                                <div className="mb-6">
+                                    <h3 className="text-xl font-bold" style={{ color: 'var(--slate-900)', marginBottom: '0.25rem' }}>Post New Announcement</h3>
+                                    <p className="text-sm" style={{ color: 'var(--slate-500)' }}>Broadcast updates to all users</p>
                                 </div>
 
                                 <form onSubmit={handlePostAnnouncement}>

@@ -929,9 +929,36 @@
     width: 100%;
 }
 
+/* Override search bar styles within dashboard to stretch full width */
+.project-grid-wrapper .search-filter-container {
+    width: 100%;
+}
+
+.project-grid-wrapper .search-bar-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+.project-grid-wrapper .search-input-main {
+    width: 100%;
+}
+
+.project-grid-wrapper .filter-wrapper {
+    flex-shrink: 0;
+    max-width: 180px;
+}
+
 /* Style for project cards to wrap */
 .project-grid-wrapper>div {
     display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Projects row should display cards horizontally */
+.project-grid-wrapper .projects-rowM {
+    display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
     gap: 20px;
 }

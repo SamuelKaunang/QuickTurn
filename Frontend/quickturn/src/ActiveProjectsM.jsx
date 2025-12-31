@@ -197,7 +197,7 @@ const ActiveProjectsM = ({ token }) => {
                                 )}
 
                                 {p.finishingSubmittedAt ? (
-                                    <button className="btn-applyM" disabled style={{ background: 'rgba(255,255,255,0.1)', cursor: 'default' }}>
+                                    <button className="btn-applyM" disabled style={{ background: '#f1f5f9', color: '#64748b', border: '1px solid #e2e8f0', cursor: 'default', boxShadow: 'none' }}>
                                         Waiting for Review
                                     </button>
                                 ) : (

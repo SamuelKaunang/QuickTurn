@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from './Toast';
 import { api } from './utils/apiConfig';
 import { SkeletonProjectCard } from './Skeleton';
-import { Clock, Users, Target, Sparkles } from 'lucide-react';
+import { Clock, Users, Target, Sparkles, Star } from 'lucide-react';
 import './ProjectsM.css';
 
 const ProjectsM = ({ token, limit, userCategory }) => {
@@ -150,7 +150,8 @@ const ProjectsM = ({ token, limit, userCategory }) => {
     const renderStars = (rating) => {
         const score = rating || 0;
         return (
-            <span style={{ color: '#f59e0b', fontWeight: 'bold', marginLeft: '5px' }}>
+            <span style={{ color: '#f59e0b', fontWeight: 'bold', marginLeft: '5px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                <Star size={14} fill="#f59e0b" strokeWidth={0} />
                 {score > 0 ? score.toFixed(1) : "New"}
             </span>
         );

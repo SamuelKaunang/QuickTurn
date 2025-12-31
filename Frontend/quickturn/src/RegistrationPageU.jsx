@@ -96,7 +96,7 @@ function RegistrationPageU() {
     if (!isFormValid) {
       // Find first error and show it
       const firstError = Object.values(validations).find(v => !v.valid);
-      setMessage(firstError?.message || 'Harap perbaiki error di form.');
+      setMessage(firstError?.message || 'Please fix the errors in the form.');
       return;
     }
 
@@ -118,13 +118,13 @@ function RegistrationPageU() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success('Registrasi berhasil! Silakan login.', 'Selamat!');
+        toast.success('Registration successful! Please log in.', 'Congratulations!');
         navigate('/login');
       } else {
-        setMessage(data.message || "Registrasi Gagal");
+        setMessage(data.message || "Registration Failed");
       }
     } catch (err) {
-      setMessage('Terjadi kesalahan saat menghubungi server.');
+      setMessage('An error occurred while connecting to the server.');
     } finally {
       setIsLoading(false);
     }
@@ -142,7 +142,7 @@ function RegistrationPageU() {
               <span className="highlight-text">digital future.</span>
             </h1>
             <p className="hero-desc">
-              Platform workspace generasi terbaru. Aman, kenceng, dan didesain buat inovator kayak lo.
+              The next-generation workspace platform. Secure, fast, and designed for innovators like you.
             </p>
 
             <div className="quote-block">
@@ -210,19 +210,19 @@ function RegistrationPageU() {
           </div>
           <div className="form-header">
             {message && <div className={`error-alert ${message.includes('Berhasil') ? 'success-alert' : ''}`}>{message}</div>}
-            <h2>Registrasi Client</h2>
-            <p>Buat akun baru dan mulai posting project untuk bisnis lo.</p>
+            <h2>Client Registration</h2>
+            <p>Create a new account and start posting projects for your business.</p>
           </div>
 
           <form onSubmit={handleRegistration} className="auth-form">
             <div className="input-group">
-              <label htmlFor="name">Nama Bisnis / Perusahaan</label>
+              <label htmlFor="name">Business / Company Name</label>
               <div className={`input-wrapper ${touched.name && !validations.name.valid ? 'input-error' : ''} ${touched.name && validations.name.valid ? 'input-valid' : ''}`}>
                 <span className="material-symbols-outlined icon-left">business</span>
                 <input
                   id="name"
                   type="text"
-                  placeholder="Masukkan nama bisnis/perusahaan lo"
+                  placeholder="Enter your business/company name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   onBlur={() => handleBlur('name')}
@@ -260,7 +260,7 @@ function RegistrationPageU() {
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Minimal 6 karakter (huruf + angka)"
+                  placeholder="Minimum 6 characters (letters + numbers)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onBlur={() => handleBlur('password')}
@@ -280,13 +280,13 @@ function RegistrationPageU() {
             </div>
 
             <div className="input-group">
-              <label htmlFor="confirmPassword">Konfirmasi Password</label>
+              <label htmlFor="confirmPassword">Confirm Password</label>
               <div className={`input-wrapper ${touched.confirmPassword && !validations.confirmPassword.valid ? 'input-error' : ''} ${touched.confirmPassword && validations.confirmPassword.valid ? 'input-valid' : ''}`}>
                 <span className="material-symbols-outlined icon-left">lock</span>
                 <input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Ulangi password lo"
+                  placeholder="Re-enter your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   onBlur={() => handleBlur('confirmPassword')}
@@ -314,14 +314,14 @@ function RegistrationPageU() {
                   <span>Creating...</span>
                 </div>
               ) : (
-                'Buat Akun'
+                'Create Account'
               )}
             </button>
           </form>
 
           <div className="register-cta">
             <p>
-              Sudah punya akun? <Link to="/login">Login di sini</Link>
+              Already have an account? <Link to="/login">Login here</Link>
             </p>
           </div>
 

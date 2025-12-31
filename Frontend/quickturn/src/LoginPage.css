@@ -511,12 +511,13 @@
 /* Role Toggle for Registration Pages */
 .role-toggle {
   display: flex;
+  width: fit-content;
   background: rgba(255, 255, 255, 0.05);
   padding: 6px;
   border-radius: 30px;
   gap: 8px;
   border: 1px solid #e5e7eb;
-  margin-top: 1.5rem;
+  margin: 1.5rem auto 0 auto;
 }
 
 .role-btn {
