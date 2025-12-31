@@ -69,6 +69,10 @@ public class ApplicationService {
 
         Application saved = applicationRepo.save(application);
 
+        // Increment applicant count for social proof
+        project.incrementApplicantCount();
+        projectRepo.save(project);
+
         // Log activity for student
         activityService.logActivity(student, ActivityService.TYPE_APPLIED, "Applied to project: " + project.getTitle(),
                 "PROJECT", project.getId());

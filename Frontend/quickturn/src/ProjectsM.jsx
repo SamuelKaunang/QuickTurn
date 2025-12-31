@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from './Toast';
 import { api } from './utils/apiConfig';
 import { SkeletonProjectCard } from './Skeleton';
+import { Clock, Users, Target, Sparkles } from 'lucide-react';
 import './ProjectsM.css';
 
 const ProjectsM = ({ token, limit, userCategory }) => {
@@ -34,7 +35,7 @@ const ProjectsM = ({ token, limit, userCategory }) => {
                 setProjects(data.data || []);
             }
         } catch (err) {
-            console.error("Failed to fetch projects", err);
+            // Silently handle
         } finally {
             setLoading(false);
         }
@@ -72,6 +73,23 @@ const ProjectsM = ({ token, limit, userCategory }) => {
         if (cat.includes("Video")) return "video";
         if (cat.includes("Writing")) return "writing";
         return "design";
+    };
+
+    const getComplexityInfo = (complexity) => {
+        switch (complexity) {
+            case 'BEGINNER':
+                return { label: 'Beginner', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.1)' };
+            case 'EXPERT':
+                return { label: 'Expert', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' };
+            default:
+                return { label: 'Intermediate', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' };
+        }
+    };
+
+    // Parse skills from comma-separated string
+    const parseSkills = (skillsStr) => {
+        if (!skillsStr) return [];
+        return skillsStr.split(',').map(s => s.trim()).filter(s => s);
     };
 
     // --- VIEW DETAIL ---
@@ -221,32 +239,71 @@ const ProjectsM = ({ token, limit, userCategory }) => {
                 ) : displayProjects.length === 0 ? (
                     <p style={{ color: '#64748b', padding: '20px' }}>No matching projects found.</p>
                 ) : (
-                    displayProjects.map((p) => (
-                        <div
-                            className="project-cardM"
-                            key={p.id}
-                            onClick={() => handleCardClick(p)}
-                        >
-                            <div className={`card-headerM ${getCategoryClass(p.category)}`}>
-                                <span className="card-statusM open">{p.status}</span>
-                            </div>
-                            <div className="card-bodyM">
-                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                                    <span>{p.owner ? p.owner.nama : 'Unknown'}</span>
-                                    {p.owner && renderStars(p.owner.averageRating)}
-                                </div>
+                    displayProjects.map((p) => {
+                        const skills = parseSkills(p.requiredSkills);
+                        const complexityInfo = getComplexityInfo(p.complexity);
 
-                                <div className="card-categoryM">{p.category}</div>
-                                <div className="card-titleM">{p.title}</div>
-                                <div className="card-metaM">
-                                    <span className="card-budgetM">Rp {p.budget.toLocaleString()}</span>
-                                    <span className="card-deadlineM">{p.deadline}</span>
+                        return (
+                            <div
+                                className="project-cardM"
+                                key={p.id}
+                                onClick={() => handleCardClick(p)}
+                            >
+                                <div className={`card-headerM ${getCategoryClass(p.category)}`}>
+                                    <span className="card-statusM open">{p.status}</span>
+                                    {/* Complexity Badge */}
+                                    <span
+                                        className="card-complexity-badge"
+                                        style={{ backgroundColor: complexityInfo.color }}
+                                    >
+                                        {complexityInfo.label}
+                                    </span>
                                 </div>
+                                <div className="card-bodyM">
+                                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
+                                        <span>{p.owner ? p.owner.nama : 'Unknown'}</span>
+                                        {p.owner && renderStars(p.owner.averageRating)}
+                                    </div>
 
-                                {renderActionButton(p)}
+                                    <div className="card-categoryM">{p.category}</div>
+                                    <div className="card-titleM">{p.title}</div>
+
+                                    {/* Required Skills */}
+                                    {skills.length > 0 && (
+                                        <div className="card-skills">
+                                            {skills.slice(0, 3).map((skill, idx) => (
+                                                <span key={idx} className={`skill-badge skill-${idx % 4}`}>{skill}</span>
+                                            ))}
+                                            {skills.length > 3 && (
+                                                <span className="skill-badge-more">+{skills.length - 3}</span>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Duration & Applicants Row */}
+                                    <div className="card-info-row">
+                                        {p.estimatedDuration && (
+                                            <span className="card-duration">
+                                                <Clock size={12} />
+                                                {p.estimatedDuration}
+                                            </span>
+                                        )}
+                                        <span className="card-applicants">
+                                            <Users size={12} />
+                                            {p.applicantCount || 0} applied
+                                        </span>
+                                    </div>
+
+                                    <div className="card-metaM">
+                                        <span className="card-budgetM">Rp {p.budget.toLocaleString()}</span>
+                                        <span className="card-deadlineM">{p.deadline}</span>
+                                    </div>
+
+                                    {renderActionButton(p)}
+                                </div>
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
 
@@ -275,6 +332,40 @@ const ProjectsM = ({ token, limit, userCategory }) => {
                                 </div>
                             </div>
 
+                            {/* NEW: Duration & Complexity Row */}
+                            <div className="detail-meta-row">
+                                <div className="detail-meta-item">
+                                    <div className="detail-label">
+                                        <Clock size={14} style={{ marginRight: '6px' }} />
+                                        Duration
+                                    </div>
+                                    <div className="detail-value">{detailProject.estimatedDuration || 'Not specified'}</div>
+                                </div>
+                                <div className="detail-meta-item">
+                                    <div className="detail-label">
+                                        <Target size={14} style={{ marginRight: '6px' }} />
+                                        Complexity
+                                    </div>
+                                    <div
+                                        className="detail-complexity-badge"
+                                        style={{
+                                            color: getComplexityInfo(detailProject.complexity).color,
+                                            backgroundColor: getComplexityInfo(detailProject.complexity).bg
+                                        }}
+                                    >
+                                        {getComplexityInfo(detailProject.complexity).label}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Social Proof - Applicant Count */}
+                            <div className="detail-social-proof">
+                                <Users size={16} />
+                                <span>
+                                    <strong>{detailProject.applicantCount || 0}</strong> people have applied for this project
+                                </span>
+                            </div>
+
                             <div className="detail-section">
                                 <div className="detail-label">Category</div>
                                 <div className="detail-value">{detailProject.category}</div>
@@ -287,6 +378,21 @@ const ProjectsM = ({ token, limit, userCategory }) => {
                                     {detailProject.owner && renderStars(detailProject.owner.averageRating)}
                                 </div>
                             </div>
+
+                            {/* NEW: Required Skills */}
+                            {detailProject.requiredSkills && (
+                                <div className="detail-section">
+                                    <div className="detail-label">
+                                        <Sparkles size={14} style={{ marginRight: '6px', color: '#f59e0b' }} />
+                                        Required Skills
+                                    </div>
+                                    <div className="detail-skills">
+                                        {parseSkills(detailProject.requiredSkills).map((skill, idx) => (
+                                            <span key={idx} className={`detail-skill-badge skill-${idx % 4}`}>{skill}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="detail-section">
                                 <div className="detail-label">Description</div>

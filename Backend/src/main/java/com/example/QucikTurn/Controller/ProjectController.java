@@ -188,4 +188,17 @@ public class ProjectController {
             return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
         }
     }
+
+    // --- GET PROJECT BRIEF & ATTACHMENT (ONLY FOR ACCEPTED TALENTS) ---
+    @GetMapping("/{projectId}/brief")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getProjectBrief(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal User user) {
+        try {
+            Map<String, Object> briefData = projectSvc.getProjectBriefForAcceptedTalent(projectId, user.getId());
+            return ResponseEntity.ok(ApiResponse.ok("Brief retrieved", briefData));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
+    }
 }

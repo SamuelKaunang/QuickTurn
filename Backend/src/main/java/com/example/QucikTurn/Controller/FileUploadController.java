@@ -127,4 +127,22 @@ public class FileUploadController {
             return ResponseEntity.internalServerError().body(ApiResponse.error("Failed to delete file"));
         }
     }
+
+    // --- PROJECT ATTACHMENT UPLOAD (for UMKM) ---
+    @PostMapping("/project-attachment/{projectId}")
+    public ResponseEntity<ApiResponse<Map<String, String>>> uploadProjectAttachment(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long projectId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            Map<String, String> result = fileStorageService.uploadProjectAttachment(file, user, projectId);
+            return ResponseEntity.ok(ApiResponse.ok("Project attachment uploaded successfully", result));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Failed to upload file"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
 }

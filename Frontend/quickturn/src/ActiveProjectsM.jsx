@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import './ProjectsM.css';
 import ReviewModal from './ReviewModal';
 import WorkSubmissionModal from './WorkSubmissionModal';
+import BriefModal from './BriefModal';
 import { useToast } from './Toast';
 import { api } from './utils/apiConfig';
+import { Paperclip } from 'lucide-react';
 
 const ActiveProjectsM = ({ token }) => {
     const [activeProjects, setActiveProjects] = useState([]);
@@ -16,6 +18,10 @@ const ActiveProjectsM = ({ token }) => {
 
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [reviewProject, setReviewProject] = useState(null);
+
+    // Brief Modal state
+    const [showBriefModal, setShowBriefModal] = useState(false);
+    const [briefProject, setBriefProject] = useState(null);
 
     // --- Track reviewed projects: { projectId: { hasReviewed, rating, comment } }
     const [reviewedProjects, setReviewedProjects] = useState({});
@@ -89,6 +95,11 @@ const ActiveProjectsM = ({ token }) => {
         fetchMyActiveProjects();
     };
 
+    const handleOpenBrief = (project) => {
+        setBriefProject(project);
+        setShowBriefModal(true);
+    };
+
     const handleSubmitReview = async (rating, comment) => {
         if (!reviewProject) return;
         try {
@@ -139,6 +150,31 @@ const ActiveProjectsM = ({ token }) => {
                                 <p style={{ fontSize: '12px', color: '#ccc', marginBottom: '10px' }}>
                                     Budget: Rp {p.budget.toLocaleString()}
                                 </p>
+
+                                {/* View Brief Button */}
+                                <button
+                                    className="btn-brief"
+                                    onClick={() => handleOpenBrief(p)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        padding: '8px 12px',
+                                        fontSize: '12px',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        marginBottom: '10px',
+                                        width: '100%',
+                                        justifyContent: 'center'
+                                    }}
+                                >
+                                    <Paperclip size={14} />
+                                    View Brief & Attachments
+                                </button>
 
                                 {/* Show rejection feedback if last submission was rejected */}
                                 {p.latestSubmissionStatus === 'REJECTED' && (
@@ -275,6 +311,18 @@ const ActiveProjectsM = ({ token }) => {
                 onClose={() => setShowReviewModal(false)}
                 onSubmit={handleSubmitReview}
                 projectTitle={reviewProject?.title}
+            />
+
+            {/* Brief Modal */}
+            <BriefModal
+                isOpen={showBriefModal}
+                onClose={() => {
+                    setShowBriefModal(false);
+                    setBriefProject(null);
+                }}
+                projectId={briefProject?.id}
+                projectTitle={briefProject?.title}
+                token={token}
             />
         </div>
     );

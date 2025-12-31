@@ -2,9 +2,11 @@ package com.example.QucikTurn.Service;
 
 import com.example.QucikTurn.Entity.UploadedFile;
 import com.example.QucikTurn.Entity.User;
+import com.example.QucikTurn.Entity.Project;
 import com.example.QucikTurn.Entity.enums.FileType;
 import com.example.QucikTurn.Repository.UploadedFileRepository;
 import com.example.QucikTurn.Repository.UserRepository;
+import com.example.QucikTurn.Repository.ProjectRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +25,7 @@ public class FileStorageService {
     private final AzureBlobService azureBlobService;
     private final UploadedFileRepository uploadedFileRepository;
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     // Allowed file types
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
@@ -47,10 +50,12 @@ public class FileStorageService {
 
     public FileStorageService(AzureBlobService azureBlobService,
             UploadedFileRepository uploadedFileRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            ProjectRepository projectRepository) {
         this.azureBlobService = azureBlobService;
         this.uploadedFileRepository = uploadedFileRepository;
         this.userRepository = userRepository;
+        this.projectRepository = projectRepository;
     }
 
     /**
@@ -285,5 +290,62 @@ public class FileStorageService {
             return url.substring(lastSlash + 1);
         }
         return url;
+    }
+
+    /**
+     * Upload a project attachment (brief files, design specs, etc.).
+     * Only the project owner (UMKM) can upload attachments.
+     *
+     * @param file      The file to upload
+     * @param user      The user uploading (must be project owner)
+     * @param projectId The project ID
+     * @return Map containing url and filename
+     * @throws IOException If upload fails
+     */
+    @Transactional
+    public Map<String, String> uploadProjectAttachment(MultipartFile file, User user, Long projectId)
+            throws IOException {
+        // Find the project
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        // Validate ownership
+        if (!project.getOwner().getId().equals(user.getId())) {
+            throw new RuntimeException("You are not authorized to upload attachments to this project");
+        }
+
+        // Validate file type
+        String contentType = file.getContentType();
+        if (!isAllowedFileType(contentType)) {
+            throw new IllegalArgumentException(
+                    "Invalid file type. Please upload images or documents only.");
+        }
+
+        // Validate file size
+        if (file.getSize() > MAX_ATTACHMENT_SIZE) {
+            throw new IllegalArgumentException(
+                    "File too large. Maximum attachment size is 25MB.");
+        }
+
+        // Generate unique filename
+        String extension = azureBlobService.getFileExtension(file.getOriginalFilename());
+        String storedFilename = azureBlobService.generateUniqueFilename(extension);
+
+        // Upload to Azure with project-attachments subdirectory
+        String subdirectory = "project-attachments/" + projectId;
+        String blobUrl = azureBlobService.uploadFileWithName(file, subdirectory, storedFilename);
+
+        // Update project with attachment info
+        project.setAttachmentUrl(blobUrl);
+        project.setAttachmentName(file.getOriginalFilename());
+        projectRepository.save(project);
+
+        // Return the URL and original filename
+        Map<String, String> result = new HashMap<>();
+        result.put("url", blobUrl);
+        result.put("filename", file.getOriginalFilename());
+        result.put("contentType", contentType);
+
+        return result;
     }
 }

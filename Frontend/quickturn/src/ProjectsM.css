@@ -574,3 +574,197 @@
     border-top: 1px solid #e2e8f0;
     background: #f8fafc;
 }
+
+/* =========================================
+   NEW: COMPLEXITY BADGE ON CARD
+========================================= */
+.card-complexity-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: white;
+}
+
+/* =========================================
+   NEW: SKILL BADGES ON CARD
+========================================= */
+.card-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.skill-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.skill-badge.skill-0 {
+    border-left: 2px solid #e11d48;
+}
+
+.skill-badge.skill-1 {
+    border-left: 2px solid #7c3aed;
+}
+
+.skill-badge.skill-2 {
+    border-left: 2px solid #2563eb;
+}
+
+.skill-badge.skill-3 {
+    border-left: 2px solid #059669;
+}
+
+.skill-badge-more {
+    padding: 4px 8px;
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 12px;
+}
+
+/* =========================================
+   NEW: INFO ROW (DURATION & APPLICANTS)
+========================================= */
+.card-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #f1f5f9;
+}
+
+.card-duration {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.card-applicants {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 500;
+    padding: 3px 8px;
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+/* =========================================
+   DETAIL MODAL ENHANCEMENTS
+========================================= */
+.detail-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+}
+
+.detail-complexity-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* NEW: SOCIAL PROOF BOX */
+.detail-social-proof {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: #92400e;
+    font-size: 0.9rem;
+}
+
+.detail-social-proof strong {
+    font-weight: 800;
+    color: #78350f;
+}
+
+/* NEW: DETAIL SKILLS */
+.detail-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.detail-skill-badge {
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+}
+
+.detail-skill-badge.skill-0 {
+    background: linear-gradient(135deg, #e11d48, #f97316);
+}
+
+.detail-skill-badge.skill-1 {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+}
+
+.detail-skill-badge.skill-2 {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.detail-skill-badge.skill-3 {
+    background: linear-gradient(135deg, #059669, #10b981);
+}
+
+.detail-meta-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.detail-meta-item {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .card-skills {
+        display: none;
+    }
+
+    .card-info-row {
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+    }
+}

@@ -33,7 +33,8 @@ public class ProjectService {
     private final ActivityService activityService;
 
     public ProjectService(ProjectRepository projectRepo, UserRepository userRepo,
-            ApplicationRepository applicationRepo, WorkSubmissionRepository workSubmissionRepo, ActivityService activityService) {
+            ApplicationRepository applicationRepo, WorkSubmissionRepository workSubmissionRepo,
+            ActivityService activityService) {
         this.projectRepo = projectRepo;
         this.userRepo = userRepo;
         this.applicationRepo = applicationRepo;
@@ -60,10 +61,20 @@ public class ProjectService {
         p.setDeadline(req.deadline());
         p.setStatus(ProjectStatus.OPEN);
 
+        // NEW: Set additional fields
+        p.setRequiredSkills(req.requiredSkills());
+        p.setEstimatedDuration(req.estimatedDuration());
+        if (req.complexity() != null) {
+            p.setComplexity(req.complexity());
+        }
+        p.setApplicantCount(0);
+        p.setBriefText(req.briefText()); // Brief for accepted talents
+
         Project savedProject = projectRepo.save(p);
 
         // Log activity
-        activityService.logActivity(owner, ActivityService.TYPE_PROJECT_POSTED, "Posted new project: " + savedProject.getTitle(), "PROJECT", savedProject.getId());
+        activityService.logActivity(owner, ActivityService.TYPE_PROJECT_POSTED,
+                "Posted new project: " + savedProject.getTitle(), "PROJECT", savedProject.getId());
 
         return savedProject;
     }
@@ -160,9 +171,13 @@ public class ProjectService {
                 myStatus,
                 p.getFinishingSubmittedAt(),
                 p.getFinishedAt(),
-                latestSubmissionStatus, // ✅ NEW: Latest submission status
-                latestSubmissionFeedback // ✅ NEW: Latest submission feedback
-        );
+                latestSubmissionStatus,
+                latestSubmissionFeedback,
+                // NEW FIELDS
+                p.getRequiredSkills(),
+                p.getEstimatedDuration(),
+                p.getComplexity(),
+                p.getApplicantCount());
     }
 
     // --- MAHASISWA SUBMIT FINISHING ---
@@ -234,5 +249,31 @@ public class ProjectService {
         });
 
         return status;
+    }
+
+    // --- GET PROJECT BRIEF & ATTACHMENT (ONLY FOR ACCEPTED TALENTS) ---
+    public Map<String, Object> getProjectBriefForAcceptedTalent(Long projectId, Long userId) {
+        Project project = projectRepo.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        // Check if user is the accepted talent
+        Application application = applicationRepo.findByProjectIdAndStudentId(projectId, userId)
+                .orElseThrow(() -> new RuntimeException("You have not applied to this project"));
+
+        if (application.getStatus() != ApplicationStatus.APPROVED) {
+            throw new RuntimeException(
+                    "You are not authorized to view this content. Only accepted talents can access the brief and attachments.");
+        }
+
+        Map<String, Object> briefData = new HashMap<>();
+        briefData.put("projectId", projectId);
+        briefData.put("projectTitle", project.getTitle());
+        briefData.put("briefText", project.getBriefText());
+        briefData.put("attachmentUrl", project.getAttachmentUrl());
+        briefData.put("attachmentName", project.getAttachmentName());
+        briefData.put("ownerName", project.getOwner().getNama());
+        briefData.put("ownerEmail", project.getOwner().getEmail());
+
+        return briefData;
     }
 }
