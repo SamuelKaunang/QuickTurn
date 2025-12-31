@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from './Toast';
 import { api } from './utils/apiConfig';
 import { SkeletonProjectCard } from './Skeleton';
-import { Clock, Users, Target, Sparkles, Star } from 'lucide-react';
+import { Clock, Users, Target, Sparkles, Star, DollarSign, Calendar } from 'lucide-react';
 import './ProjectsM.css';
 
 const ProjectsM = ({ token, limit, userCategory }) => {
+    const navigate = useNavigate();
     const toast = useToast();
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -54,17 +56,28 @@ const ProjectsM = ({ token, limit, userCategory }) => {
         return matchesSearch && matchesCategory && matchesUserCategory;
     });
 
-    // Sort to show user's category first if applicable
-    const sortedProjects = userCategory
-        ? [...filteredProjects].sort((a, b) => {
-            if (a?.category === userCategory && b?.category !== userCategory) return -1;
-            if (a?.category !== userCategory && b?.category === userCategory) return 1;
-            return 0;
-        })
-        : filteredProjects;
+    // NEW: Sort by Most Appliers first, then by date (newest)
+    const sortedProjects = [...filteredProjects].sort((a, b) => {
+        // First sort by applicant count (descending)
+        const applierDiff = (b?.applicantCount || 0) - (a?.applicantCount || 0);
+        if (applierDiff !== 0) return applierDiff;
+
+        // If same applier count, sort by creation date (newest first)
+        const dateA = new Date(a?.createdAt || 0);
+        const dateB = new Date(b?.createdAt || 0);
+        return dateB - dateA;
+    });
 
     // Apply limit if specified (for dashboard view)
     const displayProjects = limit ? sortedProjects.slice(0, limit) : sortedProjects;
+
+    // Navigate to client profile
+    const handleClientClick = (e, ownerId) => {
+        e.stopPropagation();
+        if (ownerId) {
+            navigate(`/profile/${ownerId}`);
+        }
+    };
 
     const getCategoryClass = (cat) => {
         if (!cat) return "design";
@@ -243,63 +256,107 @@ const ProjectsM = ({ token, limit, userCategory }) => {
                     displayProjects.map((p) => {
                         const skills = parseSkills(p.requiredSkills);
                         const complexityInfo = getComplexityInfo(p.complexity);
+                        const ownerAvatar = p.owner?.profilePictureUrl;
+                        const ownerInitial = p.owner?.nama?.charAt(0)?.toUpperCase() || '?';
 
                         return (
                             <div
-                                className="project-cardM"
+                                className={`project-card-landscape ${getCategoryClass(p.category)}`}
                                 key={p.id}
                                 onClick={() => handleCardClick(p)}
                             >
-                                <div className={`card-headerM ${getCategoryClass(p.category)}`}>
-                                    <span className="card-statusM open">{p.status}</span>
-                                    {/* Complexity Badge */}
+                                {/* Left Color Accent */}
+                                <div className={`card-accent ${getCategoryClass(p.category)}`}>
                                     <span
-                                        className="card-complexity-badge"
+                                        className="complexity-badge-landscape"
                                         style={{ backgroundColor: complexityInfo.color }}
                                     >
                                         {complexityInfo.label}
                                     </span>
                                 </div>
-                                <div className="card-bodyM">
-                                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                                        <span>{p.owner ? p.owner.nama : 'Unknown'}</span>
-                                        {p.owner && renderStars(p.owner.averageRating)}
+
+                                {/* Main Content */}
+                                <div className="card-content-landscape">
+                                    {/* Top Row: Client Info + Category */}
+                                    <div className="card-top-row">
+                                        <div
+                                            className="client-info-landscape"
+                                            onClick={(e) => handleClientClick(e, p.owner?.id)}
+                                        >
+                                            {ownerAvatar ? (
+                                                <img
+                                                    src={ownerAvatar}
+                                                    alt={p.owner?.nama}
+                                                    className="client-avatar"
+                                                />
+                                            ) : (
+                                                <div className="client-avatar-placeholder">
+                                                    {ownerInitial}
+                                                </div>
+                                            )}
+                                            <div className="client-details">
+                                                <span className="client-name">{p.owner?.nama || 'Unknown'}</span>
+                                                <span className="client-rating">
+                                                    <Star size={12} fill="#f59e0b" strokeWidth={0} />
+                                                    {p.owner?.averageRating > 0 ? p.owner.averageRating.toFixed(1) : 'New'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="card-badges-row">
+                                            <span className={`category-badge ${getCategoryClass(p.category)}`}>
+                                                {p.category}
+                                            </span>
+                                            <span className="status-badge open">{p.status}</span>
+                                        </div>
                                     </div>
 
-                                    <div className="card-categoryM">{p.category}</div>
-                                    <div className="card-titleM">{p.title}</div>
+                                    {/* Middle: Title + Description */}
+                                    <div className="card-main-info">
+                                        <h3 className="card-title-landscape">{p.title}</h3>
+                                        <p className="card-desc-landscape">
+                                            {p.description?.length > 120
+                                                ? p.description.substring(0, 120) + '...'
+                                                : p.description}
+                                        </p>
+                                    </div>
 
-                                    {/* Required Skills */}
+                                    {/* Skills Row */}
                                     {skills.length > 0 && (
-                                        <div className="card-skills">
-                                            {skills.slice(0, 3).map((skill, idx) => (
-                                                <span key={idx} className={`skill-badge skill-${idx % 4}`}>{skill}</span>
+                                        <div className="card-skills-landscape">
+                                            {skills.slice(0, 4).map((skill, idx) => (
+                                                <span key={idx} className={`skill-tag skill-${idx % 4}`}>{skill}</span>
                                             ))}
-                                            {skills.length > 3 && (
-                                                <span className="skill-badge-more">+{skills.length - 3}</span>
+                                            {skills.length > 4 && (
+                                                <span className="skill-tag-more">+{skills.length - 4}</span>
                                             )}
                                         </div>
                                     )}
 
-                                    {/* Duration & Applicants Row */}
-                                    <div className="card-info-row">
+                                    {/* Bottom Row: Meta Info */}
+                                    <div className="card-meta-landscape">
+                                        <div className="meta-item">
+                                            <DollarSign size={14} />
+                                            <span className="meta-budget">Rp {p.budget?.toLocaleString()}</span>
+                                        </div>
+                                        <div className="meta-item">
+                                            <Calendar size={14} />
+                                            <span>{p.deadline}</span>
+                                        </div>
                                         {p.estimatedDuration && (
-                                            <span className="card-duration">
-                                                <Clock size={12} />
-                                                {p.estimatedDuration}
-                                            </span>
+                                            <div className="meta-item">
+                                                <Clock size={14} />
+                                                <span>{p.estimatedDuration}</span>
+                                            </div>
                                         )}
-                                        <span className="card-applicants">
-                                            <Users size={12} />
-                                            {p.applicantCount || 0} applied
-                                        </span>
+                                        <div className="meta-item appliers">
+                                            <Users size={14} />
+                                            <span>{p.applicantCount || 0} appliers</span>
+                                        </div>
                                     </div>
+                                </div>
 
-                                    <div className="card-metaM">
-                                        <span className="card-budgetM">Rp {p.budget.toLocaleString()}</span>
-                                        <span className="card-deadlineM">{p.deadline}</span>
-                                    </div>
-
+                                {/* Right: Action Button */}
+                                <div className="card-action-landscape">
                                     {renderActionButton(p)}
                                 </div>
                             </div>
