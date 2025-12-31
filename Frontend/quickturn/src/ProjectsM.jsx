@@ -46,19 +46,19 @@ const ProjectsM = ({ token, limit, userCategory }) => {
     }, [token]);
 
     // --- FILTERING LOGIC ---
-    const filteredProjects = projects.filter((project) => {
-        const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            project.description.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = selectedCategory === "All" || project.category === selectedCategory;
-        const matchesUserCategory = !userCategory || project.category === userCategory || selectedCategory !== "All";
+    const filteredProjects = (projects || []).filter((project) => {
+        const matchesSearch = project?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            project?.description?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = selectedCategory === "All" || project?.category === selectedCategory;
+        const matchesUserCategory = !userCategory || project?.category === userCategory || selectedCategory !== "All";
         return matchesSearch && matchesCategory && matchesUserCategory;
     });
 
     // Sort to show user's category first if applicable
     const sortedProjects = userCategory
         ? [...filteredProjects].sort((a, b) => {
-            if (a.category === userCategory && b.category !== userCategory) return -1;
-            if (a.category !== userCategory && b.category === userCategory) return 1;
+            if (a?.category === userCategory && b?.category !== userCategory) return -1;
+            if (a?.category !== userCategory && b?.category === userCategory) return 1;
             return 0;
         })
         : filteredProjects;
@@ -237,7 +237,7 @@ const ProjectsM = ({ token, limit, userCategory }) => {
                         <SkeletonProjectCard />
                         <SkeletonProjectCard />
                     </>
-                ) : displayProjects.length === 0 ? (
+                ) : !displayProjects || displayProjects.length === 0 ? (
                     <p style={{ color: '#64748b', padding: '20px' }}>No matching projects found.</p>
                 ) : (
                     displayProjects.map((p) => {
