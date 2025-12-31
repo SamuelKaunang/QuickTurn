@@ -259,26 +259,87 @@ const ProjectsM = ({ token, limit, userCategory }) => {
                         const ownerAvatar = p.owner?.profilePictureUrl;
                         const ownerInitial = p.owner?.nama?.charAt(0)?.toUpperCase() || '?';
 
+                        // === COMPACT CARD for Dashboard (when limit is set) ===
+                        if (limit) {
+                            return (
+                                <div
+                                    className="project-cardM"
+                                    key={p.id}
+                                    onClick={() => handleCardClick(p)}
+                                >
+                                    <div className={`card-headerM ${getCategoryClass(p.category)}`}>
+                                        <span className="card-statusM open">{p.status}</span>
+                                        <span
+                                            className="card-complexity-badge"
+                                            style={{ backgroundColor: complexityInfo.color }}
+                                        >
+                                            {complexityInfo.label}
+                                        </span>
+                                    </div>
+                                    <div className="card-bodyM">
+                                        <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
+                                            <span>{p.owner ? p.owner.nama : 'Unknown'}</span>
+                                            <span style={{ color: '#f59e0b', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                                <Star size={12} fill="#f59e0b" strokeWidth={0} />
+                                                {p.owner?.averageRating > 0 ? p.owner.averageRating.toFixed(1) : 'New'}
+                                            </span>
+                                        </div>
+
+                                        <div className="card-categoryM">{p.category}</div>
+                                        <div className="card-titleM">{p.title}</div>
+
+                                        {skills.length > 0 && (
+                                            <div className="card-skills">
+                                                {skills.slice(0, 3).map((skill, idx) => (
+                                                    <span key={idx} className={`skill-badge skill-${idx % 4}`}>{skill}</span>
+                                                ))}
+                                                {skills.length > 3 && (
+                                                    <span className="skill-badge-more">+{skills.length - 3}</span>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="card-info-row">
+                                            {p.estimatedDuration && (
+                                                <span className="card-duration">
+                                                    <Clock size={12} />
+                                                    {p.estimatedDuration}
+                                                </span>
+                                            )}
+                                            <span className="card-applicants">
+                                                <Users size={12} />
+                                                {p.applicantCount || 0} applied
+                                            </span>
+                                        </div>
+
+                                        <div className="card-metaM">
+                                            <span className="card-budgetM">Rp {p.budget?.toLocaleString()}</span>
+                                            <span className="card-deadlineM">{p.deadline}</span>
+                                        </div>
+
+                                        {renderActionButton(p)}
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        // === LANDSCAPE CARD for Browse Projects (no limit) ===
                         return (
                             <div
-                                className={`project-card-landscape ${getCategoryClass(p.category)}`}
+                                className="project-card-landscape"
                                 key={p.id}
                                 onClick={() => handleCardClick(p)}
                             >
-                                {/* Left Color Accent */}
-                                <div className={`card-accent ${getCategoryClass(p.category)}`}>
-                                    <span
-                                        className="complexity-badge-landscape"
-                                        style={{ backgroundColor: complexityInfo.color }}
-                                    >
-                                        {complexityInfo.label}
-                                    </span>
+                                {/* Category Color Strip */}
+                                <div className={`card-category-strip ${getCategoryClass(p.category)}`}>
+                                    <span className="category-label-vertical">{p.category}</span>
                                 </div>
 
                                 {/* Main Content */}
                                 <div className="card-content-landscape">
-                                    {/* Top Row: Client Info + Category */}
-                                    <div className="card-top-row">
+                                    {/* Header Row */}
+                                    <div className="card-header-landscape">
+                                        {/* Client Info */}
                                         <div
                                             className="client-info-landscape"
                                             onClick={(e) => handleClientClick(e, p.owner?.id)}
@@ -302,60 +363,67 @@ const ProjectsM = ({ token, limit, userCategory }) => {
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="card-badges-row">
-                                            <span className={`category-badge ${getCategoryClass(p.category)}`}>
-                                                {p.category}
+
+                                        {/* Badges */}
+                                        <div className="card-header-badges">
+                                            <span
+                                                className="complexity-pill"
+                                                style={{ backgroundColor: complexityInfo.bg, color: complexityInfo.color }}
+                                            >
+                                                <Target size={12} />
+                                                {complexityInfo.label}
                                             </span>
-                                            <span className="status-badge open">{p.status}</span>
+                                            <span className="status-pill open">{p.status}</span>
                                         </div>
                                     </div>
 
-                                    {/* Middle: Title + Description */}
-                                    <div className="card-main-info">
+                                    {/* Title + Description */}
+                                    <div className="card-body-landscape">
                                         <h3 className="card-title-landscape">{p.title}</h3>
                                         <p className="card-desc-landscape">
-                                            {p.description?.length > 120
-                                                ? p.description.substring(0, 120) + '...'
+                                            {p.description?.length > 150
+                                                ? p.description.substring(0, 150) + '...'
                                                 : p.description}
                                         </p>
                                     </div>
 
-                                    {/* Skills Row */}
-                                    {skills.length > 0 && (
-                                        <div className="card-skills-landscape">
+                                    {/* Skills + Meta Row */}
+                                    <div className="card-footer-landscape">
+                                        {/* Skills */}
+                                        <div className="skills-section">
                                             {skills.slice(0, 4).map((skill, idx) => (
-                                                <span key={idx} className={`skill-tag skill-${idx % 4}`}>{skill}</span>
+                                                <span key={idx} className={`skill-chip skill-${idx % 4}`}>{skill}</span>
                                             ))}
                                             {skills.length > 4 && (
-                                                <span className="skill-tag-more">+{skills.length - 4}</span>
+                                                <span className="skill-chip-more">+{skills.length - 4}</span>
                                             )}
                                         </div>
-                                    )}
 
-                                    {/* Bottom Row: Meta Info */}
-                                    <div className="card-meta-landscape">
-                                        <div className="meta-item">
-                                            <DollarSign size={14} />
-                                            <span className="meta-budget">Rp {p.budget?.toLocaleString()}</span>
-                                        </div>
-                                        <div className="meta-item">
-                                            <Calendar size={14} />
-                                            <span>{p.deadline}</span>
-                                        </div>
-                                        {p.estimatedDuration && (
-                                            <div className="meta-item">
-                                                <Clock size={14} />
-                                                <span>{p.estimatedDuration}</span>
+                                        {/* Meta Info */}
+                                        <div className="meta-section">
+                                            <div className="meta-pill budget">
+                                                <DollarSign size={14} />
+                                                Rp {p.budget?.toLocaleString()}
                                             </div>
-                                        )}
-                                        <div className="meta-item appliers">
-                                            <Users size={14} />
-                                            <span>{p.applicantCount || 0} appliers</span>
+                                            <div className="meta-pill">
+                                                <Calendar size={14} />
+                                                {p.deadline}
+                                            </div>
+                                            {p.estimatedDuration && (
+                                                <div className="meta-pill">
+                                                    <Clock size={14} />
+                                                    {p.estimatedDuration}
+                                                </div>
+                                            )}
+                                            <div className="meta-pill appliers">
+                                                <Users size={14} />
+                                                {p.applicantCount || 0} appliers
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Right: Action Button */}
+                                {/* Action Area */}
                                 <div className="card-action-landscape">
                                     {renderActionButton(p)}
                                 </div>
