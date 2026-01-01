@@ -13,6 +13,8 @@ import com.example.QucikTurn.dto.auth.RegisterRequest;
 import com.example.QucikTurn.dto.auth.ResetPasswordRequest;
 import com.example.QucikTurn.dto.auth.VerifyCodeRequest;
 import com.example.QucikTurn.dto.auth.VerifyCodeResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +25,8 @@ import java.util.HashMap;
 
 @Service
 public class AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepo;
@@ -97,8 +101,8 @@ public class AuthService {
         User user = userRepository.findByEmail(req.getEmail()).orElse(null);
 
         if (user == null) {
-            // For security, we don't reveal if user doesn't exist
-            System.out.println("⚠️ Forgot password request for non-existent email: " + req.getEmail());
+            // SECURITY: Don't reveal if user exists, log masked email for debugging
+            log.info("Password reset requested for: {}", maskEmail(req.getEmail()));
             return;
         }
 
@@ -111,15 +115,30 @@ public class AuthService {
             tokenRepo.save(token);
 
             // Send email with verification code
-            System.out.println("📧 Attempting to send verification code to: " + user.getEmail());
+            log.info("Sending verification code to: {}", maskEmail(user.getEmail()));
             emailService.sendVerificationCodeEmail(user.getEmail(), token.getVerificationCode());
-            System.out.println("✅ Verification code sent successfully to: " + user.getEmail());
+            log.info("Verification code sent successfully to: {}", maskEmail(user.getEmail()));
 
         } catch (Exception e) {
-            System.err.println("❌ Failed to send verification email to: " + user.getEmail());
-            e.printStackTrace();
+            log.error("Failed to send verification email to: {}", maskEmail(user.getEmail()), e);
             throw new RuntimeException("Gagal mengirim email. Silakan coba lagi nanti.");
         }
+    }
+
+    /**
+     * SECURITY: Mask email for logging (e.g., "sam***@gmail.com")
+     */
+    private String maskEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            return "***";
+        }
+        String[] parts = email.split("@");
+        String local = parts[0];
+        String domain = parts[1];
+        if (local.length() <= 3) {
+            return local.charAt(0) + "***@" + domain;
+        }
+        return local.substring(0, 3) + "***@" + domain;
     }
 
     // -------- STEP 2: VERIFY CODE (Validasi code, return reset token) --------

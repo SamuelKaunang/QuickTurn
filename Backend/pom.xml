@@ -113,6 +113,13 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Rate Limiting for Brute Force Protection -->
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>8.10.1</version>
+		</dependency>
+
 		<!-- Azure Blob Storage SDK -->
 		<dependency>
 			<groupId>com.azure</groupId>
