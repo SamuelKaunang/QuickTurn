@@ -101,6 +101,19 @@ public class User implements UserDetails {
     @Column(length = 200)
     private String githubUrl;
 
+    // New social media fields for UMKM/Client
+    @Column(length = 200)
+    private String youtubeUrl;
+
+    @Column(length = 200)
+    private String instagramUrl;
+
+    @Column(length = 200)
+    private String facebookUrl;
+
+    @Column(length = 200)
+    private String businessWebsite;
+
     // UserDetails - All security methods are hidden from JSON serialization
     @JsonIgnore // SECURITY: Hide authorities from API responses
     @Override
@@ -343,5 +356,38 @@ public class User implements UserDetails {
      */
     public boolean isDeleted() {
         return accountStatus == AccountStatus.DELETED;
+    }
+
+    // New social media getters/setters
+    public String getYoutubeUrl() {
+        return youtubeUrl;
+    }
+
+    public void setYoutubeUrl(String youtubeUrl) {
+        this.youtubeUrl = youtubeUrl;
+    }
+
+    public String getInstagramUrl() {
+        return instagramUrl;
+    }
+
+    public void setInstagramUrl(String instagramUrl) {
+        this.instagramUrl = instagramUrl;
+    }
+
+    public String getFacebookUrl() {
+        return facebookUrl;
+    }
+
+    public void setFacebookUrl(String facebookUrl) {
+        this.facebookUrl = facebookUrl;
+    }
+
+    public String getBusinessWebsite() {
+        return businessWebsite;
+    }
+
+    public void setBusinessWebsite(String businessWebsite) {
+        this.businessWebsite = businessWebsite;
     }
 }

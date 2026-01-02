@@ -25,6 +25,11 @@ public class UserProfileResponse {
     private String address;
     private String linkedinUrl;
     private String githubUrl;
+    // New social media fields for Client/UMKM
+    private String youtubeUrl;
+    private String instagramUrl;
+    private String facebookUrl;
+    private String businessWebsite;
 
     // Constructor from User entity
     public static UserProfileResponse fromUser(com.example.QucikTurn.Entity.User user) {
@@ -50,6 +55,11 @@ public class UserProfileResponse {
         dto.address = user.getAddress();
         dto.linkedinUrl = user.getLinkedinUrl();
         dto.githubUrl = user.getGithubUrl();
+        // New social media fields
+        dto.youtubeUrl = user.getYoutubeUrl();
+        dto.instagramUrl = user.getInstagramUrl();
+        dto.facebookUrl = user.getFacebookUrl();
+        dto.businessWebsite = user.getBusinessWebsite();
         return dto;
     }
 
@@ -102,8 +112,8 @@ public class UserProfileResponse {
         return profilePictureUrl;
     }
 
-    public Double getAverageRating() {
-        return averageRating;
+    public String getAverageRating() {
+        return averageRating != null ? String.valueOf(averageRating) : null;
     }
 
     public Integer getTotalReviews() {
@@ -136,5 +146,22 @@ public class UserProfileResponse {
 
     public String getGithubUrl() {
         return githubUrl;
+    }
+
+    // New social media getters
+    public String getYoutubeUrl() {
+        return youtubeUrl;
+    }
+
+    public String getInstagramUrl() {
+        return instagramUrl;
+    }
+
+    public String getFacebookUrl() {
+        return facebookUrl;
+    }
+
+    public String getBusinessWebsite() {
+        return businessWebsite;
     }
 }

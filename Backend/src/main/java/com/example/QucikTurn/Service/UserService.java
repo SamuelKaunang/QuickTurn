@@ -56,6 +56,16 @@ public class UserService {
         if (req.githubUrl() != null)
             user.setGithubUrl(req.githubUrl());
 
+        // New social media fields for Client/UMKM
+        if (req.youtubeUrl() != null)
+            user.setYoutubeUrl(req.youtubeUrl());
+        if (req.instagramUrl() != null)
+            user.setInstagramUrl(req.instagramUrl());
+        if (req.facebookUrl() != null)
+            user.setFacebookUrl(req.facebookUrl());
+        if (req.businessWebsite() != null)
+            user.setBusinessWebsite(req.businessWebsite());
+
         return userRepo.save(user);
     }
 

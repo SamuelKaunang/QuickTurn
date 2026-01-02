@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, ArrowLeft, LogOut, Save, User, X, RotateCw, ZoomIn, Briefcase, Phone, Globe, Code, GraduationCap, MapPin } from 'lucide-react';
+import { Camera, ArrowLeft, LogOut, Save, User, X, RotateCw, ZoomIn, Briefcase, Phone, Globe, Code, GraduationCap, Trash2, AlertTriangle, Flag } from 'lucide-react';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from './canvasUtils';
 import { useToast } from './Toast';
@@ -21,6 +21,22 @@ const ProfileM = () => {
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [stats, setStats] = useState({ projects: 0, rating: '5.0' });
+
+    // Delete Account State
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteConfirmPhrase, setDeleteConfirmPhrase] = useState('');
+    const [requiredPhrase, setRequiredPhrase] = useState('');
+    const [deleting, setDeleting] = useState(false);
+
+    // Report Modal State
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportData, setReportData] = useState({
+        type: 'BUG',
+        subject: '',
+        description: ''
+    });
+    const [reportEvidence, setReportEvidence] = useState(null);
+    const [submittingReport, setSubmittingReport] = useState(false);
 
     // Crop State
     const [imageSrc, setImageSrc] = useState(null);
@@ -56,7 +72,7 @@ const ProfileM = () => {
                     setProfilePicture(data.data.profilePictureUrl);
                     setStats(prev => ({
                         ...prev,
-                        rating: data.data.averageRating?.toFixed(1) || '5.0'
+                        rating: data.data.averageRating || '5.0'
                     }));
                 }
             } catch (err) { console.error(err); }
@@ -81,8 +97,21 @@ const ProfileM = () => {
             } catch (err) { console.error(err); }
         };
 
+        const fetchDeletePhrase = async () => {
+            try {
+                const response = await fetch(api("/api/users/account/delete-confirmation"), {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (response.ok && data.data) {
+                    setRequiredPhrase(data.data.phrase);
+                }
+            } catch (err) { console.error(err); }
+        };
+
         fetchProfile();
         fetchStats();
+        fetchDeletePhrase();
     }, [token, navigate]);
 
     const handleChange = (e) => {
@@ -204,6 +233,119 @@ const ProfileM = () => {
         }
     };
 
+    // Delete Account Handler
+    const handleDeleteAccount = async () => {
+        if (deleteConfirmPhrase !== requiredPhrase) {
+            toast.error('Konfirmasi tidak sesuai. Silakan ketik kalimat yang tepat.', 'Error');
+            return;
+        }
+
+        const finalConfirm = await toast.confirm({
+            title: '⚠️ Peringatan Terakhir',
+            message: 'Ini adalah tindakan PERMANEN dan TIDAK DAPAT DIBATALKAN. Semua data Anda akan dihapus. Lanjutkan?',
+            confirmText: 'Ya, Hapus Akun Saya',
+            cancelText: 'Batal',
+            type: 'error'
+        });
+
+        if (!finalConfirm) return;
+
+        try {
+            setDeleting(true);
+            const response = await fetch(api("/api/users/account"), {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ confirmationPhrase: deleteConfirmPhrase })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                toast.success(data.message || 'Akun berhasil dihapus.', 'Goodbye');
+                sessionStorage.clear();
+                setTimeout(() => navigate('/'), 2000);
+            } else {
+                toast.error(data.message || 'Gagal menghapus akun.', 'Error');
+            }
+        } catch (err) {
+            toast.error('Connection Error', 'Error');
+        } finally {
+            setDeleting(false);
+            setShowDeleteModal(false);
+        }
+    };
+
+    // Report Handlers
+    const handleReportChange = (e) => {
+        const { name, value } = e.target;
+        setReportData({ ...reportData, [name]: value });
+    };
+
+    const handleReportEvidenceChange = (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            if (file.size > 10 * 1024 * 1024) {
+                toast.error('Ukuran file maksimal 10MB', 'Error');
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                toast.error('Hanya file gambar yang diperbolehkan', 'Error');
+                return;
+            }
+            setReportEvidence(file);
+        }
+    };
+
+    const handleSubmitReport = async (e) => {
+        e.preventDefault();
+        if (!reportData.subject || !reportData.description) {
+            toast.error('Mohon lengkapi semua field yang diperlukan', 'Error');
+            return;
+        }
+
+        try {
+            setSubmittingReport(true);
+
+            // Create report
+            const response = await fetch(api("/api/reports"), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(reportData)
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Gagal mengirim laporan');
+            }
+
+            // Upload evidence if provided
+            if (reportEvidence && data.data?.id) {
+                const formDataUpload = new FormData();
+                formDataUpload.append('file', reportEvidence);
+
+                await fetch(api(`/api/reports/${data.data.id}/evidence`), {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formDataUpload
+                });
+            }
+
+            toast.success('Laporan berhasil dikirim. Tim kami akan meninjau dalam 1-3 hari kerja.', 'Success');
+            setShowReportModal(false);
+            setReportData({ type: 'BUG', subject: '', description: '' });
+            setReportEvidence(null);
+        } catch (err) {
+            toast.error(err.message || 'Gagal mengirim laporan', 'Error');
+        } finally {
+            setSubmittingReport(false);
+        }
+    };
+
     return (
         <div className="profile-page">
             <div className="bg-glow glow-1"></div>
@@ -263,8 +405,12 @@ const ProfileM = () => {
                         </div>
                     </div>
 
-                    {/* Logout */}
+                    {/* Actions */}
                     <div className="sidebar-actions">
+                        <button onClick={() => setShowReportModal(true)} className="btn-report-page">
+                            <Flag size={18} />
+                            Laporkan Masalah
+                        </button>
                         <button onClick={handleLogout} className="btn-logout-page">
                             <LogOut size={18} />
                             Logout
@@ -466,11 +612,19 @@ const ProfileM = () => {
                                 </div>
                             </div>
 
-                            {/* Save */}
+                            {/* Action Buttons */}
                             <div className="profile-actions">
                                 <button type="submit" className="btn-save-page">
                                     <Save size={18} />
                                     Save Changes
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn-delete-account"
+                                    onClick={() => setShowDeleteModal(true)}
+                                >
+                                    <Trash2 size={18} />
+                                    Delete Account
                                 </button>
                             </div>
                         </form>
@@ -535,6 +689,133 @@ const ProfileM = () => {
                                 {uploading ? 'Uploading...' : 'Save & Upload'}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* DELETE ACCOUNT MODAL */}
+            {showDeleteModal && (
+                <div className="delete-modal-overlay">
+                    <div className="delete-modal-container">
+                        <div className="delete-modal-header">
+                            <AlertTriangle size={48} className="delete-warning-icon" />
+                            <h3>Hapus Akun Secara Permanen</h3>
+                        </div>
+                        <div className="delete-modal-body">
+                            <p className="delete-warning-text">
+                                Tindakan ini <strong>TIDAK DAPAT DIBATALKAN</strong>. Semua data Anda termasuk:
+                            </p>
+                            <ul className="delete-items-list">
+                                <li>Profil dan informasi pribadi</li>
+                                <li>Riwayat aplikasi project</li>
+                                <li>File dan dokumen yang diunggah</li>
+                                <li>Riwayat pekerjaan</li>
+                            </ul>
+                            <p className="delete-instruction">
+                                Untuk konfirmasi, ketik kalimat berikut:
+                            </p>
+                            <div className="delete-phrase-box">
+                                <code>{requiredPhrase}</code>
+                            </div>
+                            <input
+                                type="text"
+                                className="delete-confirm-input"
+                                value={deleteConfirmPhrase}
+                                onChange={(e) => setDeleteConfirmPhrase(e.target.value)}
+                                placeholder="Ketik kalimat konfirmasi di atas..."
+                            />
+                        </div>
+                        <div className="delete-modal-actions">
+                            <button
+                                onClick={() => { setShowDeleteModal(false); setDeleteConfirmPhrase(''); }}
+                                className="btn-cancel-delete"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={handleDeleteAccount}
+                                className="btn-confirm-delete"
+                                disabled={deleting || deleteConfirmPhrase !== requiredPhrase}
+                            >
+                                {deleting ? 'Menghapus...' : 'Hapus Akun Saya'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* REPORT MODAL */}
+            {showReportModal && (
+                <div className="report-modal-overlay">
+                    <div className="report-modal-container">
+                        <div className="report-modal-header">
+                            <Flag size={24} />
+                            <h3>Laporkan Masalah</h3>
+                            <button onClick={() => setShowReportModal(false)} className="close-btn-icon">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <form onSubmit={handleSubmitReport} className="report-modal-body">
+                            <div className="form-group">
+                                <label>Jenis Laporan *</label>
+                                <select
+                                    name="type"
+                                    value={reportData.type}
+                                    onChange={handleReportChange}
+                                    required
+                                >
+                                    <option value="BUG">Bug / Masalah Teknis</option>
+                                    <option value="CONTRACT_ISSUE">Masalah Project / Kontrak</option>
+                                    <option value="USER_COMPLAINT">Keluhan Pengguna</option>
+                                    <option value="PAYMENT_ISSUE">Masalah Pembayaran</option>
+                                    <option value="OTHER">Lainnya</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label>Subjek *</label>
+                                <input
+                                    type="text"
+                                    name="subject"
+                                    value={reportData.subject}
+                                    onChange={handleReportChange}
+                                    placeholder="Ringkasan masalah..."
+                                    maxLength={200}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Detail Permasalahan *</label>
+                                <textarea
+                                    name="description"
+                                    value={reportData.description}
+                                    onChange={handleReportChange}
+                                    rows={5}
+                                    placeholder="Jelaskan masalah yang Anda alami secara detail..."
+                                    maxLength={5000}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Bukti (Screenshot - Opsional)</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleReportEvidenceChange}
+                                    className="file-input-report"
+                                />
+                                {reportEvidence && (
+                                    <p className="file-selected">Terpilih: {reportEvidence.name}</p>
+                                )}
+                            </div>
+                            <div className="report-modal-actions">
+                                <button type="button" onClick={() => setShowReportModal(false)} className="btn-cancel-report">
+                                    Batal
+                                </button>
+                                <button type="submit" className="btn-submit-report" disabled={submittingReport}>
+                                    {submittingReport ? 'Mengirim...' : 'Kirim Laporan'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
