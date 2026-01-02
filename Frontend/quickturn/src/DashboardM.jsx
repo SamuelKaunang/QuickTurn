@@ -274,9 +274,21 @@ const DashboardM = () => {
                 <header className="topbar">
                     {/* Left side - Greeting/Branding */}
                     <div className="topbar-greeting">
-                        <span className="greeting-text">{t('welcomeToQuickTurn')}</span>
-                        <span className="greeting-divider">|</span>
-                        <span className="greeting-role">{t('talentDashboard')}</span>
+                        {activeTab === 'dashboard' ? (
+                            <>
+                                <span className="greeting-text">{t('welcomeToQuickTurn')}</span>
+                                <span className="greeting-divider">|</span>
+                                <span className="greeting-role">{t('talentDashboard')}</span>
+                            </>
+                        ) : (
+                            <span className="greeting-text" style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0f172a' }}>
+                                {activeTab === 'browse' ? t('browseProjects') :
+                                    activeTab === 'active' ? t('myProjects') :
+                                        activeTab === 'messages' ? t('messages') :
+                                            activeTab === 'search-users' ? t('findUsers') :
+                                                activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+                            </span>
+                        )}
                     </div>
 
                     {/* Right side - Profile - HIDDEN on Browse Projects (Search Project) page */}
