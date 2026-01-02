@@ -390,8 +390,8 @@ const ProfileM = () => {
                     {/* User Info */}
                     <div className="sidebar-user-info">
                         <h3>{formData.nama || 'Your Name'}</h3>
-                        <p>{formData.headline || 'Talent Account'}</p>
                         <span className="role-badge talent">TALENT</span>
+                        <p>{formData.headline || 'Talent Account'}</p>
                     </div>
 
                     {/* Stats */}

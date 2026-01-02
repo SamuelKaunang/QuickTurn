@@ -191,11 +191,11 @@ const PublicProfile = () => {
                     {/* User Info */}
                     <div className="sidebar-user-info">
                         <h2>{profile?.nama}</h2>
-                        {profile?.headline && <p className="headline">{profile.headline}</p>}
-                        {profile?.username && <p className="username">@{profile.username}</p>}
                         <span className={`role-badge ${isTalent ? 'talent' : 'client'}`}>
                             {isTalent ? 'Talent' : 'Client'}
                         </span>
+                        {profile?.headline && <p className="headline">{profile.headline}</p>}
+                        {profile?.username && <p className="username">@{profile.username}</p>}
                     </div>
 
                     {/* Stats */}

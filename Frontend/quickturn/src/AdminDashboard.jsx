@@ -275,18 +275,35 @@ const AdminDashboard = () => {
                                             {users.map(u => (
                                                 <tr key={u.id} style={{ borderBottom: '1px solid var(--slate-200)' }}>
                                                     <td className="p-3 text-sm">{u.id}</td>
-                                                    <td className="p-3 font-medium">{u.nama}</td>
+                                                    <td
+                                                        className="p-3 font-medium"
+                                                        style={{ cursor: 'pointer', color: 'var(--brand)' }}
+                                                        onClick={() => navigate(`/profile/${u.id}`)}
+                                                        title="View Profile"
+                                                    >
+                                                        {u.nama}
+                                                    </td>
                                                     <td className="p-3 text-sm opacity-70">{u.email}</td>
-                                                    <td className="p-3"><span className={`badge ${u.role === 'MAHASISWA' ? 'bg-blue-500/20 text-blue-800' : 'bg-green-500/20 text-green-800'} px-2 py-1 rounded text-xs`}>{u.role}</span></td>
+                                                    <td className="p-3"><span className={`badge ${u.role === 'MAHASISWA' ? 'bg-blue-500/20 text-blue-800' : u.role === 'ADMIN' ? 'bg-purple-500/20 text-purple-800' : 'bg-green-500/20 text-green-800'} px-2 py-1 rounded text-xs`}>{u.role}</span></td>
                                                     <td className="p-3">{u.enabled ? 'Active' : 'Banned'}</td>
                                                     <td className="p-3">
-                                                        <button
-                                                            onClick={() => handleDeleteUser(u.id)}
-                                                            className="text-red-500 hover:text-red-700 p-2"
-                                                            title="Delete User"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
+                                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                            <button
+                                                                onClick={() => navigate(`/profile/${u.id}`)}
+                                                                className="text-blue-500 hover:text-blue-700 p-2"
+                                                                title="View Profile"
+                                                                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                                                            >
+                                                                <Users size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteUser(u.id)}
+                                                                className="text-red-500 hover:text-red-700 p-2"
+                                                                title="Delete User"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}

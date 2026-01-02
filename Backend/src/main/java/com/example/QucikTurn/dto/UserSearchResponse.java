@@ -9,7 +9,11 @@ public record UserSearchResponse(
         String username,
         Role role,
         String bidang,
-        Double averageRating) {
+        Double averageRating,
+        String profilePictureUrl,
+        String headline,
+        String location,
+        Integer totalReviews) {
     public static UserSearchResponse from(User user) {
         return new UserSearchResponse(
                 user.getId(),
@@ -17,6 +21,10 @@ public record UserSearchResponse(
                 user.getUsernameField(),
                 user.getRole(),
                 user.getBidang(),
-                user.getAverageRating());
+                user.getAverageRating(),
+                user.getProfilePictureUrl(),
+                user.getHeadline(),
+                user.getLocation(),
+                user.getTotalReviews());
     }
 }

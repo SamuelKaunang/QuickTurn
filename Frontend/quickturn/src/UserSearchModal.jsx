@@ -126,7 +126,25 @@ const UserSearchModal = ({ isOpen, onClose }) => {
                                         onClick={() => handleViewProfile(user.id)}
                                     >
                                         <div className="result-avatar">
-                                            <User size={24} />
+                                            {user.profilePictureUrl ? (
+                                                <img
+                                                    src={user.profilePictureUrl}
+                                                    alt={user.nama}
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'cover',
+                                                        borderRadius: '50%'
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        e.target.nextSibling.style.display = 'flex';
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <div className="avatar-fallback-icon" style={{ display: user.profilePictureUrl ? 'none' : 'flex' }}>
+                                                <User size={24} />
+                                            </div>
                                         </div>
                                         <div className="result-info">
                                             <h4>{user.nama}</h4>

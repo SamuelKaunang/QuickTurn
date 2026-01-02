@@ -51,6 +51,7 @@ public class UserController {
     // --- SEARCH USERS ---
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<UserSearchResponse>>> searchUsers(
+            @AuthenticationPrincipal User currentUser,
             @RequestParam String query,
             @RequestParam(required = false) String role) {
         List<UserSearchResponse> results;
@@ -64,6 +65,14 @@ public class UserController {
             }
         } else {
             results = userSvc.searchUsers(query);
+        }
+
+        // Filter out the current user from search results
+        Long currentUserId = currentUser != null ? currentUser.getId() : null;
+        if (currentUserId != null) {
+            results = results.stream()
+                    .filter(u -> !u.id().equals(currentUserId))
+                    .collect(java.util.stream.Collectors.toList());
         }
 
         return ResponseEntity.ok(ApiResponse.ok("Search results", results));

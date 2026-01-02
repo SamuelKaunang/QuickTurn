@@ -385,8 +385,8 @@ const ProfileU = () => {
                     {/* User Info */}
                     <div className="sidebar-user-info">
                         <h3>{formData.nama || 'Your Business'}</h3>
-                        <p>{formData.headline || 'Client Account'}</p>
                         <span className="role-badge client">CLIENT</span>
+                        <p>{formData.headline || 'Client Account'}</p>
                     </div>
 
                     {/* Stats */}
