@@ -139,6 +139,22 @@ export const translations = {
         accepted: 'Diterima',
         rejected: 'Ditolak',
 
+        // Search Users
+        usersFound: 'Pengguna Ditemukan',
+        searchByNameOrUsername: 'Cari nama atau username...',
+        sortByName: 'Urutkan: Nama',
+        sortByRating: 'Urutkan: Rating',
+        sortByReviews: 'Urutkan: Ulasan',
+        userType: 'Tipe Pengguna',
+        allUsers: 'Semua Pengguna',
+        allCategories: 'Semua Kategori',
+        clearFilters: 'Hapus Filter',
+        loadingUsers: 'Memuat pengguna...',
+        tryAdjustingFilters: 'Coba sesuaikan filter pencarian',
+        viewProfile: 'Lihat Profil',
+        reviews: 'Ulasan',
+        filters: 'Filter',
+
         // Reports
         reportBug: 'Laporkan Bug',
         reportUser: 'Laporkan Pengguna',
@@ -304,6 +320,22 @@ export const translations = {
         pending: 'Pending',
         accepted: 'Accepted',
         rejected: 'Rejected',
+
+        // Search Users
+        usersFound: 'Users Found',
+        searchByNameOrUsername: 'Search by name or username...',
+        sortByName: 'Sort by: Name',
+        sortByRating: 'Sort by: Rating',
+        sortByReviews: 'Sort by: Reviews',
+        userType: 'User Type',
+        allUsers: 'All Users',
+        allCategories: 'All Categories',
+        clearFilters: 'Clear Filters',
+        loadingUsers: 'Loading users...',
+        tryAdjustingFilters: 'Try adjusting search filters',
+        viewProfile: 'View Profile',
+        reviews: 'Reviews',
+        filters: 'Filters',
 
         // Reports
         reportBug: 'Report Bug',

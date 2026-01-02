@@ -245,8 +245,8 @@ const DashboardM = () => {
                             {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
                         </button>
                         <button
-                            onClick={() => setShowSearchModal(true)}
-                            className="nav-item"
+                            onClick={() => navigate('/search-users')}
+                            className={`nav-item ${activeTab === 'search-users' ? 'active' : ''}`}
                         >
                             <Users size={20} />
                             <span>{t('findUsers')}</span>

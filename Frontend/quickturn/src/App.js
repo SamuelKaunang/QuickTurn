@@ -16,6 +16,7 @@ import ChatPage from './ChatPage';
 import PublicProfile from './PublicProfile';
 import AdminDashboard from './AdminDashboard';
 import AdminReports from './AdminReports';
+import SearchUsers from './SearchUsers';
 
 
 function App() {
@@ -98,6 +99,12 @@ function App() {
             <Route path="/post-project" element={
               <ProtectedRoute allowedRoles={['UMKM', 'UKM']}>
                 <PostProject />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/search-users" element={
+              <ProtectedRoute>
+                <SearchUsers />
               </ProtectedRoute>
             } />
 
