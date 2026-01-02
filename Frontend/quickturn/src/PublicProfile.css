@@ -294,7 +294,7 @@
     color: #94a3b8;
 }
 
-.role-badge {
+.public-profile-page .role-badge {
     display: table;
     margin: 8px auto;
     padding: 6px 16px;
@@ -303,14 +303,15 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    position: static;
 }
 
-.role-badge.talent {
+.public-profile-page .role-badge.talent {
     background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(37, 99, 235, 0.1));
     color: #7c3aed;
 }
 
-.role-badge.client {
+.public-profile-page .role-badge.client {
     background: linear-gradient(135deg, rgba(225, 29, 72, 0.1), rgba(190, 18, 60, 0.1));
     color: #e11d48;
 }

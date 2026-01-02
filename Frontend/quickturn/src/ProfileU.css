@@ -229,7 +229,7 @@
     display: inline-block;
 }
 
-.role-badge {
+.profile-page-u .role-badge {
     display: table;
     margin: 8px auto;
     padding: 6px 16px;
@@ -238,9 +238,10 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    position: static;
 }
 
-.role-badge.client {
+.profile-page-u .role-badge.client {
     background: linear-gradient(135deg, rgba(225, 29, 72, 0.1), rgba(190, 18, 60, 0.1));
     color: #e11d48;
 }

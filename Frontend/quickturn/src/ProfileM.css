@@ -220,7 +220,7 @@
     display: inline-block;
 }
 
-.role-badge {
+.profile-page .role-badge {
     display: table;
     margin: 8px auto;
     padding: 6px 16px;
@@ -229,9 +229,10 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    position: static;
 }
 
-.role-badge.talent {
+.profile-page .role-badge.talent {
     background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(37, 99, 235, 0.1));
     color: #7c3aed;
 }
