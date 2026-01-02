@@ -14,6 +14,7 @@ import ProfileU from './ProfileU';
 import ChatPage from './ChatPage';
 import PublicProfile from './PublicProfile';
 import AdminDashboard from './AdminDashboard';
+import AdminReports from './AdminReports';
 
 
 function App() {
@@ -83,6 +84,11 @@ function App() {
           <Route path="/admin/dashboard" element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/reports" element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <AdminReports />
             </ProtectedRoute>
           } />
 

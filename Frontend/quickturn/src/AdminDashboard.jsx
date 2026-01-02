@@ -5,7 +5,7 @@ import {
     LayoutDashboard, Users, Megaphone, LogOut,
     Shield, Trash2, PlusCircle, Search,
     Bold, Italic, List, Link as LinkIcon, Image as ImageIcon, AlignLeft,
-    FileText, Activity, X
+    FileText, Activity, X, Flag
 } from 'lucide-react';
 import './DashboardM.css'; // Reusing existing beautiful styles
 import logoQ from './assets/logo/logo Q.png';
@@ -183,6 +183,9 @@ const AdminDashboard = () => {
                         </button>
                         <button onClick={() => setActiveTab('projects')} className={`nav-item ${activeTab === 'projects' ? 'active' : ''}`}>
                             <FileText size={20} /> <span>Projects & Logs</span>
+                        </button>
+                        <button onClick={() => navigate('/admin/reports')} className="nav-item">
+                            <Flag size={20} /> <span>User Reports</span>
                         </button>
                     </nav>
 

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
     ArrowLeft, User, MapPin, Star, Briefcase, ExternalLink,
-    Award, Phone, Globe, Linkedin, Github, GraduationCap, Clock
+    Award, Phone, Globe, Linkedin, Github, GraduationCap, Clock,
+    Youtube, Instagram, Facebook
 } from 'lucide-react';
 import { api } from './utils/apiConfig';
 import { Skeleton, SkeletonAvatar, SkeletonText } from './Skeleton';
@@ -238,6 +239,56 @@ const PublicProfile = () => {
                             )}
                         </div>
                     )}
+
+                    {/* Social Links Buttons for Client - Direct Action Buttons */}
+                    {!isTalent && (profile?.youtubeUrl || profile?.instagramUrl || profile?.facebookUrl || profile?.businessWebsite) && (
+                        <div className="sidebar-actions">
+                            {profile?.businessWebsite && (
+                                <a
+                                    href={profile.businessWebsite}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-social website"
+                                >
+                                    <Globe size={18} />
+                                    Business Website
+                                </a>
+                            )}
+                            {profile?.instagramUrl && (
+                                <a
+                                    href={profile.instagramUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-social instagram"
+                                >
+                                    <Instagram size={18} />
+                                    Instagram
+                                </a>
+                            )}
+                            {profile?.facebookUrl && (
+                                <a
+                                    href={profile.facebookUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-social facebook"
+                                >
+                                    <Facebook size={18} />
+                                    Facebook
+                                </a>
+                            )}
+                            {profile?.youtubeUrl && (
+                                <a
+                                    href={profile.youtubeUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-social youtube"
+                                >
+                                    <Youtube size={18} />
+                                    YouTube
+                                </a>
+                            )}
+                        </div>
+                    )}
                 </div>
 
 
@@ -370,37 +421,64 @@ const PublicProfile = () => {
                         </div>
                     )}
 
-                    {/* Online Presence */}
-                    {(profile?.portfolioUrl || profile?.linkedinUrl || profile?.githubUrl) && (
-                        <div className="info-card">
-                            <div className="info-card-header">
-                                <Globe size={20} />
-                                <h3>Online Presence</h3>
-                            </div>
-                            <div className="info-card-body">
-                                <div className="links-list">
-                                    {profile?.portfolioUrl && (
-                                        <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="link-item">
-                                            <ExternalLink size={16} />
-                                            <span>Portfolio / Website</span>
-                                        </a>
-                                    )}
-                                    {profile?.linkedinUrl && (
-                                        <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="link-item linkedin">
-                                            <Linkedin size={16} />
-                                            <span>LinkedIn Profile</span>
-                                        </a>
-                                    )}
-                                    {profile?.githubUrl && (
-                                        <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="link-item github">
-                                            <Github size={16} />
-                                            <span>GitHub Profile</span>
-                                        </a>
-                                    )}
+                    {/* Online Presence - Updated to include client social media */}
+                    {(profile?.portfolioUrl || profile?.linkedinUrl || profile?.githubUrl ||
+                        profile?.youtubeUrl || profile?.instagramUrl || profile?.facebookUrl || profile?.businessWebsite) && (
+                            <div className="info-card">
+                                <div className="info-card-header">
+                                    <Globe size={20} />
+                                    <h3>Online Presence</h3>
+                                </div>
+                                <div className="info-card-body">
+                                    <div className="links-list">
+                                        {/* Talent links */}
+                                        {profile?.portfolioUrl && (
+                                            <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="link-item">
+                                                <ExternalLink size={16} />
+                                                <span>Portfolio / Website</span>
+                                            </a>
+                                        )}
+                                        {profile?.linkedinUrl && (
+                                            <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="link-item linkedin">
+                                                <Linkedin size={16} />
+                                                <span>LinkedIn Profile</span>
+                                            </a>
+                                        )}
+                                        {profile?.githubUrl && (
+                                            <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="link-item github">
+                                                <Github size={16} />
+                                                <span>GitHub Profile</span>
+                                            </a>
+                                        )}
+                                        {/* Client links */}
+                                        {profile?.businessWebsite && (
+                                            <a href={profile.businessWebsite} target="_blank" rel="noopener noreferrer" className="link-item website">
+                                                <Globe size={16} />
+                                                <span>Business Website</span>
+                                            </a>
+                                        )}
+                                        {profile?.instagramUrl && (
+                                            <a href={profile.instagramUrl} target="_blank" rel="noopener noreferrer" className="link-item instagram">
+                                                <Instagram size={16} />
+                                                <span>Instagram</span>
+                                            </a>
+                                        )}
+                                        {profile?.facebookUrl && (
+                                            <a href={profile.facebookUrl} target="_blank" rel="noopener noreferrer" className="link-item facebook">
+                                                <Facebook size={16} />
+                                                <span>Facebook Page</span>
+                                            </a>
+                                        )}
+                                        {profile?.youtubeUrl && (
+                                            <a href={profile.youtubeUrl} target="_blank" rel="noopener noreferrer" className="link-item youtube">
+                                                <Youtube size={16} />
+                                                <span>YouTube Channel</span>
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
                     {/* No information message for clients with minimal profile */}
                     {!isTalent && !profile?.bio && !profile?.location && !profile?.phone && !profile?.address && !profile?.portfolioUrl && (

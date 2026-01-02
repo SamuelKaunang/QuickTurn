@@ -44,7 +44,6 @@ const DashboardM = () => {
 
     const [user, setUser] = useState(null);
     const [token, setToken] = useState("");
-    const [searchQuery, setSearchQuery] = useState("");
     const [announcements, setAnnouncements] = useState([]);
 
     // Stats from backend
@@ -262,16 +261,6 @@ const DashboardM = () => {
             {/* Main Content */}
             <main className="main-content">
                 <header className="topbar">
-                    <div className="search-box">
-                        <Search size={18} className="search-icon" />
-                        <input
-                            type="text"
-                            placeholder="Search projects..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-
                     <div className="topbar-actions">
 
                         <div
