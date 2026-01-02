@@ -7,12 +7,14 @@ import {
     CheckCircle, Send, UserSearch
 } from 'lucide-react';
 import { api } from './utils/apiConfig';
+import { useSettings } from './SettingsContext';
 import './DashboardM.css';
 import logoQ from './assets/logo/logo Q.png';
 import logoText from './assets/logo/logo text.png';
 import ProjectsM from './ProjectsM';
 import ActiveProjectsM from './ActiveProjectsM';
 import UserSearchModal from './UserSearchModal';
+import SettingsModal from './SettingsModal';
 import RecentActivities from './RecentActivities';
 
 // --- Sub-Components ---
@@ -54,7 +56,9 @@ const DashboardM = () => {
 
     // Search Modal
     const [showSearchModal, setShowSearchModal] = useState(false);
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
+    const { t, isDark } = useSettings();
 
 
 
@@ -250,9 +254,16 @@ const DashboardM = () => {
                     </nav>
 
                     <div className="sidebar-footer">
+                        <button
+                            className="nav-item settings-nav"
+                            onClick={() => setShowSettingsModal(true)}
+                        >
+                            <Settings size={18} />
+                            <span>{t('settings')}</span>
+                        </button>
                         <button className="logout-btn" onClick={handleLogout}>
                             <LogOut size={18} />
-                            <span>Logout</span>
+                            <span>{t('logout')}</span>
                         </button>
                     </div>
                 </div>
@@ -261,8 +272,15 @@ const DashboardM = () => {
             {/* Main Content */}
             <main className="main-content">
                 <header className="topbar">
-                    <div className="topbar-actions">
+                    {/* Left side - Greeting/Branding */}
+                    <div className="topbar-greeting">
+                        <span className="greeting-text">👋 Welcome to QuickTurn</span>
+                        <span className="greeting-divider">|</span>
+                        <span className="greeting-role">Talent Dashboard</span>
+                    </div>
 
+                    {/* Right side - Profile */}
+                    <div className="topbar-actions">
                         <div
                             className="profile-pill"
                             onClick={() => navigate('/profile-mahasiswa')}
@@ -402,6 +420,12 @@ const DashboardM = () => {
             <UserSearchModal
                 isOpen={showSearchModal}
                 onClose={() => setShowSearchModal(false)}
+            />
+
+            {/* Settings Modal */}
+            <SettingsModal
+                isOpen={showSettingsModal}
+                onClose={() => setShowSettingsModal(false)}
             />
         </div>
     );

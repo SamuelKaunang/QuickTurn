@@ -405,6 +405,40 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    margin-left: auto;
+}
+
+/* Topbar Greeting - Left side accent */
+.topbar-greeting {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 241, 242, 0.8) 100%);
+    border: 1px solid rgba(225, 29, 72, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(225, 29, 72, 0.08);
+    backdrop-filter: blur(8px);
+}
+
+.greeting-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--slate-700);
+}
+
+.greeting-divider {
+    color: var(--slate-300);
+    font-weight: 300;
+}
+
+.greeting-role {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--brand);
+    padding: 4px 12px;
+    background: linear-gradient(135deg, rgba(225, 29, 72, 0.1) 0%, rgba(190, 18, 60, 0.05) 100%);
+    border-radius: 20px;
 }
 
 
