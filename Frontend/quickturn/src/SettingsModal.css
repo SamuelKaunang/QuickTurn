@@ -35,12 +35,6 @@
     overflow: hidden;
 }
 
-/* Dark mode support */
-.dark-mode .settings-modal {
-    background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -63,11 +57,6 @@
     background: linear-gradient(135deg, #fafafa 0%, white 100%);
 }
 
-.dark-mode .settings-modal-header {
-    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-}
-
 .settings-modal-header h2 {
     margin: 0;
     font-size: 1.25rem;
@@ -76,10 +65,6 @@
     display: flex;
     align-items: center;
     gap: 8px;
-}
-
-.dark-mode .settings-modal-header h2 {
-    color: white;
 }
 
 .btn-close-settings {
@@ -98,11 +83,6 @@
 .btn-close-settings:hover {
     background: #f1f5f9;
     color: #64748b;
-}
-
-.dark-mode .btn-close-settings:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
 }
 
 /* Body */
@@ -128,17 +108,13 @@
     gap: 10px;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #64748b;
+    color: #475569;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .section-label svg {
     color: #e11d48;
-}
-
-.dark-mode .section-label {
-    color: #94a3b8;
 }
 
 /* Toggle Group */
@@ -165,21 +141,10 @@
     position: relative;
 }
 
-.dark-mode .toggle-btn {
-    background: #334155;
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
-}
-
 .toggle-btn:hover {
     background: white;
     border-color: #cbd5e1;
     transform: translateY(-1px);
-}
-
-.dark-mode .toggle-btn:hover {
-    background: #475569;
-    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .toggle-btn.active {
@@ -189,12 +154,6 @@
     box-shadow: 0 4px 16px rgba(225, 29, 72, 0.15);
 }
 
-.dark-mode .toggle-btn.active {
-    background: linear-gradient(135deg, rgba(225, 29, 72, 0.2) 0%, rgba(225, 29, 72, 0.1) 100%);
-    border-color: #e11d48;
-    color: #f87171;
-}
-
 .toggle-btn svg:first-child {
     flex-shrink: 0;
 }
@@ -202,10 +161,6 @@
 .check-icon {
     margin-left: auto;
     color: #e11d48;
-}
-
-.dark-mode .check-icon {
-    color: #f87171;
 }
 
 /* Special elements */
@@ -244,16 +199,6 @@
     color: #e11d48;
 }
 
-.dark-mode .format-example {
-    background: rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
-}
-
-.dark-mode .toggle-btn.active .format-example {
-    background: rgba(225, 29, 72, 0.2);
-    color: #f87171;
-}
-
 /* Footer */
 .settings-modal-footer {
     display: flex;
@@ -262,11 +207,6 @@
     padding: 20px 28px;
     border-top: 1px solid #e2e8f0;
     background: #fafafa;
-}
-
-.dark-mode .settings-modal-footer {
-    background: #334155;
-    border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 .btn-cancel-settings {
@@ -285,16 +225,6 @@
 .btn-cancel-settings:hover {
     background: #f1f5f9;
     color: #475569;
-}
-
-.dark-mode .btn-cancel-settings {
-    background: #475569;
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
-}
-
-.dark-mode .btn-cancel-settings:hover {
-    background: #64748b;
 }
 
 .btn-save-settings {
@@ -333,13 +263,4 @@
     .settings-modal-body {
         padding: 20px;
     }
-}
-
-/* Dark Mode Global Styles */
-.dark-mode {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --border-color: rgba(255, 255, 255, 0.1);
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sun, Moon, Globe, DollarSign, Calendar, Check } from 'lucide-react';
+import { X, Globe, DollarSign, Calendar, Check } from 'lucide-react';
 import { useSettings } from './SettingsContext';
 import './SettingsModal.css';
 
@@ -38,32 +38,6 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
                 {/* Body */}
                 <div className="settings-modal-body">
-                    {/* Theme Section */}
-                    <div className="settings-section">
-                        <div className="section-label">
-                            <Sun size={18} />
-                            <span>{t('appearance')}</span>
-                        </div>
-                        <div className="toggle-group theme-toggle">
-                            <button
-                                className={`toggle-btn ${localSettings.theme === 'light' ? 'active' : ''}`}
-                                onClick={() => handleChange('theme', 'light')}
-                            >
-                                <Sun size={16} />
-                                <span>{t('lightMode')}</span>
-                                {localSettings.theme === 'light' && <Check size={14} className="check-icon" />}
-                            </button>
-                            <button
-                                className={`toggle-btn ${localSettings.theme === 'dark' ? 'active' : ''}`}
-                                onClick={() => handleChange('theme', 'dark')}
-                            >
-                                <Moon size={16} />
-                                <span>{t('darkMode')}</span>
-                                {localSettings.theme === 'dark' && <Check size={14} className="check-icon" />}
-                            </button>
-                        </div>
-                    </div>
-
                     {/* Language Section */}
                     <div className="settings-section">
                         <div className="section-label">

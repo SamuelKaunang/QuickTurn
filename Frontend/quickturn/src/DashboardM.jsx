@@ -58,7 +58,7 @@ const DashboardM = () => {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
-    const { t, isDark } = useSettings();
+    const { t } = useSettings();
 
 
 
@@ -168,7 +168,7 @@ const DashboardM = () => {
 
     const stats = [
         {
-            label: 'Available Projects',
+            label: t('availableProjects'),
             value: availableProjectsCount.toString(),
             change: null,
             positive: true,
@@ -176,7 +176,7 @@ const DashboardM = () => {
             colorClass: 'red'
         },
         {
-            label: 'Projects Completed',
+            label: t('projectsCompleted'),
             value: projectsDoneCount.toString(),
             change: null,
             positive: true,
@@ -184,7 +184,7 @@ const DashboardM = () => {
             colorClass: 'green'
         },
         {
-            label: 'Applications Sent',
+            label: t('applicationsSent'),
             value: myApplicationsCount.toString(),
             change: null,
             positive: true,
@@ -207,7 +207,7 @@ const DashboardM = () => {
                         <img src={logoQ} alt="QuickTurn" className="logo-icon-img" />
                         <div>
                             <img src={logoText} alt="QuickTurn" className="logo-text-img" />
-                            <p className="logo-subtext">Micro-Internships</p>
+                            <p className="logo-subtext">{t('microInternships')}</p>
                         </div>
                     </div>
 
@@ -217,21 +217,21 @@ const DashboardM = () => {
                             className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
                         >
                             <LayoutDashboard size={20} />
-                            <span>Dashboard</span>
+                            <span>{t('dashboard')}</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('browse')}
                             className={`nav-item ${activeTab === 'browse' ? 'active' : ''}`}
                         >
                             <Search size={20} />
-                            <span>Browse Projects</span>
+                            <span>{t('browseProjects')}</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('active')}
                             className={`nav-item ${activeTab === 'active' ? 'active' : ''}`}
                         >
                             <Briefcase size={20} />
-                            <span>My Projects</span>
+                            <span>{t('myProjects')}</span>
                         </button>
                         <button
                             onClick={() => navigate('/chat')}
@@ -241,7 +241,7 @@ const DashboardM = () => {
                                 <MessageSquare size={20} />
                                 {unreadCount > 0 && <span className="unread-dot"></span>}
                             </div>
-                            <span>Messages</span>
+                            <span>{t('messages')}</span>
                             {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
                         </button>
                         <button
@@ -249,7 +249,7 @@ const DashboardM = () => {
                             className="nav-item"
                         >
                             <Users size={20} />
-                            <span>Find Users</span>
+                            <span>{t('findUsers')}</span>
                         </button>
                     </nav>
 
@@ -274,9 +274,9 @@ const DashboardM = () => {
                 <header className="topbar">
                     {/* Left side - Greeting/Branding */}
                     <div className="topbar-greeting">
-                        <span className="greeting-text">👋 Welcome to QuickTurn</span>
+                        <span className="greeting-text">👋 {t('welcomeToQuickTurn')}</span>
                         <span className="greeting-divider">|</span>
-                        <span className="greeting-role">Talent Dashboard</span>
+                        <span className="greeting-role">{t('talentDashboard')}</span>
                     </div>
 
                     {/* Right side - Profile */}
@@ -287,8 +287,8 @@ const DashboardM = () => {
                             style={{ cursor: 'pointer' }}
                         >
                             <div className="profile-info">
-                                <p className="p-name">{user?.name || 'Talent'}</p>
-                                <p className="p-status">Pro Level</p>
+                                <p className="p-name">{user?.name || t('talent')}</p>
+                                <p className="p-status">{t('proLevel')}</p>
                             </div>
                             {user?.profilePicture ? (
                                 <img
@@ -310,12 +310,12 @@ const DashboardM = () => {
                         <div className="fade-in">
                             <div className="welcome-banner">
                                 <div className="banner-text">
-                                    <h2>Welcome back, {user?.name?.split(' ')[0] || 'Talent'}!</h2>
-                                    <p>Time to build your portfolio and find your next opportunity.</p>
+                                    <h2>{t('welcomeBack')}, {user?.name?.split(' ')[0] || t('talent')}!</h2>
+                                    <p>{t('buildPortfolio')}</p>
                                 </div>
                                 <button className="banner-btn" onClick={scrollToProjects}>
                                     <Search size={18} />
-                                    Find Work
+                                    {t('findWork')}
                                 </button>
                             </div>
 
@@ -329,12 +329,12 @@ const DashboardM = () => {
                                                 <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0" />
                                             </svg>
                                         </div>
-                                        <h3>Latest Announcements</h3>
+                                        <h3>{t('latestAnnouncements')}</h3>
                                     </div>
                                     <div className="glass-card announcement-card">
                                         {announcements.length === 0 ? (
                                             <div className="empty-state">
-                                                <p>No new announcements.</p>
+                                                <p>{t('noAnnouncements')}</p>
                                             </div>
                                         ) : (
                                             <div className="announcement-list">
@@ -363,7 +363,7 @@ const DashboardM = () => {
                                                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
                                             </svg>
                                         </div>
-                                        <h3>Recent Activity</h3>
+                                        <h3>{t('recentActivity')}</h3>
                                     </div>
                                     <div className="glass-card activity-card-top">
                                         <RecentActivities />
@@ -378,12 +378,12 @@ const DashboardM = () => {
                             {/* Full Width Projects Section */}
                             <div className="projects-section-full">
                                 <div className="section-header">
-                                    <h3>Recommended Projects</h3>
+                                    <h3>{t('recommendedProjects')}</h3>
                                     <button
                                         className="text-link"
                                         onClick={() => setActiveTab('browse')}
                                     >
-                                        View All
+                                        {t('viewAll')}
                                     </button>
                                 </div>
                                 <div className="project-grid-wrapper">
