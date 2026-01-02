@@ -809,38 +809,32 @@
     gap: 16px;
 }
 
-/* Projects row should display cards horizontally */
+/* Projects row should display cards in 3-column grid */
 .project-grid-wrapper .projects-rowM {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
 
-/* Make each project card consistent width */
+/* Make each project card fill grid cell */
 .project-grid-wrapper .glass-card,
-.project-grid-wrapper .project-card {
-    flex: 0 0 calc(33.333% - 14px);
-    min-width: 280px;
-    max-width: calc(33.333% - 14px);
+.project-grid-wrapper .project-card,
+.project-grid-wrapper .project-cardM {
+    width: 100%;
+    min-width: unset;
+    max-width: 100%;
 }
 
 /* Responsive adjustments */
-@media (max-width: 1400px) {
-
-    .project-grid-wrapper .glass-card,
-    .project-grid-wrapper .project-card {
-        flex: 0 0 calc(50% - 10px);
-        max-width: calc(50% - 10px);
+@media (max-width: 1200px) {
+    .project-grid-wrapper .projects-rowM {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (max-width: 900px) {
-
-    .project-grid-wrapper .glass-card,
-    .project-grid-wrapper .project-card {
-        flex: 0 0 100%;
-        max-width: 100%;
+@media (max-width: 768px) {
+    .project-grid-wrapper .projects-rowM {
+        grid-template-columns: 1fr;
     }
 
     .top-info-grid {
