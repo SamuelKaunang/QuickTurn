@@ -302,6 +302,11 @@ public class AccountDeletionService {
         user.setAddress(null);
         user.setLinkedinUrl(null);
         user.setGithubUrl(null);
+        // Clear new social media fields
+        user.setYoutubeUrl(null);
+        user.setInstagramUrl(null);
+        user.setFacebookUrl(null);
+        user.setBusinessWebsite(null);
 
         // Mark as deleted
         user.setAccountStatus(AccountStatus.DELETED);
