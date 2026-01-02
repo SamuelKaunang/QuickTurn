@@ -294,7 +294,7 @@ const ChatPage = () => {
     const getRole = () => sessionStorage.getItem("role");
 
     return (
-        <div className="chat-container">
+        <div className={`chat-container ${activeChat ? 'chat-active' : ''}`}>
             {/* Sidebar */}
             <div className="chat-sidebar">
                 <div className="sidebar-header">
@@ -358,6 +358,12 @@ const ChatPage = () => {
                 {activeChat ? (
                     <>
                         <div className="chat-header">
+                            <button
+                                className="mobile-chat-back-btn"
+                                onClick={() => setActiveChat(null)}
+                            >
+                                <ArrowLeft size={20} />
+                            </button>
                             <div
                                 className="chat-header-avatar-wrapper"
                                 onClick={(e) => navigateToProfile(activeChat.userId, e)}

@@ -165,13 +165,18 @@ const AdminReports = () => {
 
     return (
         <div className="admin-reports-page">
+            {/* Mobile Floating Back Button */}
+            <button className="mobile-floating-back" onClick={() => navigate(-1)}>
+                <ArrowLeft size={22} />
+            </button>
+
             <div className="admin-bg-glow glow-1"></div>
             <div className="admin-bg-glow glow-2"></div>
 
             {/* Header */}
             <header className="admin-header">
                 <div className="header-left">
-                    <button onClick={() => navigate(-1)} className="btn-back-admin">
+                    <button onClick={() => navigate(-1)} className="btn-back-admin hide-on-mobile">
                         <ArrowLeft size={18} />
                         Back
                     </button>

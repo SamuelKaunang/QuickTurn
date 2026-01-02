@@ -1762,6 +1762,7 @@
 
     .main-content {
         padding-bottom: 90px;
+        padding-top: 80px;
     }
 
     .content-body {
@@ -1775,5 +1776,98 @@
 
     .topbar-greeting {
         display: none;
+    }
+
+    .topbar {
+        display: none;
+    }
+}
+
+/* =========================================
+   MOBILE TOP HEADER
+   ========================================= */
+.mobile-top-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--slate-200);
+    padding: 0 16px;
+    z-index: 999;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+}
+
+.mobile-top-header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    max-width: 100%;
+}
+
+.mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mobile-logo img {
+    height: 36px;
+    width: auto;
+}
+
+.mobile-profile-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px 6px 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+    border: 1px solid rgba(225, 29, 72, 0.2);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mobile-profile-pill:active {
+    transform: scale(0.98);
+}
+
+.mobile-profile-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--slate-800);
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mobile-profile-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.mobile-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Show mobile top header on mobile */
+@media (max-width: 768px) {
+    .mobile-top-header {
+        display: block;
     }
 }

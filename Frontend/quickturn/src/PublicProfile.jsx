@@ -76,12 +76,17 @@ const PublicProfile = () => {
     if (loading) {
         return (
             <div className="public-profile-page">
+                {/* Mobile Floating Back Button */}
+                <button className="mobile-floating-back" onClick={handleBack}>
+                    <ArrowLeft size={22} />
+                </button>
+
                 <div className="bg-glow glow-1"></div>
                 <div className="bg-glow glow-2"></div>
                 <div className="profile-layout">
                     {/* Skeleton Sidebar */}
                     <div className="profile-sidebar">
-                        <button onClick={handleBack} className="btn-back">
+                        <button onClick={handleBack} className="btn-back hide-on-mobile">
                             <ArrowLeft size={16} />
                             Back
                         </button>
@@ -165,13 +170,18 @@ const PublicProfile = () => {
 
     return (
         <div className={`public-profile-page ${accentColor}`}>
+            {/* Mobile Floating Back Button */}
+            <button className="mobile-floating-back" onClick={handleBack}>
+                <ArrowLeft size={22} />
+            </button>
+
             <div className="bg-glow glow-1"></div>
             <div className="bg-glow glow-2"></div>
 
             <div className="profile-layout">
                 {/* Left Sidebar */}
                 <div className="profile-sidebar">
-                    <button onClick={handleBack} className="btn-back">
+                    <button onClick={handleBack} className="btn-back hide-on-mobile">
                         <ArrowLeft size={16} />
                         Back
                     </button>

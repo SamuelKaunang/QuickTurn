@@ -348,13 +348,18 @@ const ProfileM = () => {
 
     return (
         <div className="profile-page">
+            {/* Mobile Floating Back Button */}
+            <button className="mobile-floating-back" onClick={() => navigate('/dashboardm')}>
+                <ArrowLeft size={22} />
+            </button>
+
             <div className="bg-glow glow-1"></div>
             <div className="bg-glow glow-2"></div>
 
             <div className="profile-container">
                 {/* Left Sidebar */}
                 <div className="profile-sidebar">
-                    <button onClick={() => navigate('/dashboardm')} className="btn-back">
+                    <button onClick={() => navigate('/dashboardm')} className="btn-back hide-on-mobile">
                         <ArrowLeft size={16} />
                         Back
                     </button>

@@ -215,6 +215,11 @@ const SearchUsers = () => {
 
     return (
         <div className="dashboard-container">
+            {/* Mobile Floating Back Button */}
+            <button className="mobile-floating-back" onClick={() => navigate('/dashboardm')}>
+                <ArrowLeft size={22} />
+            </button>
+
             {/* Background Blobs (Consistent with Dashboard) */}
             <div className="bg-glow glow-1"></div>
             <div className="bg-glow glow-2"></div>

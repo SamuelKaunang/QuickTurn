@@ -343,13 +343,18 @@ const ProfileU = () => {
 
     return (
         <div className="profile-page-u">
+            {/* Mobile Floating Back Button */}
+            <button className="mobile-floating-back" onClick={() => navigate('/dashboardu')}>
+                <ArrowLeft size={22} />
+            </button>
+
             <div className="bg-glow glow-1"></div>
             <div className="bg-glow glow-2"></div>
 
             <div className="profile-container-u">
                 {/* Left Sidebar */}
                 <div className="profile-sidebar-u">
-                    <button onClick={() => navigate('/dashboardu')} className="btn-back-u">
+                    <button onClick={() => navigate('/dashboardu')} className="btn-back-u hide-on-mobile">
                         <ArrowLeft size={16} />
                         Back
                     </button>

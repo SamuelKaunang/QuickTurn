@@ -731,31 +731,121 @@
     }
 }
 
+/* =========================================
+   MOBILE CHAT - WHATSAPP STYLE
+   ========================================= */
 @media (max-width: 768px) {
     .chat-container {
         flex-direction: column;
+        position: relative;
     }
 
+    /* Mobile: Show sidebar as full screen when no chat selected */
     .chat-sidebar {
         width: 100%;
-        height: auto;
-        max-height: 300px;
+        height: 100vh;
+        max-height: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        transition: transform 0.3s ease;
     }
 
+    /* Hide sidebar when chat is active */
+    .chat-container.chat-active .chat-sidebar {
+        transform: translateX(-100%);
+    }
+
+    /* Mobile: Show chat window as full screen */
     .chat-window {
-        flex: 1;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: 99;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
     }
 
+    /* Show chat window when active */
+    .chat-container.chat-active .chat-window {
+        transform: translateX(0);
+    }
+
+    /* Mobile Sidebar Header */
+    .sidebar-header {
+        padding: 16px 20px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .btn-back-chat {
+        padding: 10px 16px;
+    }
+
+    /* Mobile Contact List */
+    .contacts-list {
+        height: calc(100vh - 80px);
+    }
+
+    .contact-item {
+        padding: 14px 20px;
+    }
+
+    /* Mobile Chat Header - Single header with profile info */
+    .chat-header {
+        padding: 12px 16px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .chat-header-avatar,
+    .chat-header-avatar-img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .chat-header h2 {
+        font-size: 1rem;
+    }
+
+    .chat-header-info span {
+        font-size: 0.75rem;
+    }
+
+    /* Mobile Chat Messages */
     .chat-messages {
         padding: 16px;
-    }
-
-    .chat-input-area {
-        padding: 16px;
+        height: calc(100vh - 140px);
     }
 
     .message-bubble {
         max-width: 85%;
+    }
+
+    /* Mobile Input Area */
+    .chat-input-area {
+        padding: 12px 16px;
+        position: sticky;
+        bottom: 0;
+    }
+
+    .chat-input-area input {
+        padding: 12px 16px;
+    }
+
+    .chat-input-area button {
+        width: 44px;
+        height: 44px;
+    }
+
+    .attach-btn {
+        width: 40px;
+        height: 40px;
     }
 
     .file-preview-bar {
@@ -764,6 +854,41 @@
 
     .image-attachment img {
         max-width: 100%;
+    }
+
+    /* No chat selected state - not visible on mobile */
+    .no-chat-selected {
+        display: none;
+    }
+}
+
+/* =========================================
+   MOBILE BACK BUTTON IN CHAT
+   ========================================= */
+.mobile-chat-back-btn {
+    display: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(225, 29, 72, 0.1);
+    border: none;
+    color: #e11d48;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.mobile-chat-back-btn:active {
+    transform: scale(0.95);
+    background: rgba(225, 29, 72, 0.2);
+}
+
+@media (max-width: 768px) {
+    .mobile-chat-back-btn {
+        display: flex;
     }
 }
 

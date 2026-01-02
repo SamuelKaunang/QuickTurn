@@ -183,3 +183,54 @@ body::-webkit-scrollbar-thumb:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px var(--shadow);
 }
+
+/* =========================================
+   MOBILE FLOATING BACK BUTTON
+   Fixed position di kiri atas untuk semua page
+   ========================================= */
+.mobile-floating-back {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(225, 29, 72, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  color: #e11d48;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.mobile-floating-back:active {
+  transform: scale(0.9);
+  background: rgba(225, 29, 72, 0.1);
+}
+
+.mobile-floating-back svg {
+  width: 22px;
+  height: 22px;
+}
+
+@media (max-width: 768px) {
+  .mobile-floating-back {
+    display: flex;
+  }
+
+  /* Tambahkan padding top untuk konten agar tidak tertutup floating button */
+  .page-with-floating-back {
+    padding-top: 70px;
+  }
+
+  /* Sembunyikan tombol back standar di mobile karena sudah ada floating */
+  .hide-on-mobile {
+    display: none !important;
+  }
+}

@@ -200,6 +200,28 @@ const DashboardM = () => {
             <div className="bg-glow glow-2"></div>
             <div className="bg-glow glow-3"></div>
 
+            {/* Mobile Top Header */}
+            <header className="mobile-top-header">
+                <div className="mobile-top-header-inner">
+                    <div className="mobile-logo">
+                        <img src={logoQ} alt="QuickTurn" />
+                    </div>
+                    <div
+                        className="mobile-profile-pill"
+                        onClick={() => navigate('/profile-mahasiswa')}
+                    >
+                        <span className="mobile-profile-name">{user?.name?.split(' ')[0] || 'Talent'}</span>
+                        <div className="mobile-profile-avatar">
+                            {user?.profilePicture ? (
+                                <img src={user.profilePicture} alt="Profile" />
+                            ) : (
+                                <Users size={16} />
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </header>
+
             {/* Sidebar */}
             <aside className="sidebar">
                 <div className="sidebar-inner">

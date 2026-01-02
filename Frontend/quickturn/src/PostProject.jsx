@@ -210,6 +210,11 @@ const PostProject = () => {
 
   return (
     <div className="post-project-page">
+      {/* Mobile Floating Back Button */}
+      <button className="mobile-floating-back" onClick={() => navigate('/dashboardU')}>
+        <ArrowLeft size={22} />
+      </button>
+
       <div className="bg-glow glow-1"></div>
       <div className="bg-glow glow-2"></div>
       <div className="bg-glow glow-3"></div>
@@ -218,7 +223,7 @@ const PostProject = () => {
         {/* Header */}
         <div className="post-header">
           <div className="post-header-left">
-            <button onClick={() => navigate('/dashboardU')} className="btn-back-post">
+            <button onClick={() => navigate('/dashboardU')} className="btn-back-post hide-on-mobile">
               <ArrowLeft size={18} />
               Back
             </button>

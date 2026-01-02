@@ -1,0 +1,136 @@
+# Development Docker Compose - For local testing
+# Pastikan kamu sudah membuat file .env.local dengan secrets yang diperlukan!
+
+services:
+  # --- DATABASE ZONE ---
+  mysql:
+    image: mysql:8.0
+    container_name: quickturn-mysql-dev
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: quickturn
+      MYSQL_USER: quickturn
+      MYSQL_PASSWORD: password123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+    networks:
+      - app-network-dev
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:latest
+    container_name: quickturn-mongo-dev
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data_dev:/data/db
+    networks:
+      - app-network-dev
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- BACKEND ZONE ---
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: dockerfile
+    container_name: quickturn-backend-dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    environment:
+      # Database Connections - Sudah di-handle Docker networking
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/quickturn?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Jakarta&characterEncoding=utf8
+      SPRING_DATASOURCE_USERNAME: quickturn
+      SPRING_DATASOURCE_PASSWORD: password123
+      SPRING_DATA_MONGODB_URI: mongodb://root:example@mongodb:27017/quickturn_chat?authSource=admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      
+      # JWT Secret - WAJIB untuk authentication
+      APP_JWT_SECRET: devSecretKey123456789012345678901234567890
+      
+      # Email (Optional untuk dev - bisa dikosongkan)
+      RESEND_API_KEY: ${RESEND_API_KEY:-re_dummy_key}
+      RESEND_FROM_EMAIL: noreply@localhost
+      
+      # Azure Storage (Optional untuk dev - bisa dikosongkan)
+      AZURE_STORAGE_CONNECTION_STRING: ${AZURE_STORAGE_CONNECTION_STRING:-}
+      AZURE_STORAGE_CONTAINER_NAME: quickturn-files-dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads_data_dev:/app/uploads
+    networks:
+      - app-network-dev
+
+  # --- FRONTEND ZONE (Development with hot reload) ---
+  frontend:
+    image: node:18-alpine
+    container_name: quickturn-frontend-dev
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Frontend/quickturn:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm start"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      # API URL - Mengarah ke backend container
+      - REACT_APP_API_URL=http://localhost:8080
+    depends_on:
+      - backend
+    networks:
+      - app-network-dev
+
+  # --- GUI TOOLS (Optional - untuk debugging) ---
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.1
+    container_name: quickturn-pma-dev
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: quickturn
+      PMA_PASSWORD: password123
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+    networks:
+      - app-network-dev
+
+  mongo-express:
+    image: mongo-express
+    container_name: quickturn-mongo-express-dev
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    depends_on:
+      - mongodb
+    networks:
+      - app-network-dev
+
+volumes:
+  mysql_data_dev:
+  mongo_data_dev:
+  uploads_data_dev:
+
+networks:
+  app-network-dev:
+    driver: bridge
