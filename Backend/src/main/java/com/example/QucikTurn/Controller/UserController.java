@@ -2,12 +2,15 @@ package com.example.QucikTurn.Controller;
 
 import com.example.QucikTurn.Entity.User;
 import com.example.QucikTurn.Entity.enums.Role;
+import com.example.QucikTurn.Service.AccountDeletionService;
 import com.example.QucikTurn.Service.UserService;
 import com.example.QucikTurn.dto.ApiResponse;
+import com.example.QucikTurn.dto.DeleteAccountRequest;
 import com.example.QucikTurn.dto.PublicProfileResponse;
 import com.example.QucikTurn.dto.UpdateProfileRequest;
 import com.example.QucikTurn.dto.UserProfileResponse;
 import com.example.QucikTurn.dto.UserSearchResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +23,11 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userSvc;
+    private final AccountDeletionService accountDeletionService;
 
-    public UserController(UserService userSvc) {
+    public UserController(UserService userSvc, AccountDeletionService accountDeletionService) {
         this.userSvc = userSvc;
+        this.accountDeletionService = accountDeletionService;
     }
 
     // --- GET MY PROFILE ---
@@ -68,6 +73,12 @@ public class UserController {
     @GetMapping("/profile/{userId}")
     public ResponseEntity<ApiResponse<PublicProfileResponse>> getPublicProfileById(
             @PathVariable Long userId) {
+        // Check if user is deleted
+        User targetUser = userSvc.getUserById(userId);
+        if (targetUser.isDeleted()) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.fail("Akun ini sudah tidak aktif lagi."));
+        }
         PublicProfileResponse profile = userSvc.getPublicProfileById(userId);
         return ResponseEntity.ok(ApiResponse.ok("Public profile", profile));
     }
@@ -114,5 +125,42 @@ public class UserController {
         String bidang = request.get("bidang");
         User updated = userSvc.updateBidang(user.getId(), bidang);
         return ResponseEntity.ok(ApiResponse.ok("Bidang updated successfully", UserProfileResponse.fromUser(updated)));
+    }
+
+    /**
+     * DELETE ACCOUNT - Permanently delete user account
+     * 
+     * User must provide the exact confirmation phrase:
+     * "Saya mengerti bahwa akun saya akan dihapus permanen dan tidak bisa
+     * dikembalikan."
+     * 
+     * This operation:
+     * 1. Deletes all user files from cloud storage
+     * 2. Anonymizes chat history (messages preserved, identity hidden)
+     * 3. Archives completed projects (keeps system records)
+     * 4. Removes personal data and marks account as DELETED
+     */
+    @DeleteMapping("/account")
+    public ResponseEntity<ApiResponse<Void>> deleteAccount(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody DeleteAccountRequest request) {
+        try {
+            accountDeletionService.deleteAccount(user, request);
+            return ResponseEntity.ok(
+                    ApiResponse.ok("Akun Anda telah berhasil dihapus. Terima kasih telah menggunakan QuickTurn.",
+                            null));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
+    }
+
+    /**
+     * GET REQUIRED CONFIRMATION PHRASE
+     * Returns the exact phrase user must type to delete their account.
+     */
+    @GetMapping("/account/delete-confirmation")
+    public ResponseEntity<ApiResponse<Map<String, String>>> getDeleteConfirmationPhrase() {
+        return ResponseEntity.ok(ApiResponse.ok("Confirmation phrase",
+                Map.of("phrase", DeleteAccountRequest.REQUIRED_PHRASE)));
     }
 }

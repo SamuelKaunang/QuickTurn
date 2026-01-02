@@ -15,6 +15,7 @@ import com.example.QucikTurn.dto.ApplicantResponse;
 import com.example.QucikTurn.dto.ApplyProjectRequest;
 import com.example.QucikTurn.dto.ApplyProjectResponse;
 import com.example.QucikTurn.Service.ActivityService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,29 +57,39 @@ public class ApplicationService {
         if (project.getStatus() != ProjectStatus.OPEN)
             throw new RuntimeException("Project closed");
 
+        // SECURITY: Soft check (can be bypassed by race condition, but DB constraint is
+        // backup)
         if (applicationRepo.existsByProjectIdAndStudentId(projectId, studentId)) {
             throw new RuntimeException("Already applied");
         }
 
-        Application application = new Application();
-        application.setProject(project);
-        application.setStudent(student);
-        application.setProposal(req.proposal());
-        application.setBidAmount(req.bidAmount());
-        application.setStatus(ApplicationStatus.PENDING);
+        try {
+            Application application = new Application();
+            application.setProject(project);
+            application.setStudent(student);
+            application.setProposal(req.proposal());
+            application.setBidAmount(req.bidAmount());
+            application.setStatus(ApplicationStatus.PENDING);
 
-        Application saved = applicationRepo.save(application);
+            Application saved = applicationRepo.save(application);
 
-        // Increment applicant count for social proof
-        project.incrementApplicantCount();
-        projectRepo.save(project);
+            // Increment applicant count for social proof
+            project.incrementApplicantCount();
+            projectRepo.save(project);
 
-        // Log activity for student
-        activityService.logActivity(student, ActivityService.TYPE_APPLIED, "Applied to project: " + project.getTitle(),
-                "PROJECT", project.getId());
+            // Log activity for student
+            activityService.logActivity(student, ActivityService.TYPE_APPLIED,
+                    "Applied to project: " + project.getTitle(),
+                    "PROJECT", project.getId());
 
-        return new ApplyProjectResponse(saved.getId(), saved.getProject().getId(), saved.getStudent().getId(),
-                saved.getStatus().name());
+            return new ApplyProjectResponse(saved.getId(), saved.getProject().getId(), saved.getStudent().getId(),
+                    saved.getStatus().name());
+
+        } catch (DataIntegrityViolationException e) {
+            // SECURITY FIX P0: Unique constraint violation = duplicate application attempt
+            // (race condition caught)
+            throw new RuntimeException("Already applied");
+        }
     }
 
     // --- LOGIC UMKM MELIHAT LIST PELAMAR ---

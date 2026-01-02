@@ -15,4 +15,7 @@ public interface UploadedFileRepository extends JpaRepository<UploadedFile, Long
     List<UploadedFile> findByUploaderIdAndFileType(Long uploaderId, FileType fileType);
 
     Optional<UploadedFile> findByStoredFilename(String storedFilename);
+
+    // For account deletion - delete all files uploaded by a user
+    void deleteByUploaderId(Long uploaderId);
 }

@@ -4,9 +4,10 @@ import com.example.QucikTurn.Entity.Project;
 import com.example.QucikTurn.Entity.UploadedFile;
 import com.example.QucikTurn.Entity.User;
 import com.example.QucikTurn.Entity.WorkSubmission;
+import com.example.QucikTurn.Entity.enums.ApplicationStatus;
+import com.example.QucikTurn.Repository.ApplicationRepository;
 import com.example.QucikTurn.Repository.ProjectRepository;
 import com.example.QucikTurn.Repository.WorkSubmissionRepository;
-import com.example.QucikTurn.Service.ActivityService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,27 +15,33 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
+@SuppressWarnings("null") // Suppress Eclipse null analysis false positives for JPA repository methods
 public class WorkSubmissionService {
 
     private final WorkSubmissionRepository submissionRepository;
     private final ProjectRepository projectRepository;
+    private final ApplicationRepository applicationRepository;
     private final FileStorageService fileStorageService;
     private final ActivityService activityService;
 
     public WorkSubmissionService(WorkSubmissionRepository submissionRepository,
             ProjectRepository projectRepository,
+            ApplicationRepository applicationRepository,
             FileStorageService fileStorageService,
             ActivityService activityService) {
         this.submissionRepository = submissionRepository;
         this.projectRepository = projectRepository;
+        this.applicationRepository = applicationRepository;
         this.fileStorageService = fileStorageService;
         this.activityService = activityService;
     }
 
     /**
      * Create a new work submission with files and links
+     * SECURITY FIX P3: Only approved applicants can submit work
      */
     @Transactional
     public WorkSubmission createSubmission(Long projectId, User submitter,
@@ -43,6 +50,14 @@ public class WorkSubmissionService {
         // Get project
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        // SECURITY FIX P3: Verify submitter is the approved applicant for this project
+        boolean isApprovedApplicant = applicationRepository.existsByProjectIdAndStudentIdAndStatus(
+                projectId, Objects.requireNonNull(submitter.getId(), "Submitter ID cannot be null"),
+                ApplicationStatus.APPROVED);
+        if (!isApprovedApplicant) {
+            throw new RuntimeException("Only approved applicants can submit work for this project");
+        }
 
         // Create submission
         WorkSubmission submission = new WorkSubmission(project, submitter, description, links);
@@ -82,17 +97,43 @@ public class WorkSubmissionService {
 
     /**
      * Get all submissions for a project
+     * SECURITY FIX P1: Only project owner or approved applicant can view
+     * submissions
      */
-    public List<WorkSubmission> getProjectSubmissions(Long projectId) {
+    public List<WorkSubmission> getProjectSubmissions(Long projectId, User requester) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        // SECURITY FIX P1: Verify requester is owner OR approved applicant
+        boolean isOwner = project.getOwner().getId().equals(requester.getId());
+        boolean isApprovedApplicant = applicationRepository.existsByProjectIdAndStudentIdAndStatus(
+                projectId, Objects.requireNonNull(requester.getId(), "Requester ID cannot be null"),
+                ApplicationStatus.APPROVED);
+
+        if (!isOwner && !isApprovedApplicant) {
+            throw new RuntimeException("Access denied: You are not authorized to view these submissions");
+        }
+
         return submissionRepository.findByProjectIdOrderBySubmittedAtDesc(projectId);
     }
 
     /**
      * Get submission by ID
+     * SECURITY FIX P2: Only submitter or project owner can view specific submission
      */
-    public WorkSubmission getSubmissionById(Long submissionId) {
-        return submissionRepository.findById(submissionId)
+    public WorkSubmission getSubmissionById(Long submissionId, User requester) {
+        WorkSubmission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
+
+        // SECURITY FIX P2: Verify requester is submitter OR project owner
+        boolean isSubmitter = submission.getSubmittedBy().getId().equals(requester.getId());
+        boolean isProjectOwner = submission.getProject().getOwner().getId().equals(requester.getId());
+
+        if (!isSubmitter && !isProjectOwner) {
+            throw new RuntimeException("Access denied: You are not authorized to view this submission");
+        }
+
+        return submission;
     }
 
     /**

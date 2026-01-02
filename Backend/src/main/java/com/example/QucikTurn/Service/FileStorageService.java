@@ -7,6 +7,8 @@ import com.example.QucikTurn.Entity.enums.FileType;
 import com.example.QucikTurn.Repository.UploadedFileRepository;
 import com.example.QucikTurn.Repository.UserRepository;
 import com.example.QucikTurn.Repository.ProjectRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +22,10 @@ import java.util.*;
  * database.
  */
 @Service
+@SuppressWarnings("null") // Suppress Eclipse null analysis false positives for JPA repository methods
 public class FileStorageService {
+
+    private static final Logger log = LoggerFactory.getLogger(FileStorageService.class);
 
     private final AzureBlobService azureBlobService;
     private final UploadedFileRepository uploadedFileRepository;
@@ -243,7 +248,7 @@ public class FileStorageService {
         boolean deleted = azureBlobService.deleteFile(blobUrl);
 
         if (!deleted) {
-            System.err.println("Warning: Could not delete file from Azure: " + blobUrl);
+            log.warn("Could not delete file from Azure: {}", blobUrl);
         }
 
         // If it's a profile picture, clear the user's profilePictureUrl

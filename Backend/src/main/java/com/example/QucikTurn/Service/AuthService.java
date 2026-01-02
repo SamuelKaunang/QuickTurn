@@ -60,7 +60,20 @@ public class AuthService {
         user.setNama(request.nama());
         user.setEmail(request.email());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
-        user.setRole(request.role() == null ? Role.MAHASISWA : request.role());
+
+        // SECURITY FIX P0: Whitelist allowed roles to prevent privilege escalation
+        // Only MAHASISWA and UMKM are allowed during self-registration
+        // ADMIN role can only be assigned by existing admins through admin panel
+        Role requestedRole = request.role();
+        if (requestedRole == null) {
+            requestedRole = Role.MAHASISWA; // Default role
+        } else if (requestedRole != Role.MAHASISWA && requestedRole != Role.UMKM) {
+            // Prevent mass assignment attack - only whitelist MAHASISWA and UMKM
+            log.warn("Attempted privilege escalation: user tried to register as {} with email: {}",
+                    requestedRole, maskEmail(request.email()));
+            requestedRole = Role.MAHASISWA; // Downgrade to safe default
+        }
+        user.setRole(requestedRole);
         userRepository.save(user);
 
         var claims = new HashMap<String, Object>();

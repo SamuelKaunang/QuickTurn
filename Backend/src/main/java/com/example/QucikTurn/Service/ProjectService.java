@@ -14,16 +14,17 @@ import com.example.QucikTurn.Entity.WorkSubmission;
 import com.example.QucikTurn.dto.CreateProjectRequest;
 import com.example.QucikTurn.dto.ProjectWithStatusResponse;
 import com.example.QucikTurn.dto.UmkmProjectResponse;
-import com.example.QucikTurn.Service.ActivityService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@SuppressWarnings("null") // Suppress Eclipse null analysis false positives for JPA repository methods
 public class ProjectService {
 
     private final ProjectRepository projectRepo;
@@ -45,6 +46,7 @@ public class ProjectService {
     // --- UMKM: Post Project ---
     @Transactional
     public Project createProject(Long ownerId, CreateProjectRequest req) {
+        Objects.requireNonNull(ownerId, "Owner ID cannot be null");
         User owner = userRepo.findById(ownerId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -192,9 +194,6 @@ public class ProjectService {
         if (application.getStatus() != ApplicationStatus.APPROVED) {
             throw new RuntimeException("Only approved applicants can submit finishing");
         }
-
-        User student = userRepo.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (project.getStatus() != ProjectStatus.ONGOING) {
             throw new RuntimeException("Project is not in ONGOING status");

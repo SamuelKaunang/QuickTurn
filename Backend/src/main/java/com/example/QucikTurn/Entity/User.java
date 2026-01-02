@@ -1,5 +1,6 @@
 package com.example.QucikTurn.Entity;
 
+import com.example.QucikTurn.Entity.enums.AccountStatus;
 import com.example.QucikTurn.Entity.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -31,6 +32,15 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role = Role.MAHASISWA;
+
+    // Account status for soft-delete functionality
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status", nullable = false, length = 20)
+    private AccountStatus accountStatus = AccountStatus.ACTIVE;
+
+    // Timestamp when account was deleted (for audit purposes)
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
@@ -310,5 +320,28 @@ public class User implements UserDetails {
 
     public void setGithubUrl(String githubUrl) {
         this.githubUrl = githubUrl;
+    }
+
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    /**
+     * Helper method to check if account is deleted
+     */
+    public boolean isDeleted() {
+        return accountStatus == AccountStatus.DELETED;
     }
 }

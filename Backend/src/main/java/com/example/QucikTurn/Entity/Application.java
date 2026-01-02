@@ -6,7 +6,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "project_applications")
+@Table(name = "project_applications", uniqueConstraints = {
+        // SECURITY FIX P0: Prevent race condition - one student can only apply once per
+        // project
+        @UniqueConstraint(columnNames = { "project_id", "applicant_id" }, name = "uk_project_applicant")
+})
 public class Application {
 
     @Id
@@ -37,10 +41,10 @@ public class Application {
     // Finishing mechanism fields
     @Column(name = "finishing_submitted_at")
     private LocalDateTime finishingSubmittedAt;
-    
+
     @Column(name = "finishing_link")
     private String finishingLink;
-    
+
     @Column(name = "is_finished_by_student")
     private Boolean isFinishedByStudent = false;
 
@@ -50,29 +54,79 @@ public class Application {
     }
 
     // --- Getters & Setters ---
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public Project getProject() { return project; }
-    public void setProject(Project project) { this.project = project; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public User getStudent() { return student; }
-    public void setStudent(User student) { this.student = student; }
+    public Project getProject() {
+        return project;
+    }
 
-    public String getProposal() { return proposal; }
-    public void setProposal(String proposal) { this.proposal = proposal; }
+    public void setProject(Project project) {
+        this.project = project;
+    }
 
-    public BigDecimal getBidAmount() { return bidAmount; }
-    public void setBidAmount(BigDecimal bidAmount) { this.bidAmount = bidAmount; }
+    public User getStudent() {
+        return student;
+    }
 
-    public ApplicationStatus getStatus() { return status; }
-    public void setStatus(ApplicationStatus status) { this.status = status; }
+    public void setStudent(User student) {
+        this.student = student;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getFinishingSubmittedAt() { return finishingSubmittedAt; }
-    public void setFinishingSubmittedAt(LocalDateTime finishingSubmittedAt) { this.finishingSubmittedAt = finishingSubmittedAt; }
-    public String getFinishingLink() { return finishingLink; }
-    public void setFinishingLink(String finishingLink) { this.finishingLink = finishingLink; }
-    public Boolean getIsFinishedByStudent() { return isFinishedByStudent; }
-    public void setIsFinishedByStudent(Boolean isFinishedByStudent) { this.isFinishedByStudent = isFinishedByStudent; }
+    public String getProposal() {
+        return proposal;
+    }
+
+    public void setProposal(String proposal) {
+        this.proposal = proposal;
+    }
+
+    public BigDecimal getBidAmount() {
+        return bidAmount;
+    }
+
+    public void setBidAmount(BigDecimal bidAmount) {
+        this.bidAmount = bidAmount;
+    }
+
+    public ApplicationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ApplicationStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getFinishingSubmittedAt() {
+        return finishingSubmittedAt;
+    }
+
+    public void setFinishingSubmittedAt(LocalDateTime finishingSubmittedAt) {
+        this.finishingSubmittedAt = finishingSubmittedAt;
+    }
+
+    public String getFinishingLink() {
+        return finishingLink;
+    }
+
+    public void setFinishingLink(String finishingLink) {
+        this.finishingLink = finishingLink;
+    }
+
+    public Boolean getIsFinishedByStudent() {
+        return isFinishedByStudent;
+    }
+
+    public void setIsFinishedByStudent(Boolean isFinishedByStudent) {
+        this.isFinishedByStudent = isFinishedByStudent;
+    }
 }

@@ -149,6 +149,10 @@ public class ChatService {
                 .collect(Collectors.toMap(
                         User::getId,
                         user -> {
+                            // Show "Deleted User" for deleted accounts
+                            if (user.isDeleted()) {
+                                return "Deleted User";
+                            }
                             if (user.getNama() != null && !user.getNama().isEmpty()) {
                                 return user.getNama();
                             }

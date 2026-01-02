@@ -4,6 +4,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
+# SECURITY FIX P2: Disable source maps in production to prevent code exposure
+ENV GENERATE_SOURCEMAP=false
 RUN npm run build
 
 # Tahap 2: Production (Lingkungan Nginx)
@@ -11,7 +14,7 @@ FROM nginx:stable-alpine
 
 # [FIXED] Salin config Nginx custom lu ke dalem container
 # Ini bakal nimpa config default si Nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf  
 
 # Salin hasil build dari tahap sebelumnya
 COPY --from=build /app/build /usr/share/nginx/html

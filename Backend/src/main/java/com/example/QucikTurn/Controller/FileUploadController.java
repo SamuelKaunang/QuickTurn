@@ -65,13 +65,18 @@ public class FileUploadController {
         }
     }
 
-    // --- GET PROJECT SUBMISSIONS (for UMKM) ---
+    // --- GET PROJECT SUBMISSIONS (for UMKM or approved applicant) ---
     @GetMapping("/submissions/{projectId}")
     public ResponseEntity<ApiResponse<List<WorkSubmission>>> getProjectSubmissions(
             @AuthenticationPrincipal User user,
             @PathVariable Long projectId) {
-        List<WorkSubmission> submissions = workSubmissionService.getProjectSubmissions(projectId);
-        return ResponseEntity.ok(ApiResponse.ok("Submissions retrieved", submissions));
+        try {
+            // SECURITY: Service now verifies ownership/access rights
+            List<WorkSubmission> submissions = workSubmissionService.getProjectSubmissions(projectId, user);
+            return ResponseEntity.ok(ApiResponse.ok("Submissions retrieved", submissions));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     // --- GET SINGLE SUBMISSION ---
@@ -80,7 +85,8 @@ public class FileUploadController {
             @AuthenticationPrincipal User user,
             @PathVariable Long submissionId) {
         try {
-            WorkSubmission submission = workSubmissionService.getSubmissionById(submissionId);
+            // SECURITY: Service now verifies ownership/access rights
+            WorkSubmission submission = workSubmissionService.getSubmissionById(submissionId, user);
             return ResponseEntity.ok(ApiResponse.ok("Submission retrieved", submission));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));

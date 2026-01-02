@@ -4,11 +4,15 @@ import com.resend.Resend;
 import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.CreateEmailOptions;
 import com.resend.services.emails.model.CreateEmailResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
     private final Resend resend;
     private final String fromEmail;
@@ -59,13 +63,27 @@ public class EmailService {
                     .build();
 
             CreateEmailResponse response = resend.emails().send(createEmailOptions);
-            System.out
-                    .println("✅ Verification code berhasil dikirim ke: " + toEmail + " (ID: " + response.getId() + ")");
+            log.info("Verification code sent successfully to: {} (ID: {})", maskEmail(toEmail), response.getId());
 
         } catch (ResendException e) {
-            System.err.println("❌ Gagal mengirim email via Resend: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Failed to send verification email to: {} - {}", maskEmail(toEmail), e.getMessage());
             throw new RuntimeException("Gagal mengirim email. Silakan coba lagi nanti.");
         }
+    }
+
+    /**
+     * SECURITY: Mask email for logging (e.g., "sam***@gmail.com")
+     */
+    private String maskEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            return "***";
+        }
+        String[] parts = email.split("@");
+        String local = parts[0];
+        String domain = parts[1];
+        if (local.length() <= 3) {
+            return local.charAt(0) + "***@" + domain;
+        }
+        return local.substring(0, 3) + "***@" + domain;
     }
 }

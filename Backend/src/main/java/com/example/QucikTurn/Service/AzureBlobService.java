@@ -6,6 +6,8 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobHttpHeaders;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +24,8 @@ import java.util.UUID;
 @Service
 public class AzureBlobService {
 
+    private static final Logger log = LoggerFactory.getLogger(AzureBlobService.class);
+
     @Value("${azure.storage.connection-string}")
     private String connectionString;
 
@@ -33,8 +37,8 @@ public class AzureBlobService {
     @PostConstruct
     public void init() {
         if (connectionString == null || connectionString.isEmpty()) {
-            System.err.println("WARNING: Azure Storage connection string is not configured. " +
-                    "File uploads will fail until AZURE_STORAGE_CONNECTION_STRING is set.");
+            log.warn(
+                    "Azure Storage connection string is not configured. File uploads will fail until AZURE_STORAGE_CONNECTION_STRING is set.");
             return;
         }
 
@@ -48,12 +52,12 @@ public class AzureBlobService {
             // Create container if it doesn't exist
             if (!containerClient.exists()) {
                 containerClient.create();
-                System.out.println("Created Azure Blob container: " + containerName);
+                log.info("Created Azure Blob container: {}", containerName);
             }
 
-            System.out.println("Azure Blob Storage initialized successfully. Container: " + containerName);
+            log.info("Azure Blob Storage initialized successfully. Container: {}", containerName);
         } catch (Exception e) {
-            System.err.println("Failed to initialize Azure Blob Storage: " + e.getMessage());
+            log.error("Failed to initialize Azure Blob Storage: {}", e.getMessage());
             throw new RuntimeException("Failed to initialize Azure Blob Storage", e);
         }
     }
@@ -91,7 +95,7 @@ public class AzureBlobService {
             blobClient.setHttpHeaders(headers);
 
             String blobUrl = blobClient.getBlobUrl();
-            System.out.println("File uploaded to Azure Blob: " + blobUrl);
+            log.debug("File uploaded to Azure Blob: {}", blobUrl);
 
             return blobUrl;
         } catch (Exception e) {
@@ -146,21 +150,21 @@ public class AzureBlobService {
             // Extract blob name from URL
             String blobName = extractBlobNameFromUrl(blobUrl);
             if (blobName == null) {
-                System.err.println("Could not extract blob name from URL: " + blobUrl);
+                log.warn("Could not extract blob name from URL: {}", blobUrl);
                 return false;
             }
 
             BlobClient blobClient = containerClient.getBlobClient(blobName);
             if (blobClient.exists()) {
                 blobClient.delete();
-                System.out.println("Deleted blob: " + blobName);
+                log.debug("Deleted blob: {}", blobName);
                 return true;
             } else {
-                System.out.println("Blob not found: " + blobName);
+                log.debug("Blob not found: {}", blobName);
                 return false;
             }
         } catch (Exception e) {
-            System.err.println("Failed to delete blob: " + e.getMessage());
+            log.error("Failed to delete blob: {}", e.getMessage());
             return false;
         }
     }
@@ -228,7 +232,7 @@ public class AzureBlobService {
                 return blobUrl.substring(containerIndex + containerPath.length());
             }
         } catch (Exception e) {
-            System.err.println("Error extracting blob name: " + e.getMessage());
+            log.warn("Error extracting blob name: {}", e.getMessage());
         }
         return null;
     }

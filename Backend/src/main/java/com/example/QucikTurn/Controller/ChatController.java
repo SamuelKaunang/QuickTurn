@@ -88,11 +88,17 @@ public class ChatController {
                 responseDTO.setFileSize(saved.getFileSize());
             }
 
-            // Get sender name
+            // Get sender name (show "Deleted User" if account is deleted)
             Long senderIdValue = saved.getSenderId();
             if (senderIdValue != null) {
                 userRepository.findById(senderIdValue)
-                        .ifPresent(sender -> responseDTO.setSenderName(sender.getNama()));
+                        .ifPresent(sender -> {
+                            if (sender.isDeleted()) {
+                                responseDTO.setSenderName("Deleted User");
+                            } else {
+                                responseDTO.setSenderName(sender.getNama());
+                            }
+                        });
             }
 
             // Send to recipient

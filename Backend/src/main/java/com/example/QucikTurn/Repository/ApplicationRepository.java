@@ -1,6 +1,7 @@
 package com.example.QucikTurn.Repository;
 
 import com.example.QucikTurn.Entity.Application;
+import com.example.QucikTurn.Entity.enums.ApplicationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -10,6 +11,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     // Cek apakah mahasiswa sudah pernah apply ke project tertentu
     boolean existsByProjectIdAndStudentId(Long projectId, Long studentId);
+
+    // SECURITY: Check if student has specific application status for a project
+    boolean existsByProjectIdAndStudentIdAndStatus(Long projectId, Long studentId, ApplicationStatus status);
 
     // Ambil semua aplikasi untuk satu project (UMKM lihat siapa saja yang apply)
     List<Application> findByProjectId(Long projectId);
@@ -25,4 +29,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     // Count applications for a project
     int countByProjectId(Long projectId);
+
+    // For account deletion - delete all applications for a project
+    void deleteByProjectId(Long projectId);
 }
