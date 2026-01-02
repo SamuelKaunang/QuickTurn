@@ -424,6 +424,49 @@ const DashboardU = () => {
         projectId={submissionViewProjectId}
         token={token}
       />
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="mobile-nav">
+        <div className="mobile-nav-inner">
+          <button
+            className={`mobile-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveTab('dashboard')}
+          >
+            <LayoutDashboard size={22} />
+            <span>Dashboard</span>
+          </button>
+          <button
+            className={`mobile-nav-item ${activeTab === 'projects' ? 'active' : ''}`}
+            onClick={() => setActiveTab('projects')}
+          >
+            <Briefcase size={22} />
+            <span>Projects</span>
+          </button>
+          <button
+            className="mobile-nav-item mobile-nav-add"
+            onClick={() => navigate('/post-project')}
+          >
+            <Plus size={24} />
+          </button>
+          <div className="mobile-nav-item-wrapper">
+            <button
+              className="mobile-nav-item"
+              onClick={() => navigate('/chat')}
+            >
+              <MessageSquare size={22} />
+              <span>Messages</span>
+              {unreadCount > 0 && <span className="nav-badge">{unreadCount}</span>}
+            </button>
+          </div>
+          <button
+            className="mobile-nav-item"
+            onClick={() => navigate('/profile-umkm')}
+          >
+            <Users size={22} />
+            <span>Profile</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 };

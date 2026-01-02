@@ -1673,3 +1673,107 @@
 .btn-brand:active {
     transform: scale(0.98);
 }
+
+/* =========================================
+   MOBILE BOTTOM NAVIGATION
+   ========================================= */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--slate-200);
+    padding: 8px 12px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.mobile-nav-inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    color: var(--slate-500);
+    font-size: 0.65rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 12px;
+    min-width: 60px;
+    font-family: inherit;
+}
+
+.mobile-nav-item:active {
+    transform: scale(0.95);
+}
+
+.mobile-nav-item.active {
+    color: var(--brand);
+    background: var(--brand-light);
+}
+
+.mobile-nav-item svg {
+    width: 22px;
+    height: 22px;
+}
+
+.mobile-nav-item .nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    min-width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+.mobile-nav-item-wrapper {
+    position: relative;
+}
+
+/* Show mobile nav on mobile, hide sidebar content body padding */
+@media (max-width: 768px) {
+    .mobile-nav {
+        display: block;
+    }
+
+    .main-content {
+        padding-bottom: 90px;
+    }
+
+    .content-body {
+        padding-bottom: 80px;
+    }
+
+    /* Hide search box on very small screens */
+    .topbar .search-box {
+        display: none;
+    }
+
+    .topbar-greeting {
+        display: none;
+    }
+}

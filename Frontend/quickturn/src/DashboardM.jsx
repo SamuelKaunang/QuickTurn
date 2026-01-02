@@ -441,6 +441,50 @@ const DashboardM = () => {
                 isOpen={showSettingsModal}
                 onClose={() => setShowSettingsModal(false)}
             />
+
+            {/* Mobile Bottom Navigation */}
+            <nav className="mobile-nav">
+                <div className="mobile-nav-inner">
+                    <button
+                        className={`mobile-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('dashboard')}
+                    >
+                        <LayoutDashboard size={22} />
+                        <span>{t('dashboard')}</span>
+                    </button>
+                    <button
+                        className={`mobile-nav-item ${activeTab === 'browse' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('browse')}
+                    >
+                        <Search size={22} />
+                        <span>{t('browseProjects')}</span>
+                    </button>
+                    <button
+                        className={`mobile-nav-item ${activeTab === 'active' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('active')}
+                    >
+                        <Briefcase size={22} />
+                        <span>{t('myProjects')}</span>
+                    </button>
+                    <div className="mobile-nav-item-wrapper">
+                        <button
+                            className="mobile-nav-item"
+                            onClick={() => navigate('/chat')}
+                        >
+                            <MessageSquare size={22} />
+                            <span>{t('messages')}</span>
+                            {unreadCount > 0 && <span className="nav-badge">{unreadCount}</span>}
+                        </button>
+                    </div>
+                    <button
+                        className="mobile-nav-item"
+                        onClick={() => navigate('/profile-mahasiswa')}
+                    >
+                        <Users size={22} />
+                        <span>{t('profile')}</span>
+                    </button>
+                </div>
+            </nav>
         </div>
     );
 };

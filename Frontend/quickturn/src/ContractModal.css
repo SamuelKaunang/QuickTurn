@@ -229,3 +229,44 @@
         transform: rotate(360deg);
     }
 }
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .contract-modal-overlay {
+        padding: 12px;
+        align-items: flex-end;
+    }
+
+    .contract-modal-box {
+        max-height: 90vh;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .contract-modal-header {
+        padding: 14px 16px;
+    }
+
+    .contract-title h3 {
+        font-size: 1rem;
+    }
+
+    .contract-modal-body {
+        padding: 16px;
+    }
+
+    .contract-text {
+        padding: 14px;
+        font-size: 0.8rem;
+    }
+
+    .contract-modal-footer {
+        padding: 12px 16px;
+        flex-direction: column;
+    }
+
+    .contract-btn-secondary,
+    .contract-btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+}

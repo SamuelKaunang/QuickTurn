@@ -231,3 +231,41 @@
         opacity: 1;
     }
 }
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .modal-overlay-fixed {
+        padding: 12px;
+        align-items: flex-end;
+    }
+
+    .modal-box-modern {
+        width: 100%;
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .modal-header-modern {
+        padding: 14px 16px;
+    }
+
+    .modal-body-scroll {
+        padding: 16px;
+    }
+
+    .applicant-item {
+        flex-direction: column;
+        padding: 14px;
+    }
+
+    .applicant-actions {
+        flex-direction: row;
+        width: 100%;
+        margin-top: 12px;
+    }
+
+    .applicant-actions button {
+        flex: 1;
+    }
+}
