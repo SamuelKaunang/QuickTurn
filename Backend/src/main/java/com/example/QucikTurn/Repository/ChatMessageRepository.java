@@ -26,4 +26,8 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Stri
 
     // Find unread messages to mark as read
     List<ChatMessage> findByRecipientIdAndSenderIdAndIsReadFalse(Long recipientId, Long senderId);
+
+    // Get the latest message between two users (sorted by timestamp desc, limit 1)
+    @Query(value = "{ $or: [ { senderId: ?0, recipientId: ?1 }, { senderId: ?1, recipientId: ?0 } ] }", sort = "{ timestamp: -1 }")
+    List<ChatMessage> findLatestMessageBetweenUsers(Long userId1, Long userId2);
 }

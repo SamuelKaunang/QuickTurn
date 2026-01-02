@@ -4,5 +4,6 @@ public enum ProjectStatus {
     OPEN,
     ONGOING,
     DONE,
-    CLOSED
+    CLOSED,
+    OVERDUE // Deadline sudah terlewat tapi project belum selesai
 }

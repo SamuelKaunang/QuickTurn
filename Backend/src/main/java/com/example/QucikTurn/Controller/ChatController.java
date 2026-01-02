@@ -314,11 +314,36 @@ public class ChatController {
                                     new java.util.ArrayList<>(java.util.List.of(app.getProject().getTitle())));
                             contactMap.put("unreadCount", chatService.getUnreadCountFromSender(
                                     currentUser.getId(), umkmId));
+                            // Add last message time for sorting
+                            contactMap.put("lastMessageTime", chatService.getLastMessageTime(
+                                    currentUser.getId(), umkmId));
                             contactsMap.put(umkmId, contactMap);
                         }
                     });
 
-            return new java.util.ArrayList<>(contactsMap.values());
+            // Sort by lastMessageTime descending (most recent first), then by unread count
+            return contactsMap.values().stream()
+                    .sorted((a, b) -> {
+                        // First prioritize contacts with unread messages
+                        Long unreadA = (Long) a.getOrDefault("unreadCount", 0L);
+                        Long unreadB = (Long) b.getOrDefault("unreadCount", 0L);
+                        if (unreadB > 0 && unreadA == 0)
+                            return 1;
+                        if (unreadA > 0 && unreadB == 0)
+                            return -1;
+
+                        // Then sort by last message time
+                        java.time.LocalDateTime timeA = (java.time.LocalDateTime) a.get("lastMessageTime");
+                        java.time.LocalDateTime timeB = (java.time.LocalDateTime) b.get("lastMessageTime");
+                        if (timeA == null && timeB == null)
+                            return 0;
+                        if (timeA == null)
+                            return 1;
+                        if (timeB == null)
+                            return -1;
+                        return timeB.compareTo(timeA);
+                    })
+                    .collect(Collectors.toList());
         } else {
             // UMKM: get students with approved applications, deduplicated by userId
             Map<Long, Map<String, Object>> contactsMap = new java.util.LinkedHashMap<>();
@@ -349,11 +374,36 @@ public class ChatController {
                                     new java.util.ArrayList<>(java.util.List.of(app.getProject().getTitle())));
                             contactMap.put("unreadCount", chatService.getUnreadCountFromSender(
                                     currentUser.getId(), mahasiswaId));
+                            // Add last message time for sorting
+                            contactMap.put("lastMessageTime", chatService.getLastMessageTime(
+                                    currentUser.getId(), mahasiswaId));
                             contactsMap.put(mahasiswaId, contactMap);
                         }
                     });
 
-            return new java.util.ArrayList<>(contactsMap.values());
+            // Sort by lastMessageTime descending (most recent first), then by unread count
+            return contactsMap.values().stream()
+                    .sorted((a, b) -> {
+                        // First prioritize contacts with unread messages
+                        Long unreadA = (Long) a.getOrDefault("unreadCount", 0L);
+                        Long unreadB = (Long) b.getOrDefault("unreadCount", 0L);
+                        if (unreadB > 0 && unreadA == 0)
+                            return 1;
+                        if (unreadA > 0 && unreadB == 0)
+                            return -1;
+
+                        // Then sort by last message time
+                        java.time.LocalDateTime timeA = (java.time.LocalDateTime) a.get("lastMessageTime");
+                        java.time.LocalDateTime timeB = (java.time.LocalDateTime) b.get("lastMessageTime");
+                        if (timeA == null && timeB == null)
+                            return 0;
+                        if (timeA == null)
+                            return 1;
+                        if (timeB == null)
+                            return -1;
+                        return timeB.compareTo(timeA);
+                    })
+                    .collect(Collectors.toList());
         }
     }
 }

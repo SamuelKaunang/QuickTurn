@@ -30,6 +30,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     // Count applications for a project
     int countByProjectId(Long projectId);
 
+    // Find applications by project and status
+    List<Application> findByProjectIdAndStatus(Long projectId, ApplicationStatus status);
+
     // For account deletion - delete all applications for a project
     void deleteByProjectId(Long projectId);
 }

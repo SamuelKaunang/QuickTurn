@@ -135,6 +135,18 @@ public class ChatService {
         return hasContract;
     }
 
+    /**
+     * Get the timestamp of the last message between two users
+     * Used for sorting contacts by most recent conversation
+     */
+    public java.time.LocalDateTime getLastMessageTime(Long userId1, Long userId2) {
+        List<ChatMessage> messages = chatMessageRepository.findLatestMessageBetweenUsers(userId1, userId2);
+        if (messages != null && !messages.isEmpty()) {
+            return messages.get(0).getTimestamp();
+        }
+        return null;
+    }
+
     // -------- PRIVATE HELPER METHODS --------
 
     private void validateChatPermission(Long userId1, Long userId2) {

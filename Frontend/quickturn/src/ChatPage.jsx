@@ -123,7 +123,15 @@ const ChatPage = () => {
 
             const fixedContacts = (data.data || [])
                 .map(c => ({ ...c, userId: c.userId || c.id }))
-                .filter(c => c.userId != user.id);
+                .filter(c => c.userId != user.id)
+                // Sort by unread count (highest first), then by name
+                .sort((a, b) => {
+                    // Prioritize contacts with unread messages
+                    if ((b.unreadCount || 0) !== (a.unreadCount || 0)) {
+                        return (b.unreadCount || 0) - (a.unreadCount || 0);
+                    }
+                    return a.name?.localeCompare(b.name || '') || 0;
+                });
 
             setContacts(fixedContacts);
         } catch (err) { console.error(err); }
@@ -140,6 +148,35 @@ const ChatPage = () => {
                 const newMessage = JSON.parse(payload.body);
                 setMessages(prev => [...prev, newMessage]);
                 scrollToBottom();
+
+                // Update unread count for the sender in contacts list
+                // Only if the message is from someone else and not currently viewing their chat
+                const senderId = newMessage.senderId || newMessage.sender_id;
+                if (senderId && senderId !== myUserId) {
+                    setContacts(prevContacts => {
+                        const updated = prevContacts.map(contact => {
+                            if (contact.userId === senderId) {
+                                // If this contact's chat is currently active, don't increment
+                                // (messages are being read in real-time)
+                                if (activeChat?.userId === senderId) {
+                                    return contact;
+                                }
+                                return {
+                                    ...contact,
+                                    unreadCount: (contact.unreadCount || 0) + 1
+                                };
+                            }
+                            return contact;
+                        });
+                        // Re-sort contacts after update
+                        return updated.sort((a, b) => {
+                            if ((b.unreadCount || 0) !== (a.unreadCount || 0)) {
+                                return (b.unreadCount || 0) - (a.unreadCount || 0);
+                            }
+                            return a.name?.localeCompare(b.name || '') || 0;
+                        });
+                    });
+                }
             });
             setStompClient(client);
         }, (err) => console.error("WebSocket Error:", err));
@@ -321,7 +358,17 @@ const ChatPage = () => {
                             <div
                                 key={contact.userId}
                                 className={`contact-item ${activeChat?.userId === contact.userId ? 'active' : ''}`}
-                                onClick={() => setActiveChat(contact)}
+                                onClick={() => {
+                                    setActiveChat(contact);
+                                    // Clear unread count for this contact when selected
+                                    setContacts(prevContacts =>
+                                        prevContacts.map(c =>
+                                            c.userId === contact.userId
+                                                ? { ...c, unreadCount: 0 }
+                                                : c
+                                        )
+                                    );
+                                }}
                             >
                                 <div
                                     className="contact-avatar-wrapper"
@@ -347,6 +394,12 @@ const ChatPage = () => {
                                             : contact.projectTitle}
                                     </p>
                                 </div>
+                                {/* Unread Badge */}
+                                {contact.unreadCount > 0 && (
+                                    <span className="unread-badge">
+                                        {contact.unreadCount > 99 ? '99+' : contact.unreadCount}
+                                    </span>
+                                )}
                             </div>
                         ))
                     )}
