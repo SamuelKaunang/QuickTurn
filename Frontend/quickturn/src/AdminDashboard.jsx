@@ -7,6 +7,7 @@ import {
     Bold, Italic, List, Link as LinkIcon, Image as ImageIcon, AlignLeft,
     FileText, Activity, X, Flag
 } from 'lucide-react';
+import { api } from './utils/apiConfig';
 import './DashboardM.css'; // Reusing existing beautiful styles
 import logoQ from './assets/logo/logo Q.png';
 import logoText from './assets/logo/logo text.png';
@@ -58,7 +59,7 @@ const AdminDashboard = () => {
 
     const fetchPendingReports = async (authToken) => {
         try {
-            const res = await fetch("/api/reports/admin/pending-count", {
+            const res = await fetch(api("/api/reports/admin/pending-count"), {
                 headers: { "Authorization": `Bearer ${authToken}` }
             });
             const data = await res.json();
@@ -70,7 +71,7 @@ const AdminDashboard = () => {
 
     const fetchUsers = async (authToken) => {
         try {
-            const res = await fetch("/api/admin/users", {
+            const res = await fetch(api("/api/admin/users"), {
                 headers: { "Authorization": `Bearer ${authToken}` }
             });
             const data = await res.json();
@@ -85,7 +86,7 @@ const AdminDashboard = () => {
 
     const fetchAnnouncements = async (authToken) => {
         try {
-            const res = await fetch("/api/announcements", {
+            const res = await fetch(api("/api/announcements"), {
                 headers: { "Authorization": `Bearer ${authToken}` }
             });
             const data = await res.json();
@@ -100,7 +101,7 @@ const AdminDashboard = () => {
 
     const fetchProjects = async (authToken) => {
         try {
-            const res = await fetch("/api/admin/projects", {
+            const res = await fetch(api("/api/admin/projects"), {
                 headers: { "Authorization": `Bearer ${authToken}` }
             });
             const data = await res.json();
@@ -118,7 +119,7 @@ const AdminDashboard = () => {
         setShowLogsModal(true);
         setProjectLogs([]); // Clear previous
         try {
-            const res = await fetch(`/api/admin/projects/${project.id}/logs`, {
+            const res = await fetch(api(`/api/admin/projects/${project.id}/logs`), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await res.json();
@@ -131,7 +132,7 @@ const AdminDashboard = () => {
     const handleDeleteUser = async (userId) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
         try {
-            const res = await fetch(`/api/admin/users/${userId}`, {
+            const res = await fetch(api(`/api/admin/users/${userId}`), {
                 method: "DELETE",
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -145,7 +146,7 @@ const AdminDashboard = () => {
     const handleDeleteAnnouncement = async (id) => {
         if (!window.confirm("Delete this announcement?")) return;
         try {
-            const res = await fetch(`/api/announcements/${id}`, {
+            const res = await fetch(api(`/api/announcements/${id}`), {
                 method: "DELETE",
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -158,7 +159,7 @@ const AdminDashboard = () => {
     const handlePostAnnouncement = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch(`/api/announcements`, {
+            const res = await fetch(api(`/api/announcements`), {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
