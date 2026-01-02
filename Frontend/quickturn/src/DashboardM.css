@@ -447,16 +447,34 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 8px 16px 8px 20px;
-    background: var(--glass);
-    border: 1px solid var(--slate-200);
-    border-radius: 30px;
-    transition: all 0.25s ease;
+    padding: 10px 18px 10px 22px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 241, 242, 0.9) 100%);
+    border: 2px solid rgba(225, 29, 72, 0.15);
+    border-radius: 50px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(225, 29, 72, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative accent line */
+.profile-pill::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: linear-gradient(180deg, var(--brand) 0%, var(--brand-dark) 100%);
+    border-radius: 0 4px 4px 0;
 }
 
 .profile-pill:hover {
-    background: white;
-    box-shadow: 0 4px 12px var(--shadow-md);
+    background: linear-gradient(135deg, white 0%, rgba(255, 241, 242, 1) 100%);
+    border-color: rgba(225, 29, 72, 0.25);
+    box-shadow: 0 8px 24px rgba(225, 29, 72, 0.15);
+    transform: translateY(-2px);
 }
 
 .profile-info {
@@ -935,17 +953,20 @@
 }
 
 .stat-value {
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: 800;
-    color: var(--slate-900);
+    color: #0f172a;
     letter-spacing: -1px;
     margin-bottom: 4px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .stat-label {
-    color: var(--slate-500);
-    font-size: 0.9rem;
-    font-weight: 500;
+    color: #334155;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* =========================================
