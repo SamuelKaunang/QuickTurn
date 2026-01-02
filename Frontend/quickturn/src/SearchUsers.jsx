@@ -417,73 +417,69 @@ const SearchUsers = () => {
                             </div>
                         ) : (
                             <div className="users-grid">
-                                {results.map((user) => (
-                                    <div key={user.id} className="user-card" onClick={() => handleViewProfile(user.id)}>
+                                {results.map((userItem) => (
+                                    <div key={userItem.id} className="user-card" onClick={() => handleViewProfile(userItem.id)}>
                                         <div className="user-card-header">
                                             <div className="user-avatar">
-                                                {user.profilePictureUrl ? (
+                                                {userItem.profilePictureUrl ? (
                                                     <img
-                                                        src={user.profilePictureUrl}
-                                                        alt={user.nama}
+                                                        src={userItem.profilePictureUrl}
+                                                        alt={userItem.nama}
+                                                        className="avatar-image"
                                                         onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                                                     />
                                                 ) : null}
-                                                <div className="avatar-fallback" style={{ display: user.profilePictureUrl ? 'none' : 'flex' }}>
+                                                <div className="avatar-fallback" style={{ display: userItem.profilePictureUrl ? 'none' : 'flex' }}>
                                                     <User size={28} />
                                                 </div>
                                             </div>
-                                            <div className={`role-badge ${user.role?.toLowerCase()}`}>
-                                                {getRoleIcon(user.role)}
-                                                {getRoleLabel(user.role)}
+                                            <div className={`role-badge ${userItem.role?.toLowerCase()}`}>
+                                                {getRoleIcon(userItem.role)}
+                                                {getRoleLabel(userItem.role)}
                                             </div>
                                         </div>
 
                                         <div className="user-card-body">
-                                            <h3 className="user-name">{user.nama}</h3>
-                                            {user.username && <p className="user-username">@{user.username}</p>}
-                                            {user.headline && <p className="user-headline">{user.headline}</p>}
+                                            <h3 className="user-name">{userItem.nama}</h3>
+                                            {userItem.username && <p className="user-username">@{userItem.username}</p>}
+                                            {userItem.headline && <p className="user-headline">{userItem.headline}</p>}
 
                                             <div className="user-meta">
-                                                {user.bidang && (
+                                                {userItem.bidang && (
                                                     <span className="meta-item">
                                                         <Briefcase size={14} />
-                                                        {user.bidang}
+                                                        {userItem.bidang}
                                                     </span>
                                                 )}
-                                                {user.location && (
+                                                {userItem.location && (
                                                     <span className="meta-item">
                                                         <MapPin size={14} />
-                                                        {user.location}
+                                                        {userItem.location}
                                                     </span>
                                                 )}
                                             </div>
 
-                                            {/* NEW: General Field */}
-                                            <div className="user-general-info" style={{
-                                                marginTop: '8px',
-                                                marginBottom: '12px',
-                                                padding: '8px',
-                                                background: '#f8fafc',
-                                                borderRadius: '6px',
-                                                fontSize: '0.8rem',
-                                                color: '#475569',
-                                                textAlign: 'left'
-                                            }}>
-                                                <span style={{ fontWeight: '600', display: 'block', marginBottom: '2px', color: '#94a3b8', fontSize: '0.7rem', textTransform: 'uppercase' }}>General</span>
-                                                {user.bidang || "General Talent"}
-                                            </div>
-
-                                            <div className="user-stats">
-                                                {user.averageRating > 0 && (
-                                                    <span className="stat-item rating">
-                                                        <Star size={14} /> {user.averageRating.toFixed(1)}
+                                            {/* Rating Section - Replacing General */}
+                                            <div className="user-rating-box">
+                                                <span className="rating-label">Rating</span>
+                                                <div className="rating-content">
+                                                    <div className="rating-stars">
+                                                        {[1, 2, 3, 4, 5].map((star) => (
+                                                            <Star
+                                                                key={star}
+                                                                size={14}
+                                                                fill={star <= Math.round(userItem.averageRating || 0) ? '#f59e0b' : 'none'}
+                                                                color={star <= Math.round(userItem.averageRating || 0) ? '#f59e0b' : '#cbd5e1'}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                    <span className="rating-value">
+                                                        {userItem.averageRating ? userItem.averageRating.toFixed(1) : '0.0'}
                                                     </span>
-                                                )}
-                                                {user.totalReviews > 0 && (
-                                                    <span className="stat-item reviews">
-                                                        <Award size={14} /> {user.totalReviews} {t('reviews')}
+                                                    <span className="rating-reviews">
+                                                        ({userItem.totalReviews || 0} {t('reviews')})
                                                     </span>
-                                                )}
+                                                </div>
                                             </div>
                                         </div>
 

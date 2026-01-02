@@ -908,6 +908,15 @@
     margin-bottom: 32px;
 }
 
+/* Admin Stats Grid - 2x2 Layout */
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+
 .stat-card {
     padding: 24px;
     position: relative;

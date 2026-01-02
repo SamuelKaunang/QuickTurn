@@ -76,7 +76,7 @@ const DashboardU = () => {
 
   const fetchAnnouncements = async (authToken) => {
     try {
-      const res = await fetch("/api/announcements", {
+      const res = await fetch(api("/api/announcements"), {
         headers: { "Authorization": `Bearer ${authToken}` }
       });
       const data = await res.json();

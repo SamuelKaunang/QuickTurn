@@ -220,6 +220,22 @@
     display: inline-block;
 }
 
+.role-badge {
+    display: table;
+    margin: 12px auto 0;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.role-badge.talent {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(37, 99, 235, 0.1));
+    color: #7c3aed;
+}
+
 /* Sidebar Stats */
 .sidebar-stats {
     display: grid;

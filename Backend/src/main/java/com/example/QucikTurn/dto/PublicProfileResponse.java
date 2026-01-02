@@ -23,7 +23,13 @@ public record PublicProfileResponse(
         String address,
         String linkedinUrl,
         String githubUrl,
-        String phone) {
+        String phone,
+        String email,
+        // Social media fields for UMKM/Client
+        String youtubeUrl,
+        String instagramUrl,
+        String facebookUrl,
+        String businessWebsite) {
     public static PublicProfileResponse from(User user) {
         return new PublicProfileResponse(
                 user.getId(),
@@ -45,6 +51,12 @@ public record PublicProfileResponse(
                 user.getAddress(),
                 user.getLinkedinUrl(),
                 user.getGithubUrl(),
-                user.getPhone());
+                user.getPhone(),
+                user.getEmail(),
+                // Social media fields for UMKM/Client
+                user.getYoutubeUrl(),
+                user.getInstagramUrl(),
+                user.getFacebookUrl(),
+                user.getBusinessWebsite());
     }
 }

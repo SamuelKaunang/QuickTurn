@@ -229,6 +229,22 @@
     display: inline-block;
 }
 
+.role-badge {
+    display: table;
+    margin: 12px auto 0;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.role-badge.client {
+    background: linear-gradient(135deg, rgba(225, 29, 72, 0.1), rgba(190, 18, 60, 0.1));
+    color: #e11d48;
+}
+
 /* Sidebar Stats */
 .sidebar-stats {
     display: grid;

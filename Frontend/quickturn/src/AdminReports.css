@@ -267,7 +267,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 16px;
+    padding: 12px 20px;
     background: var(--glass);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -276,14 +276,23 @@
     position: relative;
     box-shadow: 0 2px 8px var(--shadow-sm);
     transition: all 0.25s ease;
+    white-space: nowrap;
+    min-width: fit-content;
 }
 
 .filter-group:hover {
     box-shadow: 0 4px 12px var(--shadow-md);
+    border-color: var(--slate-300);
+}
+
+.filter-group:focus-within {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1);
 }
 
 .filter-group svg:first-child {
     color: var(--slate-500);
+    flex-shrink: 0;
 }
 
 .filter-group select {
@@ -293,25 +302,40 @@
     font-size: 0.9rem;
     font-family: inherit;
     cursor: pointer;
-    padding-right: 24px;
+    padding-right: 28px;
     appearance: none;
-    font-weight: 500;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    font-weight: 600;
+    min-width: 80px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0 center;
 }
 
 .filter-group select:focus {
     outline: none;
 }
 
+.filter-group select:hover {
+    color: var(--brand);
+}
+
 .filter-group select option {
     background: white;
     color: var(--slate-700);
+    padding: 12px 16px;
+    font-weight: 500;
+}
+
+.filter-group select option:checked {
+    background: var(--brand-light);
+    color: var(--brand-dark);
 }
 
 .select-arrow {
-    position: absolute;
-    right: 12px;
-    pointer-events: none;
-    color: var(--slate-400);
+    display: none;
+    /* Hidden since we use background-image now */
 }
 
 /* Reports Container */

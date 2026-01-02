@@ -227,7 +227,7 @@ const AdminDashboard = () => {
                 </header>
 
                 <section className="content-body" style={{ paddingTop: '2rem' }}>
-                    <div className="stats-grid mb-6">
+                    <div className="admin-stats-grid mb-6">
                         <GlassCard className="stat-card">
                             <h3 className="stat-value" style={{ color: 'var(--slate-900)' }}>{stats.totalUsers}</h3>
                             <p className="stat-label" style={{ color: 'var(--slate-500)' }}>Total Users</p>
