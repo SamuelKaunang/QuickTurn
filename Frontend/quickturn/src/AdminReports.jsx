@@ -13,7 +13,7 @@ const AdminReports = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const token = sessionStorage.getItem("token");
-    const userRole = sessionStorage.getItem("userRole");
+    const userRole = sessionStorage.getItem("role");
 
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);

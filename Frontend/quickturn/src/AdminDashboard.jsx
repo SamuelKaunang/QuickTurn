@@ -78,7 +78,9 @@ const AdminDashboard = () => {
                 setUsers(data.data || []);
                 setStats(prev => ({ ...prev, totalUsers: (data.data || []).length }));
             }
-        } catch (err) { /* Silently handle error */ }
+        } catch (err) {
+            console.error("Error fetching users:", err);
+        }
     };
 
     const fetchAnnouncements = async (authToken) => {
@@ -91,7 +93,9 @@ const AdminDashboard = () => {
                 setAnnouncements(data.data || []);
                 setStats(prev => ({ ...prev, totalAnnouncements: (data.data || []).length }));
             }
-        } catch (err) { /* Silently handle error */ }
+        } catch (err) {
+            console.error("Error fetching announcements:", err);
+        }
     }
 
     const fetchProjects = async (authToken) => {
@@ -104,7 +108,9 @@ const AdminDashboard = () => {
                 setProjects(data.data || []);
                 setStats(prev => ({ ...prev, totalProjects: (data.data || []).length }));
             }
-        } catch (err) { /* Silently handle error */ }
+        } catch (err) {
+            console.error("Error fetching projects:", err);
+        }
     }
 
     const handleViewLogs = async (project) => {
