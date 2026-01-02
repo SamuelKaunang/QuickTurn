@@ -279,30 +279,32 @@ const DashboardM = () => {
                         <span className="greeting-role">{t('talentDashboard')}</span>
                     </div>
 
-                    {/* Right side - Profile */}
-                    <div className="topbar-actions">
-                        <div
-                            className="profile-pill"
-                            onClick={() => navigate('/profile-mahasiswa')}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            <div className="profile-info">
-                                <p className="p-name">{user?.name || t('talent')}</p>
-                                <p className="p-status">{t('proLevel')}</p>
-                            </div>
-                            {user?.profilePicture ? (
-                                <img
-                                    src={user.profilePicture}
-                                    alt="Profile"
-                                    className="avatar-img"
-                                />
-                            ) : (
-                                <div className="avatar-placeholder">
-                                    <Users size={20} />
+                    {/* Right side - Profile - HIDDEN on Browse Projects (Search Project) page */}
+                    {activeTab !== 'browse' && (
+                        <div className="topbar-actions">
+                            <div
+                                className="profile-pill"
+                                onClick={() => navigate('/profile-mahasiswa')}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <div className="profile-info">
+                                    <p className="p-name">{user?.name || t('talent')}</p>
+                                    <p className="p-status">{t('proLevel')}</p>
                                 </div>
-                            )}
+                                {user?.profilePicture ? (
+                                    <img
+                                        src={user.profilePicture}
+                                        alt="Profile"
+                                        className="avatar-img"
+                                    />
+                                ) : (
+                                    <div className="avatar-placeholder">
+                                        <Users size={20} />
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </header>
 
                 <section className="content-body">
