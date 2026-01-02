@@ -488,6 +488,7 @@ const ChatPage = () => {
                 </div>
             </main>
 
+            {/* Settings Modal */}
             <SettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
         </div>
     );

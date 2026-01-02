@@ -26,7 +26,7 @@ const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [announcements, setAnnouncements] = useState([]);
     const [projects, setProjects] = useState([]);
-    const [stats, setStats] = useState({ totalUsers: 0, totalAnnouncements: 0, totalProjects: 0 });
+    const [stats, setStats] = useState({ totalUsers: 0, totalAnnouncements: 0, totalProjects: 0, pendingReports: 0 });
 
     // Logs Modal State
     const [showLogsModal, setShowLogsModal] = useState(false);
@@ -52,8 +52,21 @@ const AdminDashboard = () => {
         fetchUsers(storedToken);
         fetchAnnouncements(storedToken);
         fetchProjects(storedToken);
+        fetchPendingReports(storedToken);
 
     }, [navigate]);
+
+    const fetchPendingReports = async (authToken) => {
+        try {
+            const res = await fetch("/api/reports/admin/pending-count", {
+                headers: { "Authorization": `Bearer ${authToken}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setStats(prev => ({ ...prev, pendingReports: data.data.count || 0 }));
+            }
+        } catch (err) { console.error(err); }
+    }
 
     const fetchUsers = async (authToken) => {
         try {
@@ -213,12 +226,25 @@ const AdminDashboard = () => {
                             <p className="stat-label" style={{ color: 'var(--slate-500)' }}>Total Users</p>
                         </GlassCard>
                         <GlassCard className="stat-card">
+                            <h3 className="stat-value" style={{ color: 'var(--slate-900)' }}>{stats.totalProjects}</h3>
+                            <p className="stat-label" style={{ color: 'var(--slate-500)' }}>Total Projects</p>
+                        </GlassCard>
+                        <GlassCard className="stat-card">
                             <h3 className="stat-value" style={{ color: 'var(--slate-900)' }}>{stats.totalAnnouncements}</h3>
                             <p className="stat-label" style={{ color: 'var(--slate-500)' }}>Announcements</p>
                         </GlassCard>
-                        <GlassCard className="stat-card">
-                            <h3 className="stat-value" style={{ color: 'var(--slate-900)' }}>{stats.totalProjects}</h3>
-                            <p className="stat-label" style={{ color: 'var(--slate-500)' }}>Total Projects</p>
+                        <GlassCard
+                            className="stat-card pending-reports-card"
+                            onClick={() => navigate('/admin/reports')}
+                            style={{ cursor: 'pointer', border: '1px solid #feccae', background: '#fff7ed' }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <h3 className="stat-value" style={{ color: '#c2410c' }}>{stats.pendingReports}</h3>
+                                {stats.pendingReports > 0 && <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ea580c' }}></span>}
+                            </div>
+                            <p className="stat-label" style={{ color: '#9a3412', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Flag size={14} /> Pending Reports
+                            </p>
                         </GlassCard>
                     </div>
 
