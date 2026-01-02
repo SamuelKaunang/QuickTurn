@@ -274,7 +274,7 @@ const DashboardM = () => {
                 <header className="topbar">
                     {/* Left side - Greeting/Branding */}
                     <div className="topbar-greeting">
-                        <span className="greeting-text">👋 {t('welcomeToQuickTurn')}</span>
+                        <span className="greeting-text">{t('welcomeToQuickTurn')}</span>
                         <span className="greeting-divider">|</span>
                         <span className="greeting-role">{t('talentDashboard')}</span>
                     </div>

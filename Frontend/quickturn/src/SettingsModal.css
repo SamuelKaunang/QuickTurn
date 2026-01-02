@@ -164,8 +164,18 @@
 }
 
 /* Special elements */
-.flag-emoji {
-    font-size: 1.2rem;
+.flag-label {
+    font-weight: 700;
+    font-size: 0.75rem;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: white;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
 }
 
 .currency-symbol {

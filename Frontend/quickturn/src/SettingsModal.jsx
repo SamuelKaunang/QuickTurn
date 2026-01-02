@@ -30,7 +30,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
             <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="settings-modal-header">
-                    <h2>⚙️ {t('settings')}</h2>
+                    <h2>{t('settings')}</h2>
                     <button className="btn-close-settings" onClick={handleCancel}>
                         <X size={20} />
                     </button>
@@ -49,7 +49,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
                                 className={`toggle-btn ${localSettings.language === 'id' ? 'active' : ''}`}
                                 onClick={() => handleChange('language', 'id')}
                             >
-                                <span className="flag-emoji">🇮🇩</span>
+                                <span className="flag-label">ID</span>
                                 <span>{t('indonesian')}</span>
                                 {localSettings.language === 'id' && <Check size={14} className="check-icon" />}
                             </button>
@@ -57,7 +57,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
                                 className={`toggle-btn ${localSettings.language === 'en' ? 'active' : ''}`}
                                 onClick={() => handleChange('language', 'en')}
                             >
-                                <span className="flag-emoji">🇺🇸</span>
+                                <span className="flag-label">EN</span>
                                 <span>{t('english')}</span>
                                 {localSettings.language === 'en' && <Check size={14} className="check-icon" />}
                             </button>
