@@ -70,6 +70,11 @@ services:
       # Azure Storage (Optional untuk dev - bisa dikosongkan)
       AZURE_STORAGE_CONNECTION_STRING: ${AZURE_STORAGE_CONNECTION_STRING:-}
       AZURE_STORAGE_CONTAINER_NAME: quickturn-files-dev
+      
+      # Google OAuth2 - WAJIB untuk Google Login
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      APP_FRONTEND_URL: http://localhost:3000
     ports:
       - "8080:8080"
     volumes:

@@ -695,3 +695,75 @@
   content: '✓ ';
   color: #22c55e;
 }
+
+/* =========================================
+   OAUTH DIVIDER & GOOGLE LOGIN BUTTON
+========================================= */
+
+/* OAuth Divider */
+.oauth-divider {
+  position: relative;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.oauth-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  border-top: 1px solid #e5e7eb;
+}
+
+.oauth-divider span {
+  position: relative;
+  background: white;
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: lowercase;
+}
+
+/* Google Login Button */
+.google-login-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.google-login-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.google-login-btn:active {
+  transform: scale(0.98);
+}
+
+.google-login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.google-login-btn .google-icon {
+  flex-shrink: 0;
+}
+
+.google-login-btn span {
+  font-weight: 600;
+}

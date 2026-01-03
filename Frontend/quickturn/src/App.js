@@ -17,6 +17,7 @@ import PublicProfile from './PublicProfile';
 import AdminDashboard from './AdminDashboard';
 import AdminReports from './AdminReports';
 import SearchUsers from './SearchUsers';
+import OAuth2Callback from './OAuth2Callback';
 
 
 function App() {
@@ -44,6 +45,9 @@ function App() {
                 <RegistrationPageM />
               </AuthRoute>
             } />
+
+            {/* OAuth2 Callback Route - Handles Google login redirect */}
+            <Route path="/oauth2/callback" element={<OAuth2Callback />} />
 
             {/* Protected Dashboard Routes */}
             <Route path="/dashboardu" element={

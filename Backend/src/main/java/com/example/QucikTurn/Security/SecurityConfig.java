@@ -1,6 +1,8 @@
 package com.example.QucikTurn.Security;
 
 import com.example.QucikTurn.Repository.UserRepository;
+import com.example.QucikTurn.Security.oauth2.CustomOAuth2UserService;
+import com.example.QucikTurn.Security.oauth2.OAuth2AuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -81,7 +83,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
             JwtAuthFilter jwtAuthFilter,
-            RateLimitingFilter rateLimitingFilter) throws Exception {
+            RateLimitingFilter rateLimitingFilter,
+            CustomOAuth2UserService customOAuth2UserService,
+            OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler) throws Exception {
         http
                 /*
                  * SECURITY NOTE P4: CSRF is disabled because:
@@ -101,6 +105,10 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/ws-raw/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/uploads/**")).permitAll()
 
+                        // --- OAUTH2 LOGIN ENDPOINTS (must be permitAll) ---
+                        .requestMatchers(new AntPathRequestMatcher("/oauth2/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/login/oauth2/**")).permitAll()
+
                         // --- ADMIN & ANNOUNCEMENTS ---
                         .requestMatchers(new AntPathRequestMatcher("/api/admin/**"))
                         .hasAnyAuthority("ROLE_ADMIN", "ADMIN")
@@ -112,7 +120,13 @@ public class SecurityConfig {
 
                         // Block everything else
                         .anyRequest().authenticated())
-                .httpBasic(basic -> basic.disable());
+                .httpBasic(basic -> basic.disable())
+
+                // --- OAUTH2 LOGIN CONFIGURATION ---
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler));
 
         // SECURITY FIX P1: Add rate limiting filter BEFORE authentication
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
