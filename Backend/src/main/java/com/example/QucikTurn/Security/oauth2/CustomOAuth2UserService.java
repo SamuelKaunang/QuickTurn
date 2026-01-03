@@ -54,11 +54,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             userRepository.save(user);
         } else {
-            // New user - create a new record
+            // New user - create a new record with NO ROLE (null)
+            // User will be asked to select their role after first login
             User newUser = new User();
             newUser.setEmail(email);
             newUser.setNama(name);
-            newUser.setRole(Role.MAHASISWA); // Default role for new OAuth users
+            newUser.setRole(null); // NULL = needs role selection!
             newUser.setProfilePictureUrl(pictureUrl);
             newUser.setActive(true);
             newUser.setAccountStatus(AccountStatus.ACTIVE);

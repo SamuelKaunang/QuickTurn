@@ -30,8 +30,8 @@ public class User implements UserDetails {
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Role role = Role.MAHASISWA;
+    @Column(nullable = true, length = 20) // Nullable for OAuth users who haven't selected role
+    private Role role; // No default - must be set explicitly or selected by user
 
     // Account status for soft-delete functionality
     @Enumerated(EnumType.STRING)
@@ -118,7 +118,9 @@ public class User implements UserDetails {
     @JsonIgnore // SECURITY: Hide authorities from API responses
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        // Handle null role for OAuth users who haven't selected their role yet
+        String roleName = (role != null) ? role.name() : "PENDING";
+        return List.of(new SimpleGrantedAuthority("ROLE_" + roleName));
     }
 
     @JsonIgnore // SECURITY: Never expose password in API responses

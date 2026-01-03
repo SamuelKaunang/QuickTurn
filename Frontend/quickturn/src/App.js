@@ -18,6 +18,7 @@ import AdminDashboard from './AdminDashboard';
 import AdminReports from './AdminReports';
 import SearchUsers from './SearchUsers';
 import OAuth2Callback from './OAuth2Callback';
+import SelectRole from './SelectRole';
 
 
 function App() {
@@ -48,6 +49,9 @@ function App() {
 
             {/* OAuth2 Callback Route - Handles Google login redirect */}
             <Route path="/oauth2/callback" element={<OAuth2Callback />} />
+
+            {/* Role Selection Route - For new OAuth users */}
+            <Route path="/select-role" element={<SelectRole />} />
 
             {/* Protected Dashboard Routes */}
             <Route path="/dashboardu" element={

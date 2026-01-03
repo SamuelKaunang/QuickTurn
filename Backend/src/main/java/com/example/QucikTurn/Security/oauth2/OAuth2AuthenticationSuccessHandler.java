@@ -52,16 +52,21 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
+        // Check if user needs role selection (new OAuth user)
+        boolean isNewUser = user.getRole() == null;
+
         // Generate JWT token with claims (same structure as your existing login)
+        // For new users, role will be "PENDING" until they select
+        String roleValue = isNewUser ? "PENDING" : user.getRole().name();
         Map<String, Object> claims = Map.of(
                 "id", user.getId(),
-                "role", user.getRole().name(),
+                "role", roleValue,
                 "nama", user.getNama());
         String jwtToken = jwtService.generateToken(user.getEmail(), claims);
 
-        // Redirect to frontend with token
-        // Frontend should extract this token and store it in localStorage
-        String redirectUrl = frontendUrl + "/oauth2/callback?token=" + jwtToken;
+        // Redirect to frontend with token and newUser flag
+        // Frontend will redirect to role selection page if isNewUser=true
+        String redirectUrl = frontendUrl + "/oauth2/callback?token=" + jwtToken + "&isNewUser=" + isNewUser;
 
         response.sendRedirect(redirectUrl);
     }

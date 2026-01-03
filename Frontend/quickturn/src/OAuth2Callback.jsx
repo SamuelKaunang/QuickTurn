@@ -16,6 +16,7 @@ const OAuth2Callback = () => {
     useEffect(() => {
         const token = searchParams.get('token');
         const errorParam = searchParams.get('error');
+        const isNewUser = searchParams.get('isNewUser') === 'true';
 
         if (errorParam) {
             setStatus('error');
@@ -39,15 +40,21 @@ const OAuth2Callback = () => {
 
                 setStatus('success');
 
-                // Redirect based on role
+                // Redirect based on whether user is new (needs role selection) or existing
                 setTimeout(() => {
-                    const role = payload.role;
-                    if (role === 'ADMIN') {
-                        navigate('/dashboardadmin');
-                    } else if (role === 'UMKM') {
-                        navigate('/dashboardu');
+                    if (isNewUser || payload.role === 'PENDING') {
+                        // New user - redirect to role selection page
+                        navigate('/select-role');
                     } else {
-                        navigate('/dashboardm');
+                        // Existing user - redirect to dashboard based on role
+                        const role = payload.role;
+                        if (role === 'ADMIN') {
+                            navigate('/admin/dashboard');
+                        } else if (role === 'UMKM' || role === 'UKM') {
+                            navigate('/dashboardu');
+                        } else {
+                            navigate('/dashboardm');
+                        }
                     }
                 }, 1500);
             } catch (err) {

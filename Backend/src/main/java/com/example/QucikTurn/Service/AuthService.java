@@ -194,4 +194,55 @@ public class AuthService {
 
         tokenRepo.delete(token);
     }
+
+    // -------- OAUTH2 SELECT ROLE (For new Google users) --------
+    @Transactional
+    public AuthResponse selectRole(String jwtToken, com.example.QucikTurn.dto.auth.SelectRoleRequest req) {
+        // Extract email from JWT token
+        String email = jwtService.username(jwtToken);
+
+        if (email == null) {
+            throw new RuntimeException("Token tidak valid!");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User tidak ditemukan!"));
+
+        // Check if user already has a role (prevent role change)
+        if (user.getRole() != null) {
+            throw new RuntimeException("Role sudah dipilih sebelumnya. Tidak bisa diubah.");
+        }
+
+        // Validate and set role
+        String roleStr = req.getRole().toUpperCase();
+        Role selectedRole;
+
+        switch (roleStr) {
+            case "CLIENT":
+            case "UMKM":
+                selectedRole = Role.UMKM;
+                break;
+            case "TALENT":
+            case "MAHASISWA":
+                selectedRole = Role.MAHASISWA;
+                break;
+            default:
+                throw new RuntimeException("Role tidak valid! Pilih CLIENT atau TALENT.");
+        }
+
+        user.setRole(selectedRole);
+        userRepository.save(user);
+
+        log.info("User {} selected role: {}", maskEmail(email), selectedRole.name());
+
+        // Generate new JWT with updated role
+        var claims = new HashMap<String, Object>();
+        claims.put("uid", user.getId());
+        claims.put("role", user.getRole().name());
+
+        String newToken = jwtService.generateToken(user.getEmail(), claims);
+
+        return new AuthResponse(true, "Role berhasil dipilih!", newToken, "Bearer",
+                (int) jwtService.getExpires(), user.getRole().name());
+    }
 }

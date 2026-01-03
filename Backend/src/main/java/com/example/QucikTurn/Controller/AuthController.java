@@ -67,4 +67,19 @@ public class AuthController {
             return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
         }
     }
+
+    // -------- OAUTH2 SELECT ROLE (For new Google users) --------
+    @PostMapping("/select-role")
+    public ResponseEntity<ApiResponse<AuthResponse>> selectRole(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody com.example.QucikTurn.dto.auth.SelectRoleRequest req) {
+        try {
+            // Extract token from "Bearer <token>"
+            String token = authHeader.replace("Bearer ", "");
+            AuthResponse response = svc.selectRole(token, req);
+            return ResponseEntity.ok(ApiResponse.ok("Role berhasil dipilih!", response));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
+    }
 }
