@@ -27,16 +27,16 @@ const OAuth2Callback = () => {
 
         if (token) {
             try {
-                // Store the JWT token in localStorage (same as normal login)
-                localStorage.setItem('token', token);
+                // Store the JWT token in sessionStorage (same as normal login)
+                sessionStorage.setItem('token', token);
 
                 // Decode the token to get user info
                 const payload = JSON.parse(atob(token.split('.')[1]));
 
                 // Store user info
-                localStorage.setItem('userId', payload.id);
-                localStorage.setItem('role', payload.role);
-                localStorage.setItem('nama', payload.nama);
+                sessionStorage.setItem('userId', payload.id);
+                sessionStorage.setItem('role', payload.role);
+                sessionStorage.setItem('nama', payload.nama);
 
                 setStatus('success');
 
@@ -76,15 +76,15 @@ const OAuth2Callback = () => {
                 {status === 'processing' && (
                     <>
                         <div className="oauth2-spinner"></div>
-                        <h2>Memproses login...</h2>
-                        <p>Harap tunggu sebentar</p>
+                        <h2>Memproses Login...</h2>
+                        <p>Mohon tunggu, sedang memverifikasi akun Anda</p>
                     </>
                 )}
                 {status === 'success' && (
                     <>
                         <div className="oauth2-success-icon">✓</div>
-                        <h2>Login Berhasil!</h2>
-                        <p>Mengalihkan ke dashboard...</p>
+                        <h2>Login Berhasil! 🎉</h2>
+                        <p>Selamat datang kembali! Mengalihkan ke dashboard...</p>
                     </>
                 )}
                 {status === 'error' && (
