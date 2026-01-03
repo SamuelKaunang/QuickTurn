@@ -200,6 +200,10 @@ public class User implements UserDetails {
         this.lastLoginAt = t;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     public String getBio() {
         return bio;
     }

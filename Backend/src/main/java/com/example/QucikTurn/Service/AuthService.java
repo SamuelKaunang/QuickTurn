@@ -208,9 +208,11 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User tidak ditemukan!"));
 
-        // Check if user already has a role (prevent role change)
-        if (user.getRole() != null) {
-            throw new RuntimeException("Role sudah dipilih sebelumnya. Tidak bisa diubah.");
+        // Only allow role selection for newly created users (within 5 minutes)
+        // This prevents abuse of role changing
+        java.time.LocalDateTime fiveMinutesAgo = java.time.LocalDateTime.now().minusMinutes(5);
+        if (user.getCreatedAt() == null || user.getCreatedAt().isBefore(fiveMinutesAgo)) {
+            throw new RuntimeException("Role hanya bisa dipilih saat pertama kali mendaftar.");
         }
 
         // Validate and set role
