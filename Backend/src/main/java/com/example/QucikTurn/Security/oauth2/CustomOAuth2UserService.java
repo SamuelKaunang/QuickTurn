@@ -30,6 +30,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
@@ -52,10 +53,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 user.setProfilePictureUrl(pictureUrl);
             }
 
-            userRepository.save(user);
+            userRepository.saveAndFlush(user);
         } else {
             // New user - create a new record with default role MAHASISWA
-            // TODO: Implement role selection flow when User.role is nullable
             User newUser = new User();
             newUser.setEmail(email);
             newUser.setNama(name);
@@ -74,7 +74,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             // Set a random hash that cannot be used for login.
             newUser.setPasswordHash("OAUTH2_" + UUID.randomUUID().toString());
 
-            userRepository.save(newUser);
+            userRepository.saveAndFlush(newUser);
         }
 
         // Return the OAuth2User principal (Spring Security will handle authentication)
