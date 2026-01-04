@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { ToastProvider } from './Toast';
 import { SettingsProvider } from './SettingsContext';
 import { ProtectedRoute, AuthRoute } from './RouteGuards';
@@ -120,6 +122,10 @@ function App() {
             <Route path="*" element={<LandingPage />} />
           </Routes>
         </BrowserRouter>
+
+        {/* Vercel Analytics & Speed Insights */}
+        <Analytics />
+        <SpeedInsights />
       </ToastProvider>
     </SettingsProvider>
   );
