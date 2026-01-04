@@ -3,7 +3,9 @@ package com.example.QucikTurn.Controller;
 import com.example.QucikTurn.Entity.Project;
 import com.example.QucikTurn.Entity.User;
 import com.example.QucikTurn.Service.ApplicationService;
+import com.example.QucikTurn.Service.FinishingService;
 import com.example.QucikTurn.Service.ProjectService;
+import com.example.QucikTurn.Service.ProjectViewerService;
 import com.example.QucikTurn.Service.ReviewService;
 import com.example.QucikTurn.dto.ApiResponse;
 import com.example.QucikTurn.dto.ApplicantResponse;
@@ -24,12 +26,17 @@ import java.util.Map;
 public class ProjectController {
 
     private final ProjectService projectSvc;
+    private final ProjectViewerService projectViewerSvc;
+    private final FinishingService finishingSvc;
     private final ApplicationService applicationSvc;
     private final ReviewService reviewService;
 
-    public ProjectController(ProjectService projectSvc, ApplicationService applicationSvc,
+    public ProjectController(ProjectService projectSvc, ProjectViewerService projectViewerSvc,
+            FinishingService finishingSvc, ApplicationService applicationSvc,
             ReviewService reviewService) {
         this.projectSvc = projectSvc;
+        this.projectViewerSvc = projectViewerSvc;
+        this.finishingSvc = finishingSvc;
         this.applicationSvc = applicationSvc;
         this.reviewService = reviewService;
     }
@@ -47,19 +54,16 @@ public class ProjectController {
     // --- GET MY PROJECTS (UMKM) with applicant count ---
     @GetMapping("/my-projects")
     public ResponseEntity<ApiResponse<List<UmkmProjectResponse>>> getMyProjects(@AuthenticationPrincipal User user) {
-        List<UmkmProjectResponse> list = projectSvc.getProjectsByOwnerWithApplicantCount(user.getId());
+        List<UmkmProjectResponse> list = projectViewerSvc.getProjectsByOwnerWithApplicantCount(user.getId());
         return ResponseEntity.ok(ApiResponse.ok("Projects retrieved", list));
     }
 
-    // --- ✅ UPDATED: GET ALL OPEN PROJECTS (Status Aware) ---
+    // --- GET ALL OPEN PROJECTS (Status Aware) ---
     @GetMapping
     public ResponseEntity<ApiResponse<List<ProjectWithStatusResponse>>> getAllProjects(
             @AuthenticationPrincipal User user) {
-        // If user is a student, we pass their ID. If UMKM or null, we pass null.
         Long studentId = (user != null && user.getRole().name().equals("MAHASISWA")) ? user.getId() : null;
-
-        List<ProjectWithStatusResponse> list = projectSvc.getOpenProjectsWithStatus(studentId);
-
+        List<ProjectWithStatusResponse> list = projectViewerSvc.getOpenProjectsWithStatus(studentId);
         return ResponseEntity.ok(ApiResponse.ok("All open projects retrieved", list));
     }
 
@@ -67,8 +71,7 @@ public class ProjectController {
     @GetMapping("/participating")
     public ResponseEntity<ApiResponse<List<ProjectWithStatusResponse>>> getParticipatingProjects(
             @AuthenticationPrincipal User user) {
-        // Now returns DTOs instead of raw Projects
-        List<ProjectWithStatusResponse> list = projectSvc.getProjectsByStudent(user.getId());
+        List<ProjectWithStatusResponse> list = projectViewerSvc.getProjectsByStudent(user.getId());
         return ResponseEntity.ok(ApiResponse.ok("Participating projects retrieved", list));
     }
 
@@ -108,7 +111,7 @@ public class ProjectController {
             @Valid @RequestBody FinishProjectRequest request,
             @AuthenticationPrincipal User currentUser) {
         try {
-            projectSvc.submitFinishing(projectId, currentUser.getId(), request.getFinishingLink());
+            finishingSvc.submitFinishing(projectId, currentUser.getId(), request.getFinishingLink());
             return ResponseEntity
                     .ok(ApiResponse.ok("Finishing submitted successfully. Waiting for UMKM review.", null));
         } catch (RuntimeException e) {
@@ -122,7 +125,7 @@ public class ProjectController {
             @PathVariable Long projectId,
             @AuthenticationPrincipal User currentUser) {
         try {
-            projectSvc.confirmFinishing(projectId, currentUser.getId());
+            finishingSvc.confirmFinishing(projectId, currentUser.getId());
             return ResponseEntity.ok(ApiResponse.ok("Project officially finished and closed.", null));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
@@ -135,7 +138,7 @@ public class ProjectController {
             @PathVariable Long projectId,
             @AuthenticationPrincipal User currentUser) {
         try {
-            Map<String, Object> status = projectSvc.getFinishingStatus(projectId, currentUser.getId());
+            Map<String, Object> status = finishingSvc.getFinishingStatus(projectId, currentUser.getId());
             return ResponseEntity.ok(ApiResponse.ok("Finishing status retrieved", status));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
@@ -195,7 +198,7 @@ public class ProjectController {
             @PathVariable Long projectId,
             @AuthenticationPrincipal User user) {
         try {
-            Map<String, Object> briefData = projectSvc.getProjectBriefForAcceptedTalent(projectId, user.getId());
+            Map<String, Object> briefData = projectViewerSvc.getProjectBriefForAcceptedTalent(projectId, user.getId());
             return ResponseEntity.ok(ApiResponse.ok("Brief retrieved", briefData));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));

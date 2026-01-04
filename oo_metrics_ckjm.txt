@@ -1,0 +1,18 @@
+﻿java : Exception in thread "main" 
+org.apache.bcel.classfile.ClassFormatException: Invalid byte tag in 
+constant pool: 18
+At line:1 char:143
++ ... FullName }; java -jar ckjm-1.9\build\ckjm-1.9.jar $classFiles 2>&1 | 
+ ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Exception in th...nstant pool 
+   : 18:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+	at org.apache.bcel.classfile.Constant.readConstant(Constant.java:146)
+	at org.apache.bcel.classfile.ConstantPool.<init>(ConstantPool.java:67)
+	at org.apache.bcel.classfile.ClassParser.readConstantPool(ClassParser.java
+:222)
+	at org.apache.bcel.classfile.ClassParser.parse(ClassParser.java:136)
+	at gr.spinellis.ckjm.MetricsFilter.processClass(Unknown Source)
+	at gr.spinellis.ckjm.MetricsFilter.main(Unknown Source)

@@ -1,0 +1,84 @@
+================================================================================
+OO METRICS REPORT - QuickTurn Backend
+================================================================================
+
+Class                                       WMC   DIT   CBO   RFC   LCOM
+--------------------------------------------------------------------------------
+User                                         66     1     9    69     34
+Project                                      40     0     5    41     19
+Report                                       27     0     3    28     12
+UserProfileResponse                          26     0     0    53      1
+Notification                                 24     0     2    25     13
+NotificationDTO                              23     0     3    36     12
+WorkSubmission                               21     0     4    23     11
+ChatMessageDTO                               20     0     1    21     10
+UploadedFile                                 20     0     2    21     10
+ChatMessage                                  20     0     5    21     10
+Application                                  19     0     3    20      9
+PasswordResetToken                           17     0     3    24     10
+Activity                                     15     0     1    16      8
+NotificationService                          15     0    14    40     13
+ChatResponseDTO                              13     0     1    13      4
+Review                                       13     0     1    14      6
+UserService                                  13     0    10    68     12
+AccountDeletionService                       12     0    18    70      4
+Contract                                     11     0     1    12      5
+ChatService                                  11     0    16    53      8
+AzureBlobService                             10     0    14    39      7
+FileStorageService                            9     0    13    44      5
+ReportService                                 8     0    16    40      5
+AuthService                                   7     0    21    59      1
+ApiResponse                                   6     0     0     7      3
+RateLimitingFilter                            6     1    14    27      5
+SecurityConfig                                6     0    22    38      6
+ApplicationService                            6     0    23    53      0
+ProjectService                                6     0    11    41      3
+ActivityService                               5     0     7    10      4
+ProjectDeadlineSchedulerService               5     0    14    29      2
+ProjectViewerService                          5     0    15    43      2
+WorkSubmissionService                         5     0    15    31      0
+WebSocketConfig                               4     0    20    25      2
+ReviewRequest                                 4     0     0     4      2
+ResetPasswordRequest                          4     0     2     4      2
+VerifyCodeResponse                            4     0     0     4      2
+JwtService                                    4     0     7    23      2
+ReviewService                                 4     0    13    30      0
+AnnouncementService                           3     0     4    10      2
+FinishingService                              3     0    11    25      1
+DatabaseMigrationRunner                       2     0     7     9      1
+ChatController                                2     0    24    69      0
+FinishProjectRequest                          2     0     1     2      1
+ForgotPasswordRequest                         2     0     2     2      1
+SelectRoleRequest                             2     0     1     2      1
+VerifyCodeRequest                             2     0     2     2      1
+EmailService                                  2     0     8    21      0
+QucikTurnApplication                          1     0     5     3      1
+CorsConfig                                    1     0     3     8      1
+ApplicationController                         1     0     9     9      0
+Announcement                                  1     0     5     2      0
+JwtAuthFilter                                 1     1    12    15      0
+CustomOAuth2UserService                       1     1     5     2      1
+OAuth2AuthenticationSuccessHandler            1     0    19    31      0
+is                                            0     0     2     0      0
+ActivityController                            0     0     9     8      0
+AdminController                               0     0     9     9      0
+AnnouncementController                        0     0     6     8      0
+AuthController                                0     0    11    15      0
+FileUploadController                          0     0    12    18      0
+NotificationController                        0     0     9     8      0
+ProjectController                             0     0    19    29      0
+ReportController                              0     0    15    29      0
+UserController                                0     0    15    32      0
+GlobalExceptionHandler                        0     0    15    16      0
+--------------------------------------------------------------------------------
+
+SUMMARY:
+  Total Classes Analyzed: 66
+  Average WMC (Methods per Class): 8.5
+  Average CBO (Coupling): 8.6
+  Max DIT (Inheritance Depth): 1
+
+QUALITY ASSESSMENT:
+  ✅ WMC: GOOD - Classes are not overly complex
+  ✅ CBO: LOW COUPLING - Good separation of concerns
+  ✅ DIT: SHALLOW INHERITANCE - Good use of composition
