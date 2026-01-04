@@ -155,4 +155,37 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepo.findAll();
     }
+
+    /**
+     * Ban a user - sets isActive to false
+     */
+    @Transactional
+    public User banUser(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setActive(false);
+        return userRepo.save(user);
+    }
+
+    /**
+     * Unban a user - sets isActive to true
+     */
+    @Transactional
+    public User unbanUser(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setActive(true);
+        return userRepo.save(user);
+    }
+
+    /**
+     * Toggle user ban status
+     */
+    @Transactional
+    public User toggleBanStatus(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setActive(!user.isEnabled());
+        return userRepo.save(user);
+    }
 }

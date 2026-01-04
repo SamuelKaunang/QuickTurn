@@ -26,17 +26,20 @@ public class WorkSubmissionService {
     private final ApplicationRepository applicationRepository;
     private final FileStorageService fileStorageService;
     private final ActivityService activityService;
+    private final NotificationService notificationService;
 
     public WorkSubmissionService(WorkSubmissionRepository submissionRepository,
             ProjectRepository projectRepository,
             ApplicationRepository applicationRepository,
             FileStorageService fileStorageService,
-            ActivityService activityService) {
+            ActivityService activityService,
+            NotificationService notificationService) {
         this.submissionRepository = submissionRepository;
         this.projectRepository = projectRepository;
         this.applicationRepository = applicationRepository;
         this.fileStorageService = fileStorageService;
         this.activityService = activityService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -91,6 +94,13 @@ public class WorkSubmissionService {
         // Log activity for student
         activityService.logActivity(submitter, ActivityService.TYPE_SUBMITTED,
                 "Submitted work for: " + project.getTitle(), "SUBMISSION", savedSubmission.getId());
+
+        // Notify project owner that work has been submitted
+        notificationService.notifyWorkSubmitted(
+                project.getOwner(),
+                submitter.getNama(),
+                project.getTitle(),
+                savedSubmission.getId());
 
         return savedSubmission;
     }
@@ -175,6 +185,12 @@ public class WorkSubmissionService {
             // And for client
             activityService.logActivity(reviewer, ActivityService.TYPE_PROJECT_COMPLETED,
                     "Project completed: " + project.getTitle(), "PROJECT", project.getId());
+
+            // Notify talent that their work was accepted
+            notificationService.notifyWorkAccepted(
+                    submission.getSubmittedBy(),
+                    project.getTitle(),
+                    project.getId());
         }
 
         return submissionRepository.save(submission);

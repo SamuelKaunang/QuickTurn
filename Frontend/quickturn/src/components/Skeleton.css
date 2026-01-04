@@ -1,0 +1,675 @@
+/* =========================================
+   PREMIUM SKELETON LOADING SYSTEM
+   Ultra-Modern Shimmer Animation
+   ========================================= */
+
+/* Base Skeleton with Premium Shimmer */
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg,
+            rgba(99, 102, 241, 0.05) 0%,
+            rgba(139, 92, 246, 0.08) 50%,
+            rgba(99, 102, 241, 0.05) 100%);
+    border-radius: 8px;
+}
+
+.skeleton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 20%,
+            rgba(255, 255, 255, 0.2) 50%,
+            rgba(255, 255, 255, 0.1) 80%,
+            transparent 100%);
+    animation: shimmer 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -150%;
+    }
+
+    100% {
+        left: 150%;
+    }
+}
+
+/* Wave variant - More organic look */
+.skeleton.wave::before {
+    animation: wave 2.5s ease-in-out infinite;
+}
+
+@keyframes wave {
+    0% {
+        transform: translateX(-100%) skewX(-15deg);
+    }
+
+    100% {
+        transform: translateX(200%) skewX(-15deg);
+    }
+}
+
+/* Pulse variant - Breathing effect */
+.skeleton.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Glow variant - Premium glow effect */
+.skeleton.glow {
+    background: linear-gradient(135deg,
+            rgba(99, 102, 241, 0.08) 0%,
+            rgba(139, 92, 246, 0.12) 50%,
+            rgba(99, 102, 241, 0.08) 100%);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+/* Skeleton Text */
+.skeleton-text {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* =========================================
+   COMPONENT SKELETONS
+   ========================================= */
+
+/* Skeleton Stat Card */
+.skeleton-stat-card {
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skeleton-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.skeleton-stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.skeleton-stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Skeleton Project Card */
+.skeleton-project-card {
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    padding: 24px;
+    min-height: 220px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.skeleton-project-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(99, 102, 241, 0.2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.skeleton-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.skeleton-project-tags {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+}
+
+.skeleton-project-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.skeleton-project-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Skeleton Activity Item */
+.skeleton-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.skeleton-activity-item:last-child {
+    border-bottom: none;
+}
+
+.skeleton-activity-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Skeleton Profile Card */
+.skeleton-profile-card {
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 24px;
+    padding: 32px;
+    backdrop-filter: blur(10px);
+}
+
+.skeleton-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.skeleton-profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeleton-profile-body {
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Skeleton Chat Contact */
+.skeleton-chat-contact {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    margin-bottom: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.2s ease;
+}
+
+.skeleton-chat-contact:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.skeleton-chat-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Skeleton Chat Message */
+.skeleton-chat-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.skeleton-chat-message.own {
+    align-items: flex-end;
+}
+
+.skeleton-message-bubble {
+    border-radius: 20px 20px 20px 4px;
+}
+
+.skeleton-chat-message.own .skeleton-message-bubble {
+    border-radius: 20px 20px 4px 20px;
+}
+
+/* Skeleton Table Row */
+.skeleton-table-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    transition: background 0.2s ease;
+}
+
+.skeleton-table-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* =========================================
+   PAGE SKELETONS
+   ========================================= */
+
+/* Skeleton Dashboard */
+.skeleton-dashboard {
+    padding: 0;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.skeleton-welcome-banner {
+    background: linear-gradient(165deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    border-radius: 24px;
+    padding: 32px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-welcome-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+.skeleton-banner-text {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 1;
+}
+
+.skeleton-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.skeleton-grid-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 32px;
+}
+
+.skeleton-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.skeleton-project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.skeleton-activity-section {
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    padding: 24px;
+}
+
+.skeleton-activity-list {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Skeleton Projects List */
+.skeleton-projects-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+/* Skeleton Profile Page */
+.skeleton-profile-page {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.skeleton-profile-main {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 32px;
+}
+
+.skeleton-profile-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.skeleton-profile-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.skeleton-section {
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    padding: 24px;
+}
+
+.skeleton-section-title {
+    margin-bottom: 20px;
+}
+
+.skeleton-skills-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Skeleton Landing Page */
+.skeleton-landing-page {
+    padding: 80px 0;
+}
+
+.skeleton-hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.skeleton-hero-buttons {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+/* Skeleton Login Page */
+.skeleton-login-page {
+    display: flex;
+    min-height: 100vh;
+}
+
+.skeleton-login-left {
+    flex: 1;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 32px;
+}
+
+.skeleton-login-right {
+    flex: 1;
+    background: linear-gradient(165deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.skeleton-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+/* Skeleton Search Page */
+.skeleton-search-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.skeleton-search-header {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.skeleton-filter-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 20px;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.skeleton-user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+/* Skeleton User Card */
+.skeleton-user-card {
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.skeleton-user-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Skeleton Post Project */
+.skeleton-post-project {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+}
+
+.skeleton-form-section {
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 24px;
+}
+
+/* Chat Page Skeleton */
+.skeleton-chat-page {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    height: calc(100vh - 80px);
+    gap: 0;
+}
+
+.skeleton-chat-sidebar {
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.skeleton-chat-main {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+}
+
+.skeleton-chat-messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 0;
+}
+
+.skeleton-chat-input {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    gap: 12px;
+}
+
+/* Admin Dashboard Skeleton */
+.skeleton-admin-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.skeleton-admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-radius: 16px;
+}
+
+.skeleton-admin-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.skeleton-admin-table {
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.skeleton-table-header {
+    display: flex;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+
+@media (max-width: 1200px) {
+    .skeleton-profile-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    .skeleton-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .skeleton-grid-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .skeleton-admin-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .skeleton-chat-page {
+        grid-template-columns: 1fr;
+    }
+
+    .skeleton-chat-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .skeleton-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .skeleton-welcome-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 24px;
+    }
+
+    .skeleton-projects-list,
+    .skeleton-user-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .skeleton-login-page {
+        flex-direction: column;
+    }
+
+    .skeleton-login-right {
+        display: none;
+    }
+
+    .skeleton-admin-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .skeleton-post-project {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .skeleton-hero-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .skeleton-filter-bar {
+        flex-direction: column;
+    }
+
+    .skeleton-search-header {
+        flex-direction: column;
+    }
+}

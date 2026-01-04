@@ -15,6 +15,7 @@ import com.example.QucikTurn.dto.ApplicantResponse;
 import com.example.QucikTurn.dto.ApplyProjectRequest;
 import com.example.QucikTurn.dto.ApplyProjectResponse;
 import com.example.QucikTurn.Service.ActivityService;
+import com.example.QucikTurn.Service.NotificationService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,18 +33,21 @@ public class ApplicationService {
     private final UserRepository userRepo;
     private final ContractRepository contractRepo;
     private final ActivityService activityService;
+    private final NotificationService notificationService;
 
     public ApplicationService(
             ApplicationRepository applicationRepo,
             ProjectRepository projectRepo,
             UserRepository userRepo,
             ContractRepository contractRepo,
-            ActivityService activityService) {
+            ActivityService activityService,
+            NotificationService notificationService) {
         this.applicationRepo = applicationRepo;
         this.projectRepo = projectRepo;
         this.userRepo = userRepo;
         this.contractRepo = contractRepo;
         this.activityService = activityService;
+        this.notificationService = notificationService;
     }
 
     // --- LOGIC MAHASISWA APPLY ---
@@ -81,6 +85,13 @@ public class ApplicationService {
             activityService.logActivity(student, ActivityService.TYPE_APPLIED,
                     "Applied to project: " + project.getTitle(),
                     "PROJECT", project.getId());
+
+            // Send notification to project owner (Client/UMKM)
+            notificationService.notifyApplicationReceived(
+                    project.getOwner(),
+                    student.getNama(),
+                    project.getTitle(),
+                    project.getId());
 
             return new ApplyProjectResponse(saved.getId(), saved.getProject().getId(), saved.getStudent().getId(),
                     saved.getStatus().name());
@@ -134,12 +145,16 @@ public class ApplicationService {
                 // Log for student
                 activityService.logActivity(app.getStudent(), ActivityService.TYPE_ACCEPTED,
                         "Application accepted for: " + project.getTitle(), "PROJECT", project.getId());
+                // Send notification to accepted talent
+                notificationService.notifyApplicationAccepted(app.getStudent(), project.getTitle(), project.getId());
             } else if (app.getStatus() == ApplicationStatus.PENDING) {
                 app.setStatus(ApplicationStatus.REJECTED);
                 // Log for other students (optional, but requested "when he get a feedback...
                 // rejected")
                 activityService.logActivity(app.getStudent(), ActivityService.TYPE_REJECTED,
                         "Application rejected for: " + project.getTitle(), "PROJECT", project.getId());
+                // Send notification to rejected talents
+                notificationService.notifyApplicationRejected(app.getStudent(), project.getTitle(), project.getId());
             }
         }
 
@@ -193,6 +208,8 @@ public class ApplicationService {
         // Log for student
         activityService.logActivity(app.getStudent(), ActivityService.TYPE_REJECTED,
                 "Application rejected for: " + project.getTitle(), "PROJECT", project.getId());
+        // Send notification to rejected talent
+        notificationService.notifyApplicationRejected(app.getStudent(), project.getTitle(), project.getId());
     }
 
     // Helper to generate the text

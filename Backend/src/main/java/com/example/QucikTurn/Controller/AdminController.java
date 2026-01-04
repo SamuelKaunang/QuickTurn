@@ -50,4 +50,25 @@ public class AdminController {
     public ResponseEntity<ApiResponse<List<Activity>>> getProjectLogs(@PathVariable Long projectId) {
         return ResponseEntity.ok(ApiResponse.ok("Project logs", activityService.getActivitiesByProject(projectId)));
     }
+
+    // --- USER BAN MANAGEMENT ---
+
+    @PutMapping("/users/{id}/ban")
+    public ResponseEntity<ApiResponse<User>> banUser(@PathVariable Long id) {
+        User user = userService.banUser(id);
+        return ResponseEntity.ok(ApiResponse.ok("User banned successfully", user));
+    }
+
+    @PutMapping("/users/{id}/unban")
+    public ResponseEntity<ApiResponse<User>> unbanUser(@PathVariable Long id) {
+        User user = userService.unbanUser(id);
+        return ResponseEntity.ok(ApiResponse.ok("User unbanned successfully", user));
+    }
+
+    @PutMapping("/users/{id}/toggle-ban")
+    public ResponseEntity<ApiResponse<User>> toggleBan(@PathVariable Long id) {
+        User user = userService.toggleBanStatus(id);
+        String message = user.isEnabled() ? "User unbanned successfully" : "User banned successfully";
+        return ResponseEntity.ok(ApiResponse.ok(message, user));
+    }
 }

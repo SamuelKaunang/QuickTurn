@@ -25,6 +25,8 @@ public class ReviewService {
     private UserRepository userRepository;
     @Autowired
     private ContractRepository contractRepository; // We need this to find the student!
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional
     public void addReview(Long projectId, ReviewRequest request, String reviewerEmail) {
@@ -80,6 +82,9 @@ public class ReviewService {
 
         // 8. Update the Target User's Average Rating
         updateUserRating(targetUser, request.getRating());
+
+        // 9. Send notification to the reviewed user
+        notificationService.notifyReviewReceived(targetUser, reviewer.getNama(), request.getRating());
     }
 
     private void updateUserRating(User user, Integer newRating) {

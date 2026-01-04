@@ -1,19 +1,48 @@
 /* CSS Custom Properties for consistent theming */
-
+/* QuickTurn Design System - Light Mode Base + Premium Obsidian Accents */
 
 :root {
-  --bg-primary: #0f0f19;
-  --bg-secondary: #1a1a2e;
-  --bg-tertiary: #16213e;
-  --text-primary: #ffffff;
-  --text-secondary: #cccccc;
-  --text-muted: #888888;
-  --accent-primary: #e50914;
-  --accent-hover: #ff1f2c;
-  --border-color: rgba(255, 255, 255, 0.1);
-  --shadow: rgba(0, 0, 0, 0.37);
-  --glass-bg: rgba(30, 30, 30, 0.6);
-  --input-bg: rgba(255, 255, 255, 0.05);
+  /* ===== LIGHT BASE (Primary Theme) ===== */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --bg-muted: #e2e8f0;
+
+  /* ===== BRAND COLORS ===== */
+  --brand-primary: #e11d48;
+  --brand-dark: #be123c;
+  --brand-light: #fff1f2;
+  --brand-glow: rgba(225, 29, 72, 0.15);
+
+  /* ===== ACCENT COLORS ===== */
+  --accent-primary: #e11d48;
+  --accent-hover: #be123c;
+  --accent-violet: #7c3aed;
+  --accent-amber: #f59e0b;
+  --accent-emerald: #059669;
+  --accent-blue: #2563eb;
+
+  /* ===== PREMIUM OBSIDIAN (Dark Palette for Contrast) ===== */
+  --dark-base: #0B0F17;
+  --dark-surface: #151B28;
+  --dark-elevated: #1E2433;
+  --dark-border: rgba(255, 255, 255, 0.08);
+
+  /* ===== TEXT COLORS ===== */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-contrast: #ffffff;
+
+  /* ===== UTILITY ===== */
+  --border-color: #e2e8f0;
+  --border-light: rgba(0, 0, 0, 0.06);
+  --shadow-sm: rgba(0, 0, 0, 0.04);
+  --shadow-md: rgba(0, 0, 0, 0.08);
+  --shadow-lg: rgba(0, 0, 0, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-dark: rgba(11, 15, 23, 0.95);
+  --input-bg: rgba(255, 255, 255, 0.9);
   --transition: all 0.3s ease;
 }
 
