@@ -1,6 +1,10 @@
 package com.example.QucikTurn.Controller;
 
+import com.example.QucikTurn.Entity.Activity;
+import com.example.QucikTurn.Entity.Project;
 import com.example.QucikTurn.Entity.User;
+import com.example.QucikTurn.Service.ActivityService;
+import com.example.QucikTurn.Service.ProjectService;
 import com.example.QucikTurn.Service.UserService;
 import com.example.QucikTurn.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +17,12 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
-    private final com.example.QucikTurn.Service.ProjectService projectService;
-    private final com.example.QucikTurn.Service.ActivityService activityService;
+    private final ProjectService projectService;
+    private final ActivityService activityService;
 
-    public AdminController(UserService userService, 
-                           com.example.QucikTurn.Service.ProjectService projectService,
-                           com.example.QucikTurn.Service.ActivityService activityService) {
+    public AdminController(UserService userService,
+            ProjectService projectService,
+            ActivityService activityService) {
         this.userService = userService;
         this.projectService = projectService;
         this.activityService = activityService;
@@ -38,12 +42,12 @@ public class AdminController {
     // --- NEW: PROJECT MONITORING ---
 
     @GetMapping("/projects")
-    public ResponseEntity<ApiResponse<List<com.example.QucikTurn.Entity.Project>>> getAllProjects() {
+    public ResponseEntity<ApiResponse<List<Project>>> getAllProjects() {
         return ResponseEntity.ok(ApiResponse.ok("All projects", projectService.getAllProjects()));
     }
 
     @GetMapping("/projects/{projectId}/logs")
-    public ResponseEntity<ApiResponse<List<com.example.QucikTurn.Entity.Activity>>> getProjectLogs(@PathVariable Long projectId) {
+    public ResponseEntity<ApiResponse<List<Activity>>> getProjectLogs(@PathVariable Long projectId) {
         return ResponseEntity.ok(ApiResponse.ok("Project logs", activityService.getActivitiesByProject(projectId)));
     }
 }

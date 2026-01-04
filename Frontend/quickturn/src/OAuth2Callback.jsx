@@ -6,6 +6,7 @@ import './OAuth2Callback.css';
  * OAuth2 Callback Component
  * This component handles the redirect from the backend after Google OAuth2 login.
  * It extracts the JWT token from the URL and stores it in localStorage.
+ * Design matches the QuickTurn Dashboard styling.
  */
 const OAuth2Callback = () => {
     const [searchParams] = useSearchParams();
@@ -20,7 +21,7 @@ const OAuth2Callback = () => {
 
         if (errorParam) {
             setStatus('error');
-            setError('Login gagal: ' + errorParam);
+            setError('Login failed: ' + errorParam);
             setTimeout(() => navigate('/login'), 3000);
             return;
         }
@@ -60,39 +61,43 @@ const OAuth2Callback = () => {
             } catch (err) {
                 console.error('Error processing OAuth token:', err);
                 setStatus('error');
-                setError('Token tidak valid');
+                setError('Invalid token received');
                 setTimeout(() => navigate('/login'), 3000);
             }
         } else {
             setStatus('error');
-            setError('Token tidak ditemukan');
+            setError('No token found in response');
             setTimeout(() => navigate('/login'), 3000);
         }
     }, [searchParams, navigate]);
 
     return (
         <div className="oauth2-callback-container">
+            {/* Decorative background elements */}
+            <div className="bg-glow glow-1"></div>
+            <div className="bg-glow glow-2"></div>
+
             <div className="oauth2-callback-card">
                 {status === 'processing' && (
                     <>
                         <div className="oauth2-spinner"></div>
-                        <h2>Memproses Login...</h2>
-                        <p>Mohon tunggu, sedang memverifikasi akun Anda</p>
+                        <h2>Processing Login...</h2>
+                        <p>Please wait while we verify your account</p>
                     </>
                 )}
                 {status === 'success' && (
                     <>
                         <div className="oauth2-success-icon">✓</div>
-                        <h2>Login Berhasil! 🎉</h2>
-                        <p>Selamat datang kembali! Mengalihkan ke dashboard...</p>
+                        <h2>Login Successful!</h2>
+                        <p>Welcome back! Redirecting to your dashboard...</p>
                     </>
                 )}
                 {status === 'error' && (
                     <>
                         <div className="oauth2-error-icon">✕</div>
-                        <h2>Login Gagal</h2>
+                        <h2>Login Failed</h2>
                         <p>{error}</p>
-                        <p className="redirect-notice">Mengalihkan ke halaman login...</p>
+                        <p className="redirect-notice">Redirecting to login page...</p>
                     </>
                 )}
             </div>
