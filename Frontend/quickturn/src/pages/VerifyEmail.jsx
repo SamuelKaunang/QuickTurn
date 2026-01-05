@@ -58,19 +58,24 @@ const VerifyEmail = () => {
     };
 
     const handleGoToDashboard = () => {
+        // Check sessionStorage for token (user might have the same tab session)
         const token = sessionStorage.getItem('token');
         const role = sessionStorage.getItem('role');
 
         if (token) {
+            // Same tab/session - can go directly to dashboard
             if (role === 'MAHASISWA') {
                 navigate('/dashboardm');
             } else if (role === 'UMKM' || role === 'UKM') {
                 navigate('/dashboardu');
+            } else if (role === 'ADMIN') {
+                navigate('/admin');
             } else {
-                navigate('/login');
+                navigate('/login', { state: { verificationSuccess: true } });
             }
         } else {
-            navigate('/login');
+            // New tab - no session, redirect to login with success message
+            navigate('/login', { state: { verificationSuccess: true } });
         }
     };
 

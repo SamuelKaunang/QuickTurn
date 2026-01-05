@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { api, BASE_URL } from '../utils/apiConfig';
 import { Timer, Shield, Sparkles, TrendingUp } from 'lucide-react';
 import './LoginPage.css';
@@ -23,6 +23,16 @@ const LoginPage = () => {
   const otpRefs = useRef([]);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check for verification success state from VerifyEmail page
+  useEffect(() => {
+    if (location.state?.verificationSuccess) {
+      setMessage("Email berhasil diverifikasi! Silakan login untuk melanjutkan.");
+      // Clear the state so message doesn't persist on page refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Resend countdown timer
   useEffect(() => {
@@ -215,12 +225,12 @@ const LoginPage = () => {
       if (response.ok) {
         const data = responseJson.data;
 
-        // 1. Save Token and Role
-        sessionStorage.setItem('token', data.accessToken);
+        // Save Token and Role to sessionStorage only (tab isolation - prevents session pollution)
         const role = data.role ? data.role.toUpperCase() : "";
+        sessionStorage.setItem('token', data.accessToken);
         sessionStorage.setItem('role', role);
 
-        // 2. Redirect based on Role (Logic lo yang tadi)
+        // Redirect based on Role
         if (role === 'MAHASISWA') {
           navigate('/dashboardm');
         } else if (role === 'UMKM' || role === 'UKM') {

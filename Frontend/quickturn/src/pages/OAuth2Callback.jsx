@@ -28,13 +28,13 @@ const OAuth2Callback = () => {
 
         if (token) {
             try {
-                // Store the JWT token in sessionStorage (same as normal login)
+                // Store the JWT token in sessionStorage only (tab isolation - prevents session pollution)
                 sessionStorage.setItem('token', token);
 
                 // Decode the token to get user info
                 const payload = JSON.parse(atob(token.split('.')[1]));
 
-                // Store user info
+                // Store user info in sessionStorage only
                 sessionStorage.setItem('userId', payload.id);
                 sessionStorage.setItem('role', payload.role);
                 sessionStorage.setItem('nama', payload.nama);
