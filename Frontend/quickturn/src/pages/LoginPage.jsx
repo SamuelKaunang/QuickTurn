@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, BASE_URL } from '../utils/apiConfig';
 import { Timer, Shield, Sparkles, TrendingUp } from 'lucide-react';
@@ -16,11 +16,21 @@ const LoginPage = () => {
   // Forgot Password States
   const [forgotStep, setForgotStep] = useState(null); // null, 'EMAIL', 'VERIFY', 'RESET'
   const [forgotEmail, setForgotEmail] = useState('');
-  const [resetCode, setResetCode] = useState('');
+  const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
   const [newPassword, setNewPassword] = useState('');
   const [resetToken, setResetToken] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
+  const otpRefs = useRef([]);
 
   const navigate = useNavigate();
+
+  // Resend countdown timer
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendTimer]);
 
   // Forgot Password Handlers
   const handleForgotEmail = async (e) => {
@@ -39,8 +49,76 @@ const LoginPage = () => {
       if (response.ok) {
         setMessage("Verification code has been sent to your email!");
         setForgotStep('VERIFY');
+        setResendTimer(60); // Start 60 second countdown
+        setOtpValues(['', '', '', '', '', '']); // Reset OTP inputs
       } else {
         setMessage(data.message || "Failed to send email.");
+      }
+    } catch (err) {
+      setMessage("Error sending email.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle OTP input change
+  const handleOtpChange = (index, value) => {
+    // Only allow numbers
+    if (value && !/^\d+$/.test(value)) return;
+
+    const newOtpValues = [...otpValues];
+    newOtpValues[index] = value.slice(-1); // Only take last character
+    setOtpValues(newOtpValues);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      otpRefs.current[index + 1]?.focus();
+    }
+  };
+
+  // Handle OTP keydown for backspace
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && !otpValues[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
+  // Handle OTP paste
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    const newOtpValues = [...otpValues];
+    for (let i = 0; i < pastedData.length; i++) {
+      newOtpValues[i] = pastedData[i];
+    }
+    setOtpValues(newOtpValues);
+    // Focus the next empty input or last input
+    const nextEmptyIndex = newOtpValues.findIndex(val => !val);
+    otpRefs.current[nextEmptyIndex === -1 ? 5 : nextEmptyIndex]?.focus();
+  };
+
+  // Resend verification code
+  const handleResendCode = async () => {
+    if (resendTimer > 0) return;
+
+    setIsLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch(api('/api/auth/forgot-password'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("New verification code sent!");
+        setResendTimer(60);
+        setOtpValues(['', '', '', '', '', '']);
+        otpRefs.current[0]?.focus();
+      } else {
+        setMessage(data.message || "Failed to resend code.");
       }
     } catch (err) {
       setMessage("Error sending email.");
@@ -54,27 +132,24 @@ const LoginPage = () => {
     setIsLoading(true);
     setMessage("");
 
+    const code = otpValues.join('');
+    if (code.length !== 6) {
+      setMessage("Please enter all 6 digits.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // Verify code logic
       const response = await fetch(api('/api/auth/verify-reset-code'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: forgotEmail, code: resetCode }), // Assuming API needs email too, checking DTO again... DTO only had code? Oh wait.
-        // Wait, VerifyCodeRequest ONLY has 'code'. But usually verification needs email to know WHICH user.
-        // Let me re-read VerifyCodeRequest.java carefully.
-        // Response Id: 23. VerifyCodeRequest has ONLY private String code;
-        // This seems insufficient for the backend unless the code is unique globally or session based.
-        // Assuming the backend handles it via global code or something.
+        body: JSON.stringify({ email: forgotEmail, code }),
       });
-
-      // Wait, if Request only has "code", then how does backend know who it is? 
-      // Maybe the "code" is actually a token? Or maybe I missed a field in DTO?
-      // Let's assume DTO is correct (only code).
 
       const data = await response.json();
 
       if (response.ok && data.data) {
-        setResetToken(data.data.resetToken); // Store token for next step
+        setResetToken(data.data.resetToken);
         setMessage("Code verified! Please reset your password.");
         setForgotStep('RESET');
       } else {
@@ -386,23 +461,44 @@ const LoginPage = () => {
           {forgotStep === 'VERIFY' && (
             <form onSubmit={handleVerifyCode} className="auth-form">
               <div className="input-group">
-                <label htmlFor="verify-code">Verification Code</label>
-                <div className="input-wrapper">
-                  <span className="material-symbols-outlined icon-left">key</span>
-                  <input
-                    id="verify-code"
-                    type="text"
-                    placeholder="123456"
-                    value={resetCode}
-                    onChange={(e) => setResetCode(e.target.value)}
-                    maxLength={6}
-                    required
-                  />
+                <label>Verification Code</label>
+                <p className="otp-subtitle">We've sent a code to <strong>{forgotEmail}</strong></p>
+                <div className="otp-container">
+                  {otpValues.map((value, index) => (
+                    <input
+                      key={index}
+                      ref={(el) => (otpRefs.current[index] = el)}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={value}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                      onPaste={handleOtpPaste}
+                      className="otp-input"
+                      autoFocus={index === 0}
+                    />
+                  ))}
+                </div>
+                <div className="resend-container">
+                  <span className="resend-text">Didn't get a code?</span>
+                  {resendTimer > 0 ? (
+                    <span className="resend-timer">Resend in {resendTimer}s</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResendCode}
+                      className="resend-link"
+                      disabled={isLoading}
+                    >
+                      Click to resend.
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="button-group" style={{ display: 'flex', gap: '1rem' }}>
-                <button type="button" onClick={() => setForgotStep('EMAIL')} className="submit-btn" style={{ background: '#374151' }}>Back</button>
-                <button type="submit" className="submit-btn" disabled={isLoading}>
+                <button type="button" onClick={() => setForgotStep('EMAIL')} className="submit-btn" style={{ background: '#374151' }}>Cancel</button>
+                <button type="submit" className="submit-btn" disabled={isLoading || otpValues.join('').length !== 6}>
                   {isLoading ? 'Verifying...' : 'Verify'}
                 </button>
               </div>

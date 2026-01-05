@@ -767,3 +767,113 @@
 .google-login-btn span {
   font-weight: 600;
 }
+
+/* =========================================
+   OTP / VERIFICATION CODE INPUT STYLES
+========================================= */
+
+/* Subtitle under "Verification Code" label */
+.otp-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.otp-subtitle strong {
+  color: #374151;
+}
+
+/* Container for OTP boxes */
+.otp-container {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Individual OTP input box */
+.otp-input {
+  width: 3.5rem;
+  height: 4rem;
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  transition: all 0.2s ease;
+  caret-color: var(--primary);
+}
+
+.otp-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(236, 19, 19, 0.1);
+}
+
+.otp-input:hover:not(:focus) {
+  border-color: #d1d5db;
+}
+
+/* Filled state */
+.otp-input:not(:placeholder-shown) {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+/* Resend container */
+.resend-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.resend-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.resend-timer {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.resend-link {
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.resend-link:hover {
+  text-decoration: underline;
+  color: var(--primary-dark);
+}
+
+.resend-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 480px) {
+  .otp-input {
+    width: 2.75rem;
+    height: 3.25rem;
+    font-size: 1.5rem;
+  }
+  
+  .otp-container {
+    gap: 0.5rem;
+  }
+}

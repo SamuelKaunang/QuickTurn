@@ -80,7 +80,7 @@ public class EmailService {
                                             <!-- Expiry Notice - Rose Accent -->
                                             <div style="background-color: #fff1f2; border-left: 4px solid #e11d48; border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 30px 0;">
                                                 <p style="color: #9f1239; font-size: 14px; margin: 0; line-height: 1.5;">
-                                                    <strong>⏱ Important:</strong> <span style="color: #64748b;">This verification code will expire in <strong style="color: #0f172a;">15 minutes</strong>.
+                                                    <strong>⏱ Important:</strong> <span style="color: #64748b;">This verification code will expire in <strong style="color: #0f172a;">5 minutes</strong>.
                                                     Please complete your password reset promptly.</span>
                                                 </p>
                                             </div>
@@ -154,6 +154,124 @@ public class EmailService {
         } catch (ResendException e) {
             log.error("Failed to send verification email to: {} - {}", maskEmail(toEmail), e.getMessage());
             throw new RuntimeException("Failed to send email. Please try again later.");
+        }
+    }
+
+    /**
+     * Send email verification link for new account verification.
+     * Uses @Async to avoid blocking the main thread.
+     * 
+     * @param toEmail         User's email address
+     * @param userName        User's display name
+     * @param verificationUrl Full URL with token for verification
+     */
+    @Async
+    public void sendVerificationEmail(String toEmail, String userName, String verificationUrl) {
+        String subject = "Verify Your Email - QuickTurn";
+
+        String htmlContent = """
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                </head>
+                <body style="margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f5f9;">
+                    <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" border="0" style="background: linear-gradient(135deg, #f8fafc 0%%, #f1f5f9 50%%, #e2e8f0 100%%); padding: 40px 20px;">
+                        <tr>
+                            <td align="center">
+                                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: rgba(255, 255, 255, 0.95); border-radius: 16px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 10px 40px rgba(0, 0, 0, 0.04); overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.8);">
+
+                                    <!-- Header with Logo - Rose Gradient -->
+                                    <tr>
+                                        <td style="background: linear-gradient(135deg, #e11d48 0%%, #be123c 50%%, #9f1239 100%%); padding: 40px 40px 30px 40px; text-align: center;">
+                                            <img src="https://quick-turn.vercel.app/logo512.png" alt="QuickTurn Logo" width="72" height="72" style="display: block; margin: 0 auto 20px auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);">
+                                            <h1 style="color: #ffffff; font-size: 26px; font-weight: 700; margin: 0; letter-spacing: -0.5px;">Verify Your Email</h1>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Main Content -->
+                                    <tr>
+                                        <td style="padding: 40px; background-color: #ffffff;">
+                                            <p style="color: #0f172a; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0; font-weight: 500;">
+                                                Hello %s,
+                                            </p>
+                                            <p style="color: #475569; font-size: 15px; line-height: 1.7; margin: 0 0 30px 0;">
+                                                Welcome to QuickTurn! To start using our platform and access all features, please verify your email address by clicking the button below.
+                                            </p>
+
+                                            <!-- Verify Button - Rose Gradient -->
+                                            <div style="text-align: center; margin: 30px 0;">
+                                                <a href="%s" style="display: inline-block; background: linear-gradient(135deg, #e11d48 0%%, #be123c 100%%); color: #ffffff; padding: 16px 48px; font-size: 16px; font-weight: 700; text-decoration: none; border-radius: 12px; box-shadow: 0 10px 30px rgba(225, 29, 72, 0.3), 0 4px 12px rgba(225, 29, 72, 0.2);">
+                                                    ✓ Verify Email
+                                                </a>
+                                            </div>
+
+                                            <!-- Link fallback -->
+                                            <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin: 30px 0 0 0; text-align: center;">
+                                                Or copy and paste this link in your browser:<br>
+                                                <a href="%s" style="color: #e11d48; word-break: break-all;">%s</a>
+                                            </p>
+
+                                            <!-- Expiry Notice -->
+                                            <div style="background-color: #fff1f2; border-left: 4px solid #e11d48; border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 30px 0;">
+                                                <p style="color: #9f1239; font-size: 14px; margin: 0; line-height: 1.5;">
+                                                    <strong>⏱ Note:</strong> <span style="color: #64748b;">This verification link will expire in <strong style="color: #0f172a;">24 hours</strong>.</span>
+                                                </p>
+                                            </div>
+
+                                            <!-- Security Notice -->
+                                            <div style="background-color: #f8fafc; border-radius: 10px; padding: 20px; margin: 30px 0; border: 1px solid #e2e8f0;">
+                                                <p style="color: #0f172a; font-size: 14px; font-weight: 600; margin: 0 0 12px 0;">🔒 Security Notice</p>
+                                                <ul style="color: #64748b; font-size: 13px; line-height: 1.9; margin: 0; padding-left: 20px;">
+                                                    <li>If you did not create this account, please ignore this email.</li>
+                                                    <li>This verification link is unique to your account.</li>
+                                                    <li>Never share this link with anyone.</li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Footer -->
+                                    <tr>
+                                        <td style="background-color: #f8fafc; padding: 28px 40px; border-top: 1px solid #e2e8f0;">
+                                            <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" border="0">
+                                                <tr>
+                                                    <td style="text-align: center;">
+                                                        <p style="color: #e11d48; font-size: 18px; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.3px;">QuickTurn</p>
+                                                        <p style="color: #94a3b8; font-size: 13px; margin: 0 0 16px 0; font-weight: 500;">Connecting Talent with Opportunity</p>
+                                                        <p style="color: #cbd5e1; font-size: 12px; margin: 0;">
+                                                            © 2026 QuickTurn. All rights reserved.
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+                </html>
+                """
+                .formatted(userName, verificationUrl, verificationUrl, verificationUrl);
+
+        try {
+            CreateEmailOptions createEmailOptions = CreateEmailOptions.builder()
+                    .from(fromEmail)
+                    .to(toEmail)
+                    .subject(subject)
+                    .html(htmlContent)
+                    .build();
+
+            CreateEmailResponse response = resend.emails().send(createEmailOptions);
+            log.info("Verification email sent successfully to: {} (ID: {})", maskEmail(toEmail), response.getId());
+
+        } catch (ResendException e) {
+            log.error("Failed to send verification email to: {} - {}", maskEmail(toEmail), e.getMessage());
+            // Don't throw - this is async, just log the error
         }
     }
 

@@ -66,6 +66,11 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             if (user.getProfilePictureUrl() == null || user.getProfilePictureUrl().isEmpty()) {
                 user.setProfilePictureUrl(pictureUrl);
             }
+
+            // Google OAuth means email is verified by Google
+            if (!user.isEmailVerified()) {
+                user.setEmailVerified(true);
+            }
         } else {
             // New user - create record
             isNewUser = true;
@@ -77,6 +82,9 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             user.setActive(true);
             user.setAccountStatus(AccountStatus.ACTIVE);
             user.setLastLoginAt(LocalDateTime.now());
+
+            // Google OAuth means email is already verified
+            user.setEmailVerified(true);
 
             // Generate unique username
             String baseUsername = email.split("@")[0];

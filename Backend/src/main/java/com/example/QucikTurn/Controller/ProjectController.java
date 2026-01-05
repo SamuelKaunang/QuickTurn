@@ -15,6 +15,7 @@ import com.example.QucikTurn.dto.ReviewRequest;
 import com.example.QucikTurn.dto.ProjectWithStatusResponse;
 import com.example.QucikTurn.dto.UmkmProjectResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -41,11 +42,25 @@ public class ProjectController {
         this.reviewService = reviewService;
     }
 
-    // --- CREATE PROJECT ---
+    /**
+     * Create a new project.
+     * Requires email verification before first project creation.
+     */
     @PostMapping
-    public ResponseEntity<ApiResponse<Project>> createProject(
+    public ResponseEntity<?> createProject(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody CreateProjectRequest req) {
+
+        // Check email verification before allowing project creation
+        if (!user.isEmailVerified()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of(
+                            "success", false,
+                            "error", "EMAIL_NOT_VERIFIED",
+                            "message", "Silakan verifikasi email Anda sebelum membuat project.",
+                            "email", user.getEmail()));
+        }
+
         Project project = projectSvc.createProject(user.getId(), req);
         return ResponseEntity.status(201)
                 .body(ApiResponse.ok("Project berhasil dibuat", project));

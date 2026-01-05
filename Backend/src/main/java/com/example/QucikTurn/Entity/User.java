@@ -44,6 +44,11 @@ public class User implements UserDetails {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
+
+    // Email verification status - required for core actions (apply/create project)
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = false;
+
     private LocalDateTime lastLoginAt;
 
     @Column(nullable = false)
@@ -395,5 +400,14 @@ public class User implements UserDetails {
 
     public void setBusinessWebsite(String businessWebsite) {
         this.businessWebsite = businessWebsite;
+    }
+
+    // Email verification getter/setter
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
     }
 }

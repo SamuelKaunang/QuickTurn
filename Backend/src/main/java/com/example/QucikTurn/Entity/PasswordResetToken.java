@@ -9,8 +9,8 @@ import java.util.UUID;
 @Table(name = "password_reset_token")
 public class PasswordResetToken {
 
-    // Waktu kadaluarsa verification code: 15 menit
-    private static final int CODE_EXPIRATION = 15;
+    // Waktu kadaluarsa verification code: 5 menit
+    private static final int CODE_EXPIRATION = 5;
     // Waktu kadaluarsa reset token (setelah code verified): 5 menit
     private static final int RESET_TOKEN_EXPIRATION = 5;
 
