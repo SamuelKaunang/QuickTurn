@@ -150,6 +150,16 @@ const ProjectsM = ({ token, limit, userCategory }) => {
                 toast.success("Application submitted successfully!", "Success");
                 setIsModalOpen(false);
                 fetchProjects();
+            } else if (response.status === 403 && data.error === 'EMAIL_NOT_VERIFIED') {
+                // Email not verified - redirect to verification page
+                setIsModalOpen(false);
+                navigate('/email-verification-required', {
+                    state: {
+                        action: 'apply',
+                        email: data.email,
+                        returnPath: '/dashboardm'
+                    }
+                });
             } else {
                 toast.error(data.message || "Failed to submit application.", "Error");
             }

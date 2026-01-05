@@ -10,6 +10,7 @@ const VerifyEmail = () => {
     const [status, setStatus] = useState('loading'); // 'loading', 'success', 'error', 'no-token'
     const [message, setMessage] = useState('');
     const [userEmail, setUserEmail] = useState('');
+    const [countdown, setCountdown] = useState(3); // Countdown before redirect
 
     useEffect(() => {
         const token = searchParams.get('token');
@@ -22,6 +23,16 @@ const VerifyEmail = () => {
 
         verifyEmail(token);
     }, [searchParams]);
+
+    // Auto-redirect countdown after successful verification
+    useEffect(() => {
+        if (status === 'success' && countdown > 0) {
+            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+            return () => clearTimeout(timer);
+        } else if (status === 'success' && countdown === 0) {
+            handleGoToDashboard();
+        }
+    }, [status, countdown]);
 
     const verifyEmail = async (token) => {
         try {
@@ -89,8 +100,11 @@ const VerifyEmail = () => {
                                     <Mail size={16} /> {userEmail}
                                 </p>
                             )}
+                            <p className="redirect-notice">
+                                Mengalihkan ke dashboard dalam <strong>{countdown}</strong> detik...
+                            </p>
                             <button onClick={handleGoToDashboard} className="verify-btn primary">
-                                Lanjut ke Dashboard
+                                Lanjut ke Dashboard Sekarang
                             </button>
                         </>
                     )}
@@ -133,3 +147,4 @@ const VerifyEmail = () => {
 };
 
 export default VerifyEmail;
+

@@ -140,6 +140,22 @@
     margin-top: 1rem;
 }
 
+/* Redirect Notice */
+.redirect-notice {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #065f46;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+    margin: 0.5rem 0 1rem 0;
+    border: 1px solid #a7f3d0;
+}
+
+.redirect-notice strong {
+    color: #047857;
+    font-size: 1.1rem;
+}
+
 /* Footer */
 .verify-footer {
     text-align: center;

@@ -24,6 +24,7 @@ const SearchUsers = lazy(() => import('./pages/SearchUsers'));
 const OAuth2Callback = lazy(() => import('./pages/OAuth2Callback'));
 const SelectRole = lazy(() => import('./pages/SelectRole'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
+const EmailVerificationRequired = lazy(() => import('./pages/EmailVerificationRequired'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -84,8 +85,9 @@ function App() {
               {/* Role Selection Route - For new OAuth users */}
               <Route path="/select-role" element={<SelectRole />} />
 
-              {/* Email Verification Route - Public (no auth required) */}
+              {/* Email Verification Routes */}
               <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/email-verification-required" element={<EmailVerificationRequired />} />
 
               {/* Protected Dashboard Routes */}
               <Route path="/dashboardu" element={

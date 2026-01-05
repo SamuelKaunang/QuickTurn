@@ -164,6 +164,19 @@ const PostProject = () => {
       });
 
       const data = await response.json();
+
+      // Check for email verification error
+      if (response.status === 403 && data.error === 'EMAIL_NOT_VERIFIED') {
+        navigate('/email-verification-required', {
+          state: {
+            action: 'post',
+            email: data.email,
+            returnPath: '/dashboardu'
+          }
+        });
+        return;
+      }
+
       if (!response.ok) throw new Error(data.message || "Failed to post project");
 
       const projectId = data.data.id;
