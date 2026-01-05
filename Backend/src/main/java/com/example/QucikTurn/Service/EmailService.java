@@ -7,6 +7,7 @@ import com.resend.services.emails.model.CreateEmailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +29,11 @@ public class EmailService {
      * Send verification code email for password reset.
      * Uses a professional HTML template with logo and QuickTurn brand colors.
      * Color scheme matches the dashboard: Rose accent (#e11d48), slate backgrounds.
+     * 
+     * @Async: This method runs in a separate thread to avoid blocking the main
+     *         request.
      */
+    @Async
     public void sendVerificationCodeEmail(String toEmail, String code) {
         String subject = "Password Reset Verification Code - QuickTurn";
 

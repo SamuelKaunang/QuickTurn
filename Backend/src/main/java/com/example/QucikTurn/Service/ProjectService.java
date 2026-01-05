@@ -7,6 +7,8 @@ import com.example.QucikTurn.Entity.enums.Role;
 import com.example.QucikTurn.Repository.ProjectRepository;
 import com.example.QucikTurn.Repository.UserRepository;
 import com.example.QucikTurn.dto.CreateProjectRequest;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,7 @@ public class ProjectService {
 
     // --- UMKM: Post Project ---
     @Transactional
+    @CacheEvict(value = "openProjects", allEntries = true)
     public Project createProject(Long ownerId, CreateProjectRequest req) {
         Objects.requireNonNull(ownerId, "Owner ID cannot be null");
         User owner = userRepo.findById(ownerId)
@@ -79,6 +82,7 @@ public class ProjectService {
     }
 
     // --- GET ALL OPEN PROJECTS (For Browsing - Legacy) ---
+    @Cacheable(value = "openProjects")
     public List<Project> getAllOpenProjects() {
         return projectRepo.findByStatus(ProjectStatus.OPEN);
     }
@@ -96,6 +100,7 @@ public class ProjectService {
 
     // --- DELETE PROJECT ---
     @Transactional
+    @CacheEvict(value = "openProjects", allEntries = true)
     public void deleteProject(Long projectId, Long ownerId) {
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
