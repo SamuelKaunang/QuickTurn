@@ -6,7 +6,7 @@ import { SkeletonProjectCard } from '../components/Skeleton';
 import { Clock, Users, Target, Sparkles, Star, DollarSign, Calendar } from 'lucide-react';
 import './ProjectsM.css';
 
-const ProjectsM = ({ token, limit, userCategory }) => {
+const ProjectsM = ({ token, limit, userCategory, useRecommendations = false }) => {
     const navigate = useNavigate();
     const toast = useToast();
     const [projects, setProjects] = useState([]);
@@ -29,7 +29,12 @@ const ProjectsM = ({ token, limit, userCategory }) => {
     // --- FETCH DATA ---
     const fetchProjects = async () => {
         try {
-            const response = await fetch(api("/api/projects"), {
+            // Use recommendations endpoint if useRecommendations prop is true
+            const endpoint = useRecommendations
+                ? `/api/projects/recommendations?limit=${limit || 50}`
+                : "/api/projects";
+
+            const response = await fetch(api(endpoint), {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await response.json();
@@ -45,7 +50,7 @@ const ProjectsM = ({ token, limit, userCategory }) => {
 
     useEffect(() => {
         if (token) fetchProjects();
-    }, [token]);
+    }, [token, useRecommendations]);
 
     // --- FILTERING LOGIC ---
     const filteredProjects = (projects || []).filter((project) => {

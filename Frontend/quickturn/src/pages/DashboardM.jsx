@@ -413,7 +413,7 @@ const DashboardM = () => {
                                 {stats.map((s, i) => <StatCard key={i} {...s} />)}
                             </div>
 
-                            {/* Full Width Projects Section */}
+                            {/* AI-Powered Recommended Projects Section */}
                             <div className="projects-section-full">
                                 <div className="section-header">
                                     <h3>{t('recommendedProjects')}</h3>
@@ -425,7 +425,7 @@ const DashboardM = () => {
                                     </button>
                                 </div>
                                 <div className="project-grid-wrapper">
-                                    <ProjectsM token={token} limit={6} userCategory={userCategory} />
+                                    <ProjectsM token={token} limit={6} userCategory={userCategory} useRecommendations={true} />
                                 </div>
                             </div>
                         </div>

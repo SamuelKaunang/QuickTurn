@@ -152,4 +152,21 @@ public class ProjectViewerService {
                 p.getComplexity(),
                 p.getApplicantCount());
     }
+
+    /**
+     * Convert a list of Projects to ProjectWithStatusResponse DTOs.
+     * Used by RecommendationService to return consistent response format.
+     */
+    public List<ProjectWithStatusResponse> convertToStatusResponse(List<Project> projects, Long studentId) {
+        return projects.stream().map(p -> {
+            String myStatus = null;
+            if (studentId != null) {
+                var app = applicationRepo.findByProjectIdAndStudentId(p.getId(), studentId);
+                if (app.isPresent()) {
+                    myStatus = app.get().getStatus().name();
+                }
+            }
+            return mapToDTO(p, myStatus);
+        }).collect(Collectors.toList());
+    }
 }

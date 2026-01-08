@@ -6,6 +6,7 @@ import com.example.QucikTurn.Service.ApplicationService;
 import com.example.QucikTurn.Service.FinishingService;
 import com.example.QucikTurn.Service.ProjectService;
 import com.example.QucikTurn.Service.ProjectViewerService;
+import com.example.QucikTurn.Service.RecommendationService;
 import com.example.QucikTurn.Service.ReviewService;
 import com.example.QucikTurn.dto.ApiResponse;
 import com.example.QucikTurn.dto.ApplicantResponse;
@@ -31,15 +32,17 @@ public class ProjectController {
     private final FinishingService finishingSvc;
     private final ApplicationService applicationSvc;
     private final ReviewService reviewService;
+    private final RecommendationService recommendationSvc;
 
     public ProjectController(ProjectService projectSvc, ProjectViewerService projectViewerSvc,
             FinishingService finishingSvc, ApplicationService applicationSvc,
-            ReviewService reviewService) {
+            ReviewService reviewService, RecommendationService recommendationSvc) {
         this.projectSvc = projectSvc;
         this.projectViewerSvc = projectViewerSvc;
         this.finishingSvc = finishingSvc;
         this.applicationSvc = applicationSvc;
         this.reviewService = reviewService;
+        this.recommendationSvc = recommendationSvc;
     }
 
     /**
@@ -80,6 +83,21 @@ public class ProjectController {
         Long studentId = (user != null && user.getRole().name().equals("MAHASISWA")) ? user.getId() : null;
         List<ProjectWithStatusResponse> list = projectViewerSvc.getOpenProjectsWithStatus(studentId);
         return ResponseEntity.ok(ApiResponse.ok("All open projects retrieved", list));
+    }
+
+    // --- GET RECOMMENDED PROJECTS (AI-Powered) ---
+    @GetMapping("/recommendations")
+    public ResponseEntity<ApiResponse<List<ProjectWithStatusResponse>>> getRecommendedProjects(
+            @AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "10") int limit) {
+        // Get recommended projects based on user skills and category
+        List<Project> recommendedProjects = recommendationSvc.getRecommendationsForUser(user, limit);
+
+        // Convert to ProjectWithStatusResponse for consistency with other endpoints
+        List<ProjectWithStatusResponse> list = projectViewerSvc.convertToStatusResponse(
+                recommendedProjects, user.getId());
+
+        return ResponseEntity.ok(ApiResponse.ok("Recommended projects retrieved", list));
     }
 
     // --- GET PROJECTS I'M PARTICIPATING IN (For Students Dashboard) ---

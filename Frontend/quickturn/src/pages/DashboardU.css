@@ -1277,28 +1277,34 @@
 
 .mobile-nav-inner {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
     align-items: center;
+    width: 100%;
     max-width: 500px;
     margin: 0 auto;
+    padding: 0 8px;
 }
 
 .mobile-nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 8px 12px;
+    justify-content: center;
+    gap: 3px;
+    padding: 8px 6px;
     background: none;
     border: none;
     color: var(--slate-500);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    border-radius: 12px;
-    min-width: 60px;
+    border-radius: 10px;
+    flex: 1;
+    max-width: 70px;
+    min-width: 50px;
     font-family: inherit;
+    text-align: center;
 }
 
 .mobile-nav-item:active {
@@ -1311,29 +1317,40 @@
 }
 
 .mobile-nav-item svg {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.mobile-nav-item span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.2;
 }
 
 /* Special Add Button for Client */
 .mobile-nav-item.mobile-nav-add {
     background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
     color: white;
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     padding: 0;
-    margin-top: -20px;
+    margin-top: -16px;
     box-shadow: 0 4px 16px rgba(225, 29, 72, 0.4);
-    min-width: 50px;
+    min-width: 48px;
+    max-width: 48px;
+    flex: 0 0 48px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .mobile-nav-item.mobile-nav-add svg {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
 }
 
 .mobile-nav-item.mobile-nav-add:active {
@@ -1342,13 +1359,13 @@
 
 .mobile-nav-item .nav-badge {
     position: absolute;
-    top: 2px;
-    right: 8px;
+    top: 0px;
+    right: 4px;
     min-width: 16px;
     height: 16px;
     background: linear-gradient(135deg, #22c55e, #16a34a);
     color: white;
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     font-weight: 700;
     border-radius: 8px;
     display: flex;
@@ -1359,6 +1376,11 @@
 
 .mobile-nav-item-wrapper {
     position: relative;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    max-width: 70px;
+    min-width: 50px;
 }
 
 /* Show mobile nav on mobile */

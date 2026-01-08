@@ -1113,13 +1113,18 @@
     .card-category-strip {
         width: 100%;
         min-height: auto;
-        padding: 10px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .category-label-vertical {
         writing-mode: horizontal-tb;
         transform: none;
         padding: 0;
+        font-size: 0.8rem;
+        letter-spacing: 1.5px;
     }
 
     .card-footer-landscape {
