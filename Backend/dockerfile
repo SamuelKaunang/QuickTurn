@@ -23,9 +23,15 @@ COPY src /app/src
 RUN ./mvnw clean package -DskipTests
 
 # --------------------------------------------------------------------------
-# STAGE 2: FINAL IMAGE STAGE (Sama kayak sebelumnya)
+# STAGE 2: FINAL IMAGE STAGE (Optimized for 512MB RAM Free Tier)
 # --------------------------------------------------------------------------
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# JVM Memory Settings for 512MB RAM Free Tier:
+# -Xms128m  : Initial heap size (128 MB)
+# -Xmx384m  : Maximum heap size (384 MB, sisakan ~128 MB untuk OS/container)
+# -XX:+UseContainerSupport : Enable container-aware memory detection
+# -XX:MaxRAMPercentage=75  : Use max 75% of container RAM
+ENTRYPOINT ["java", "-Xms128m", "-Xmx384m", "-XX:+UseContainerSupport", "-jar", "app.jar"]
