@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import {
     ArrowRight, Users, Briefcase, TrendingUp,
     Star, CheckCircle, Instagram, Linkedin, Mail, Phone, MapPin,
@@ -34,6 +35,42 @@ const LandingPage = () => {
 
     return (
         <div className="landing-page">
+            <Helmet>
+                <title>QuickTurn | Platform Micro-Internship untuk Mahasiswa & UMKM</title>
+                <meta name="description" content="Platform #1 di Indonesia yang menghubungkan Mahasiswa dengan UMKM untuk proyek micro-internship, freelance, dan pengembangan bisnis digital." />
+                <meta name="keywords" content="micro-internship indonesia, jasa mahasiswa, proyek umkm, freelance mahasiswa, cari cuan mahasiswa, kerja sampingan mahasiswa, jasa desain logo murah, admin sosmed murah, digitalisasi umkm, magang wfa, side hustle mahasiswa, loker freelance remote, kerja online mahasiswa, magang online paid, freelance pemula, job part time kuliah, portofolio desain grafis, cari pengalaman kerja, uang saku tambahan, mahasiswa produktif, freelancer indo, creative worker, umkm go digital" />
+                
+                {/* Open Graph / Facebook */}
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://quickturn.id/" />
+                <meta property="og:title" content="QuickTurn | Solusi Digital UMKM & Pengalaman Nyata Mahasiswa" />
+                <meta property="og:description" content="Temukan talent mahasiswa terbaik untuk proyek UMKM Anda, atau bangun portofolio karir dengan proyek nyata." />
+                <meta property="og:image" content="https://quickturn.id/og-image.jpg" />
+
+                {/* Twitter */}
+                <meta property="twitter:card" content="summary_large_image" />
+                <meta property="twitter:url" content="https://quickturn.id/" />
+                <meta property="twitter:title" content="QuickTurn | Jembatan Mahasiswa & UMKM" />
+                <meta property="twitter:description" content="Micro-internship platform menghubungkan mahasiswa kreatif dengan UMKM yang butuh solusi digital cepat." />
+                <meta property="twitter:image" content="https://quickturn.id/og-image.jpg" />
+                
+                {/* Structured Data (Schema.org) */}
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "WebSite",
+                            "name": "QuickTurn",
+                            "url": "https://quickturn.id",
+                            "potentialAction": {
+                                "@type": "SearchAction",
+                                "target": "https://quickturn.id/search?q={search_term_string}",
+                                "query-input": "required name=search_term_string"
+                            }
+                        }
+                    `}
+                </script>
+            </Helmet>
             {/* Background Effects */}
             <div className="bg-glow glow-1"></div>
             <div className="bg-glow glow-2"></div>
@@ -42,17 +79,17 @@ const LandingPage = () => {
             {/* Navigation Header */}
             <nav className="landing-nav">
                 <div className="nav-container">
-                    <div className="nav-logo" onClick={() => navigate('/')}>
+                    <Link to="/" className="nav-logo">
                         <img src={logoFull} alt="QuickTurn" className="nav-logo-img" />
-                    </div>
+                    </Link>
                     <div className="nav-actions">
-                        <button className="btn-nav-login" onClick={() => navigate('/login')}>
+                        <Link to="/login" className="btn-nav-login">
                             Login
-                        </button>
-                        <button className="btn-nav-register" onClick={() => navigate('/registerm')}>
+                        </Link>
+                        <Link to="/registerm" className="btn-nav-register">
                             Get Started
                             <ArrowRight size={16} />
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </nav>
@@ -66,21 +103,21 @@ const LandingPage = () => {
                             <span>Indonesia's #1 Micro-Internship Platform</span>
                         </div>
                         <h1 className="hero-title">
-                            <span className="text-dark">Turning</span> <span className="gradient-text">Potential</span> <span className="text-dark">into</span> <span className="gradient-text">Power</span>
+                            <span className="text-dark">Solusi Digital</span> <span className="gradient-text">UMKM</span> <span className="text-dark">karya</span> <span className="gradient-text">Mahasiswa</span>
                         </h1>
                         <p className="hero-subtitle">
-                            The fastest bridge between fresh ideas from students and real needs from businesses.
-                            We don't just offer internships, we offer opportunities to make real impact.
+                            Platform yang mempertemukan ide segar mahasiswa dengan kebutuhan nyata bisnis UMKM.
+                            Dapatkan pengalaman kerja nyata atau solusi bisnis terjangkau sekarang.
                         </p>
                         <div className="hero-cta">
-                            <button className="btn-primary-hero" onClick={() => navigate('/registerm')}>
+                            <Link to="/registerm" className="btn-primary-hero">
                                 Start Now
                                 <Rocket size={18} />
-                            </button>
-                            <button className="btn-secondary-hero" onClick={() => navigate('/registeru')}>
+                            </Link>
+                            <Link to="/registeru" className="btn-secondary-hero">
                                 Find Talent
                                 <Users size={18} />
-                            </button>
+                            </Link>
                         </div>
                         <div className="hero-stats">
                             <div className="hero-stat">
@@ -168,7 +205,7 @@ const LandingPage = () => {
                 <div className="section-container">
                     <div className="community-grid">
                         <div className="community-image-wrapper">
-                            <img src={heroPerson} alt="Our Community" className="community-image" />
+                            <img src={heroPerson} alt="Our Community" className="community-image" loading="lazy" />
                             <div className="community-image-overlay"></div>
                             <div className="community-badge">
                                 <Sparkles size={16} />
@@ -209,10 +246,10 @@ const LandingPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <button className="btn-community" onClick={() => navigate('/registerm')}>
+                            <Link to="/registerm" className="btn-community">
                                 Join the Community
                                 <ArrowRight size={18} />
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -228,7 +265,7 @@ const LandingPage = () => {
                         {/* For Talents */}
                         <div className="value-card talent">
                             <div className="value-card-image">
-                                <img src={talentGirl} alt="Talent working on laptop" />
+                                <img src={talentGirl} alt="Talent working on laptop" loading="lazy" />
                             </div>
                             <div className="value-card-content">
                                 <div className="value-card-header">
@@ -260,17 +297,17 @@ const LandingPage = () => {
                                         <span>Flexible, work from anywhere</span>
                                     </li>
                                 </ul>
-                                <button className="btn-value" onClick={() => navigate('/registerm')}>
+                                <Link to="/registerm" className="btn-value">
                                     Register as Talent
                                     <ArrowUpRight size={16} />
-                                </button>
+                                </Link>
                             </div>
                         </div>
 
                         {/* For Clients */}
                         <div className="value-card client">
                             <div className="value-card-image">
-                                <img src={clientWoman} alt="Business professional" />
+                                <img src={clientWoman} alt="Business professional" loading="lazy" />
                             </div>
                             <div className="value-card-content">
                                 <div className="value-card-header">
@@ -302,10 +339,10 @@ const LandingPage = () => {
                                         <span>Verified talents & transparent reviews</span>
                                     </li>
                                 </ul>
-                                <button className="btn-value client-btn" onClick={() => navigate('/registeru')}>
+                                <Link to="/registeru" className="btn-value client-btn">
                                     Register as Client
                                     <ArrowUpRight size={16} />
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -318,7 +355,7 @@ const LandingPage = () => {
                     <div className="how-section-grid">
                         <div className="how-image-section">
                             <div className="how-image-wrapper">
-                                <img src={coworking} alt="Coworking space" className="how-main-image" />
+                                <img src={coworking} alt="Coworking space" className="how-main-image" loading="lazy" />
                                 <div className="how-image-badge">
                                     <Award size={20} />
                                     <span>Trusted by 300+ Companies</span>
@@ -377,7 +414,7 @@ const LandingPage = () => {
                     <div className="testimonial-grid">
                         <div className="testimonial-card featured">
                             <div className="testimonial-image">
-                                <img src={teamCollab} alt="Team collaborating" />
+                                <img src={teamCollab} alt="Team collaborating" loading="lazy" />
                             </div>
                             <div className="testimonial-content">
                                 <Quote size={32} className="quote-icon" />
@@ -435,7 +472,7 @@ const LandingPage = () => {
                 <div className="section-container">
                     <div className="cta-card">
                         <div className="cta-image">
-                            <img src={remoteWork} alt="Remote work" />
+                            <img src={remoteWork} alt="Remote work" loading="lazy" />
                         </div>
                         <div className="cta-content">
                             <h2>Ready to Get Started?</h2>
@@ -444,14 +481,14 @@ const LandingPage = () => {
                                 Join thousands who are already growing with QuickTurn.
                             </p>
                             <div className="cta-buttons">
-                                <button className="btn-cta-primary" onClick={() => navigate('/registerm')}>
+                                <Link to="/registerm" className="btn-cta-primary">
                                     I'm a Talent
                                     <Rocket size={18} />
-                                </button>
-                                <button className="btn-cta-secondary" onClick={() => navigate('/registeru')}>
+                                </Link>
+                                <Link to="/registeru" className="btn-cta-secondary">
                                     I'm a Client
                                     <Briefcase size={18} />
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -473,21 +510,21 @@ const LandingPage = () => {
                         <div className="footer-links-section">
                             <div className="footer-links">
                                 <h4>Platform</h4>
-                                <a onClick={() => navigate('/registerm')}>Register as Talent</a>
-                                <a onClick={() => navigate('/registeru')}>Register as Client</a>
-                                <a onClick={() => navigate('/login')}>Login</a>
+                                <Link to="/registerm">Register as Talent</Link>
+                                <Link to="/registeru">Register as Client</Link>
+                                <Link to="/login">Login</Link>
                             </div>
                             <div className="footer-links">
                                 <h4>Company</h4>
-                                <a href="#">About Us</a>
-                                <a href="#">Careers</a>
-                                <a href="#">Blog</a>
+                                <Link to="/faq">About Us & FAQ</Link>
+
                             </div>
                             <div className="footer-links">
                                 <h4>Legal</h4>
-                                <a href="#">Terms & Conditions</a>
-                                <a href="#">Privacy Policy</a>
-                                <a href="#">FAQ</a>
+                                <Link to="/terms">Terms & Conditions</Link>
+                                <Link to="/privacy">Privacy Policy</Link>
+                                <Link to="/refund">Refund Policy</Link>
+                                <Link to="/faq">FAQ</Link>
                             </div>
                         </div>
                     </div>
@@ -495,25 +532,19 @@ const LandingPage = () => {
                         <div className="contact-info">
                             <div className="contact-item">
                                 <MapPin size={16} />
-                                <span>Jl. Startup Avenue No. 123, Jakarta, Indonesia</span>
-                            </div>
-                            <div className="contact-item">
-                                <Phone size={16} />
-                                <span>+62 21 1234 5678</span>
+                                <span>Bandung, Indonesia</span>
                             </div>
                             <div className="contact-item">
                                 <Mail size={16} />
-                                <span>hello@quickturn.id</span>
+                                <span>quickturn.main@gmail.com</span>
                             </div>
                         </div>
                         <div className="social-links">
                             <a href="https://instagram.com/quickturn.id" target="_blank" rel="noopener noreferrer" className="social-link">
                                 <Instagram size={18} />
                             </a>
-                            <a href="https://linkedin.com/company/quickturn" target="_blank" rel="noopener noreferrer" className="social-link">
-                                <Linkedin size={18} />
-                            </a>
-                            <a href="mailto:hello@quickturn.id" className="social-link">
+
+                            <a href="mailto:quickturn.main@gmail.com" className="social-link">
                                 <Mail size={18} />
                             </a>
                         </div>

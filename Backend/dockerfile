@@ -34,4 +34,7 @@ COPY --from=builder /app/target/*.jar app.jar
 # -Xmx384m  : Maximum heap size (384 MB, sisakan ~128 MB untuk OS/container)
 # -XX:+UseContainerSupport : Enable container-aware memory detection
 # -XX:MaxRAMPercentage=75  : Use max 75% of container RAM
+# Expose port 8080 explicitly for Azure/Docker to detect
+EXPOSE 8080
+
 ENTRYPOINT ["java", "-Xms128m", "-Xmx384m", "-XX:+UseContainerSupport", "-jar", "app.jar"]

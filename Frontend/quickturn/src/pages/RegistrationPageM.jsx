@@ -4,6 +4,7 @@ import { useToast } from '../components/Toast';
 import { api } from '../utils/apiConfig';
 import { validators, getPasswordStrength } from '../utils/validators';
 import { Timer, Shield, Sparkles, TrendingUp, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import './LoginPage.css';
 import logoFull from '../assets/logo/Logo full.png';
 
@@ -132,6 +133,10 @@ function RegistrationPageM() {
 
   return (
     <div className="login-wrapper">
+      <Helmet>
+        <title>Daftar sebagai Talent Mahasiswa | QuickTurn</title>
+        <meta name="description" content="Gabung QuickTurn sebagai mahasiswa, dapatkan proyek micro-internship berbayar, dan bangun portofolio karirmu sekarang." />
+      </Helmet>
       {/* LEFT PANEL: Branding & Visual */}
       <section className="left-panel">
         <div className="left-content-bg"></div>

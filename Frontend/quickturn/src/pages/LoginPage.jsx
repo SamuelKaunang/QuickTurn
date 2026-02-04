@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { api, BASE_URL } from '../utils/apiConfig';
 import { Timer, Shield, Sparkles, TrendingUp } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import './LoginPage.css';
 import logoFull from '../assets/logo/Logo full.png';
 
@@ -259,6 +260,10 @@ const LoginPage = () => {
 
   return (
     <div className="login-wrapper">
+      <Helmet>
+        <title>Login Masuk | QuickTurn Workspace</title>
+        <meta name="description" content="Masuk ke dashboard QuickTurn. Akses proyek, manajemen talent, dan kolaborasi micro-internship Anda." />
+      </Helmet>
       {/* LEFT PANEL: Branding & Visual */}
       <section className="left-panel">
         <div className="left-content-bg"></div>

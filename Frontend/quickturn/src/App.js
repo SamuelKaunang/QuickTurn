@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import { ToastProvider } from './components/Toast';
 import { SettingsProvider } from './layouts/SettingsContext';
 import { ProtectedRoute, AuthRoute } from './layouts/RouteGuards';
+import { HelmetProvider } from 'react-helmet-async';
 
 // Lazy load all pages for code splitting - improves initial load time
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -25,6 +26,10 @@ const OAuth2Callback = lazy(() => import('./pages/OAuth2Callback'));
 const SelectRole = lazy(() => import('./pages/SelectRole'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 const EmailVerificationRequired = lazy(() => import('./pages/EmailVerificationRequired'));
+const TermsConditions = lazy(() => import('./pages/TermsConditions'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
+const FAQ = lazy(() => import('./pages/FAQ'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -56,6 +61,7 @@ function App() {
   return (
     <SettingsProvider>
       <ToastProvider>
+        <HelmetProvider>
         <BrowserRouter>
           <Suspense fallback={<PageLoader />}>
             <Routes>
@@ -153,11 +159,18 @@ function App() {
               } />
 
               {/* Fallback - Landing Page */}
+              {/* Fallback - Landing Page */}
               <Route path="*" element={<LandingPage />} />
+              
+              {/* Legal Routes */}
+              <Route path="/terms" element={<TermsConditions />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/refund" element={<RefundPolicy />} />
+              <Route path="/faq" element={<FAQ />} />
             </Routes>
           </Suspense>
         </BrowserRouter>
-
+        </HelmetProvider>
         {/* Vercel Analytics & Speed Insights */}
         <Analytics />
         <SpeedInsights />

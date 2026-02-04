@@ -4,6 +4,7 @@ import { useToast } from '../components/Toast';
 import { api } from '../utils/apiConfig';
 import { validators, getPasswordStrength } from '../utils/validators';
 import { Timer, Shield, Sparkles, TrendingUp, CheckCircle, XCircle } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import './LoginPage.css';
 import logoFull from '../assets/logo/Logo full.png';
 
@@ -132,6 +133,10 @@ function RegistrationPageU() {
 
   return (
     <div className="login-wrapper">
+      <Helmet>
+        <title>Daftar sebagai UMKM/Klien | QuickTurn</title>
+        <meta name="description" content="Daftarkan bisnis atau UMKM Anda di QuickTurn untuk menemukan talent mahasiswa berkualitas. Solusi digital hemat biaya dan cepat." />
+      </Helmet>
       {/* LEFT PANEL: Branding & Visual */}
       <section className="left-panel">
         <div className="left-content-bg"></div>

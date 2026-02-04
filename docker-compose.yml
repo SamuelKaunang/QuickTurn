@@ -1,8 +1,10 @@
 services:
-  # --- DATABASE ZONE ---
+  # --- DATABASE ZONE (TUNED FOR LOW RAM) ---
   mysql:
     image: mysql:8.0
     container_name: quickturn-mysql
+    # OPTIMIZED: Limit buffer pool to 128M and connections to 50
+    command: --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=128M --max-connections=50
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: quickturn
@@ -15,10 +17,16 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 384M
 
   mongodb:
     image: mongo:latest
     container_name: quickturn-mongo
+    # OPTIMIZED: Limit WiredTiger cache to 256MB
+    command: ["mongod", "--wiredTigerCacheSizeGB", "0.25"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
@@ -28,12 +36,16 @@ services:
       - mongo_data:/data/db
     networks:
       - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 384M
 
-  # --- BACKEND ZONE ---
+  # --- BACKEND ZONE (JVM OPTIMIZED) ---
   backend:
     build:
-      context: ./Backend  # Nunjuk langsung ke folder Backend
-      dockerfile: dockerfile # Sesuaikan sama nama file lu yang huruf kecil semua
+      context: ./Backend
+      dockerfile: dockerfile
     container_name: quickturn-backend
     restart: always
     depends_on:
@@ -45,17 +57,25 @@ services:
       SPRING_DATASOURCE_PASSWORD: password123
       SPRING_DATA_MONGODB_URI: mongodb://root:example@mongodb:27017/quickturn_chat?authSource=admin
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_JWT_SECRET: ${APP_JWT_SECRET}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     ports:
       - "8080:8080"
     volumes:
       - uploads_data:/app/uploads
     networks:
       - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 450M
 
   # --- FRONTEND ZONE ---
   frontend:
     build:
-      context: ./Frontend/quickturn # Jalur baru dari Root
+      context: ./Frontend/quickturn
       dockerfile: Dockerfile
     container_name: quickturn-frontend
     restart: always
@@ -65,8 +85,12 @@ services:
       - backend
     networks:
       - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
 
-  # --- GUI TOOLS ---
+  # --- GUI TOOLS (Keep as is, but consider stopping them if RAM needs saving) ---
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:5.2.1
     container_name: quickturn-pma
@@ -80,6 +104,10 @@ services:
       - mysql
     networks:
       - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
 
   mongo-express:
     image: mongo-express
@@ -94,6 +122,10 @@ services:
       - mongodb
     networks:
       - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
 
 volumes:
   mysql_data:
