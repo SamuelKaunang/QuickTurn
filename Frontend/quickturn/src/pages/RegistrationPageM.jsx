@@ -50,6 +50,7 @@ function RegistrationPageM() {
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Track which fields have been touched (for showing validation)
@@ -98,6 +99,11 @@ function RegistrationPageM() {
       // Find first error and show it
       const firstError = Object.values(validations).find(v => !v.valid);
       setMessage(firstError?.message || 'Please fix the errors in the form.');
+      return;
+    }
+
+    if (!agreedToTerms) {
+      setMessage('You must agree to the Terms & Conditions and Privacy Policy.');
       return;
     }
 
@@ -310,6 +316,18 @@ function RegistrationPageM() {
                 )}
               </div>
               <ValidationFeedback validation={validations.confirmPassword} show={touched.confirmPassword} />
+            </div>
+
+            <div className="terms-checkbox">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+              />
+              <label htmlFor="terms">
+                I agree to the <Link to="/terms" target="_blank">Terms & Conditions</Link> and <Link to="/privacy" target="_blank">Privacy Policy</Link>
+              </label>
             </div>
 
             <button type="submit" className="submit-btn" disabled={isLoading}>

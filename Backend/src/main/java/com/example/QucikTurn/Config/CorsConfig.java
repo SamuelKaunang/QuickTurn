@@ -18,7 +18,8 @@ public class CorsConfig implements WebMvcConfigurer {
                         "https://quickturn.web.id",
                         "https://www.quickturn.web.id",
                         "http://localhost:3000",
-                        "http://localhost:5173")
+                        "http://localhost:5173",
+                        "http://localhost")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Authorization", "Content-Type", "X-Requested-With")
                 .exposedHeaders("Authorization")

@@ -61,7 +61,8 @@ public class SecurityConfig {
                 "https://quickturn.web.id",
                 "https://www.quickturn.web.id",
                 "http://localhost:3000", // Local development
-                "http://localhost:5173" // Vite local development
+                "http://localhost:5173", // Vite local development
+                "http://localhost" // Docker production local
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
