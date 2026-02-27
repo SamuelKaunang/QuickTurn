@@ -43,9 +43,7 @@ services:
 
   # --- BACKEND ZONE (JVM OPTIMIZED) ---
   backend:
-    build:
-      context: ./Backend
-      dockerfile: dockerfile
+    image: sakahere4uy/quickturn-backend:latest
     container_name: quickturn-backend
     restart: always
     depends_on:
@@ -70,7 +68,8 @@ services:
     deploy:
       resources:
         limits:
-          memory: 450M
+          memory: 1200M
+
 
   # --- FRONTEND ZONE ---
   frontend:
