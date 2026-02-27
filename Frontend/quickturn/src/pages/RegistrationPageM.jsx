@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '../components/Toast';
 import { api } from '../utils/apiConfig';
 import { validators, getPasswordStrength } from '../utils/validators';
-import { Timer, Shield, Sparkles, TrendingUp, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Timer, Shield, Sparkles, TrendingUp, CheckCircle, XCircle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import './LoginPage.css';
 import logoFull from '../assets/logo/Logo full.png';

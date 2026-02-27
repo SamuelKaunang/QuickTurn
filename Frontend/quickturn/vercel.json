@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "buildCommand": "CI= react-scripts build",
+  "outputDirectory": "build",
+  "env": {
+    "GENERATE_SOURCEMAP": "false",
+    "DISABLE_ESLINT_PLUGIN": "true"
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

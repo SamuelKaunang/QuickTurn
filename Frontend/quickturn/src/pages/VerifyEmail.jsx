@@ -24,7 +24,7 @@ const VerifyEmail = () => {
         verifyEmail(token);
     }, [searchParams]);
 
-    // Auto-redirect countdown after successful verification
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (status === 'success' && countdown > 0) {
             const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -33,6 +33,7 @@ const VerifyEmail = () => {
             handleGoToDashboard();
         }
     }, [status, countdown]);
+
 
     const verifyEmail = async (token) => {
         try {

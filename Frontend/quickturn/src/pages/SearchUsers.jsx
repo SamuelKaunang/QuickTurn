@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { performLogout } from '../layouts/RouteGuards';
 import {
     Search, User, Star, Briefcase, MapPin, Filter,
-    ChevronDown, X, Users, Award, Building2, GraduationCap,
+    ChevronDown, X, Users, Building2, GraduationCap,
     ArrowLeft, RefreshCw, LayoutDashboard, MessageSquare, Settings, LogOut
 } from 'lucide-react';
 import { api } from '../utils/apiConfig';
@@ -45,6 +45,7 @@ const SearchUsers = () => {
 
     // --- EFFECTS ---
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         // Auth check
         if (!token) {
@@ -62,6 +63,7 @@ const SearchUsers = () => {
         return () => clearInterval(interval);
     }, [token, navigate]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         filterUsers();
     }, [searchQuery, roleFilter, bidangFilter, sortBy, allUsers]);
