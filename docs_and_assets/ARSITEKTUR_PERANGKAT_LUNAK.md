@@ -102,4 +102,4 @@
 | Real-time | WebSocket with STOMP |
 | File Storage | Azure Blob Storage |
 | Email Service | Resend API |
-| Deployment | Railway (Backend), Vercel (Frontend) |
+| Deployment | Azzure App Service (Backend), Vercel (Frontend) |
