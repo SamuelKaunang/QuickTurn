@@ -6,7 +6,6 @@ Role system (Mahasiswa, UMKM, Admin) → biar hak akses beda.
 
 Profile management (update bio, skill, portofolio mahasiswa / profil bisnis UMKM).
 
-Analogi: kayak pintu masuk mall → semua orang harus punya kartu masuk (akun) sesuai perannya.
 
 
 
@@ -20,7 +19,7 @@ Apply/Proposal System (Mahasiswa bisa apply dengan penjelasan singkat).
 
 Project Status Flow → OPEN → ONGOING → DONE → CLOSED.
 
-Analogi: kayak papan job fair mini, UMKM tempel lowongan kecil, mahasiswa tinggal pilih yang cocok.
+
 
 3. Matching & Contract
 
@@ -28,7 +27,7 @@ Project Matching → mahasiswa pilih proyek sesuai skill.
 
 Kontrak Digital Sederhana → semacam “agreement” dalam sistem saat UMKM memilih mahasiswa.
 
-Analogi: kayak lo tanda tangan kontrak kerja magang, tapi versi digital singkat.
+
 
 4. Communication System
 
@@ -36,7 +35,6 @@ Realtime Chat → mahasiswa & UMKM bisa diskusi detail project.
 
 Opsional: attachment upload (kirim gambar wireframe, dokumen requirement, dsb).
 
-Analogi: WhatsApp grup kerja khusus 1 proyek.
 
 5. Payment & Transaction
 
@@ -44,7 +42,7 @@ Payment Gateway Integration (Midtrans/Xendit/GoPay/DANA).
 
 Sistem escrow sederhana (UMKM bayar → dana ditahan → cair kalau project selesai).
 
-Analogi: kayak Tokopedia → duit ditahan dulu biar aman, baru cair setelah barang (proyek) selesai.
+
 
 6. Review & Rating
 
@@ -52,7 +50,6 @@ UMKM kasih rating + review mahasiswa setelah project.
 
 Mahasiswa juga bisa nilai pengalaman dengan UMKM (two-way rating).
 
-Analogi: kayak sistem bintang di Gojek/Grab, buat jaga kualitas.
 
 
 
