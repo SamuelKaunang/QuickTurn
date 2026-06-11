@@ -43,6 +43,18 @@
         0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
+/* Overdue card clickable visual hint */
+.project-cardU.overdue-clickable {
+    border-color: rgba(239, 68, 68, 0.25);
+}
+
+.project-cardU.overdue-clickable:hover {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow:
+        0 8px 16px rgba(239, 68, 68, 0.08),
+        0 20px 40px rgba(239, 68, 68, 0.1);
+}
+
 /* Card Header with Category Gradient */
 .card-headerU {
     height: 100px;
@@ -99,6 +111,12 @@
 
 .card-statusU.closed {
     color: #64748b;
+}
+
+.card-statusU.overdue {
+    color: #ef4444;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 /* Card Body */
@@ -246,6 +264,17 @@
     border: 1px solid rgba(5, 150, 105, 0.3);
 }
 
+.status-overdue {
+    text-align: center;
+    color: #ef4444;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: rgba(239, 68, 68, 0.08);
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
 /* Rating Display */
 .rating-display {
     width: 100%;
@@ -290,6 +319,182 @@
     box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
+/* =========================================
+   DETAIL MODAL - OVERDUE PROJECT INFO
+   (Same look as talent's project detail view)
+========================================= */
+.detail-modal-overlayU {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeInOverlay 0.2s ease;
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.detail-modal-contentU {
+    background: #fff;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 540px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
+    animation: slideUpModal 0.3s ease;
+}
+
+@keyframes slideUpModal {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.detail-modal-contentU::-webkit-scrollbar {
+    width: 4px;
+}
+
+.detail-modal-contentU::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.detail-modal-headerU {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    gap: 16px;
+}
+
+.detail-modal-headerU h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.4;
+    margin: 0;
+    flex: 1;
+}
+
+.close-btnU {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.close-btnU:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #ef4444;
+}
+
+.detail-modal-bodyU {
+    padding: 20px 24px;
+}
+
+.detail-meta-rowU {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-meta-itemU {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-labelU {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 600;
+}
+
+.detail-budgetU {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #059669;
+}
+
+.detail-valueU {
+    font-size: 0.95rem;
+    color: #334155;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.detail-descriptionU {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.detail-sectionU {
+    margin-bottom: 18px;
+}
+
+.detail-sectionU:last-child {
+    margin-bottom: 0;
+}
+
+.detail-status-badgeU {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-status-badgeU.overdue {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.detail-modal-footerU {
+    padding: 16px 24px 20px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Mobile Responsive */
 @media (max-width: 640px) {
     .projects-rowU {
@@ -315,5 +520,22 @@
 
     .card-budgetU {
         font-size: 1rem;
+    }
+
+    .detail-modal-contentU {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .detail-modal-headerU {
+        padding: 20px 20px 14px;
+    }
+
+    .detail-modal-bodyU {
+        padding: 16px 20px;
+    }
+
+    .detail-modal-footerU {
+        padding: 14px 20px 16px;
     }
 }

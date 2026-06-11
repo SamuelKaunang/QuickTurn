@@ -809,6 +809,13 @@
     gap: 16px;
 }
 
+/* Keep UMKM project cards horizontal scroll */
+.project-grid-wrapper .projects-rowU {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
 /* Projects row should display cards in 3-column grid */
 .project-grid-wrapper .projects-rowM {
     display: grid;

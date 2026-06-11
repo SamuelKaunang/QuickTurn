@@ -11,6 +11,10 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [reviewProject, setReviewProject] = useState(null);
 
+    // --- Detail Modal State (for OVERDUE projects) ---
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
+    const [detailProject, setDetailProject] = useState(null);
+
     // --- Track reviewed projects: { projectId: { hasReviewed, rating, comment } }
     const [reviewedProjects, setReviewedProjects] = useState({});
 
@@ -114,13 +118,25 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
         return "design";
     };
 
+    // --- HANDLE CARD CLICK (only for OVERDUE) ---
+    const handleCardClick = (project) => {
+        if (project.status === 'OVERDUE') {
+            setDetailProject(project);
+            setIsDetailOpen(true);
+        }
+    };
+
     return (
         <div className="projects-rowU">
             {projects.length === 0 ? (
                 <p style={{ color: '#64748b', padding: '20px' }}>No projects yet.</p>
             ) : (
                 projects.map((p) => (
-                    <div className="project-cardU" key={p.id}>
+                    <div
+                        className={`project-cardU ${p.status === 'OVERDUE' ? 'overdue-clickable' : ''}`}
+                        key={p.id}
+                        onClick={() => handleCardClick(p)}
+                    >
                         <div className={`card-headerU ${getCategoryClass(p.category)}`}>
                             <span className={`card-statusU ${p.status.toLowerCase()}`}>
                                 {p.status}
@@ -140,7 +156,7 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                                 {p.status === 'OPEN' && (
                                     <button
                                         className="btn-secondaryU"
-                                        onClick={() => onViewApplicants(p.id)}
+                                        onClick={(e) => { e.stopPropagation(); onViewApplicants(p.id); }}
                                     >
                                         View Applicants
                                     </button>
@@ -158,13 +174,13 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                                     <>
                                         <button
                                             className="btn-secondaryU"
-                                            onClick={() => onViewSubmissions && onViewSubmissions(p.id)}
+                                            onClick={(e) => { e.stopPropagation(); onViewSubmissions && onViewSubmissions(p.id); }}
                                         >
                                             View Submissions
                                         </button>
                                         <button
                                             className="btn-primaryU"
-                                            onClick={() => handleCompleteProject(p.id)}
+                                            onClick={(e) => { e.stopPropagation(); handleCompleteProject(p.id); }}
                                         >
                                             Approve and Complete
                                         </button>
@@ -188,7 +204,8 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                                             </div>
                                         ) : (
                                             <button
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
                                                     setReviewProject(p);
                                                     setShowReviewModal(true);
                                                 }}
@@ -200,10 +217,17 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                                     </>
                                 )}
 
-                                {/* VIEW CONTRACT BUTTON */}
+                                {/* 5. OVERDUE: Show overdue indicator, no actions on card */}
+                                {p.status === 'OVERDUE' && (
+                                    <div className="status-overdue">
+                                        Project Overdue — Tap to view details
+                                    </div>
+                                )}
+
+                                {/* VIEW CONTRACT BUTTON (not for OVERDUE) */}
                                 {(p.status === 'ONGOING' || p.status === 'DONE' || p.status === 'CLOSED') && (
                                     <button
-                                        onClick={() => onViewContract(p.id)}
+                                        onClick={(e) => { e.stopPropagation(); onViewContract(p.id); }}
                                         className="btn-outlineU"
                                     >
                                         View Contract
@@ -214,6 +238,61 @@ const ProjectsU = ({ projects, token, onRefresh, onViewApplicants, onViewContrac
                         </div>
                     </div>
                 ))
+            )}
+
+            {/* DETAIL MODAL for OVERDUE projects */}
+            {isDetailOpen && detailProject && (
+                <div className="detail-modal-overlayU" onClick={() => setIsDetailOpen(false)}>
+                    <div className="detail-modal-contentU" onClick={(e) => e.stopPropagation()}>
+                        <div className="detail-modal-headerU">
+                            <h2>{detailProject.title}</h2>
+                            <button
+                                onClick={() => setIsDetailOpen(false)}
+                                className="close-btnU"
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="detail-modal-bodyU">
+                            <div className="detail-meta-rowU">
+                                <div className="detail-meta-itemU">
+                                    <div className="detail-labelU">Budget</div>
+                                    <div className="detail-budgetU">Rp {Number(detailProject.budget).toLocaleString()}</div>
+                                </div>
+                                <div className="detail-meta-itemU">
+                                    <div className="detail-labelU">Deadline</div>
+                                    <div className="detail-valueU">{detailProject.deadline}</div>
+                                </div>
+                            </div>
+
+                            <div className="detail-sectionU">
+                                <div className="detail-labelU">Status</div>
+                                <div className="detail-status-badgeU overdue">
+                                    {detailProject.status}
+                                </div>
+                            </div>
+
+                            <div className="detail-sectionU">
+                                <div className="detail-labelU">Category</div>
+                                <div className="detail-valueU">{detailProject.category}</div>
+                            </div>
+
+                            <div className="detail-sectionU">
+                                <div className="detail-labelU">Description</div>
+                                <div className="detail-valueU detail-descriptionU">
+                                    {detailProject.description || 'No description provided.'}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* No action buttons for overdue */}
+                        <div className="detail-modal-footerU">
+                            <div className="status-overdue" style={{ width: '100%' }}>
+                                This project is overdue. No further actions available.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {/* MODAL REVIEW */}
