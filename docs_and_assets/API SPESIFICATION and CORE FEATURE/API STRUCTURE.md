@@ -1,52 +1,64 @@
-# API Structure
+# API Structure Spec (QuickTurn Backend)
 
-## General Response Structure
+Semua response REST API dibungkus oleh format standard `ApiResponse` dengan field berikut:
 ```json
 {
     "success": true,
-    "message": "Admin profile retrieved successfully",
-    "data": {}
+    "message": "Pesan sukses atau error",
+    "data": {} // Isi data spesifik per-endpoint, bernilai null jika error
 }
 ```
+
+---
 
 ## 1. AUTHENTICATION & USER MANAGEMENT
 
 ### Register User
 **REQUEST**
+* **URL:** `POST /api/auth/register`
+* **Headers:** `Content-Type: application/json`
+* **Body:**
 ```json
 {
     "nama": "Samuel Yohanes",
     "email": "samuel@example.com",
     "password": "P@ssw0rd123",
-    "role": "MAHASISWA" // bisa "UMKM" atau "ADMIN"
+    "role": "MAHASISWA" // "MAHASISWA" atau "UMKM"
 }
 ```
 
-**RESPONSE SUCCESS**
+**RESPONSE SUCCESS (201 Created)**
 ```json
 {
     "success": true,
-    "message": "User registered successfully",
+    "message": "Register ok",
     "data": {
-        "id": 101,
-        "nama": "Samuel Yohanes",
-        "email": "samuel@example.com",
+        "success": true,
+        "message": "Registration successful",
+        "accessToken": "eyJhbGciOiJIUzI1...",
+        "tokenType": "Bearer",
+        "expiresIn": 3600,
         "role": "MAHASISWA"
     }
 }
 ```
 
-**RESPONSE ERROR**
+**RESPONSE ERROR (400 Bad Request)**
 ```json
 {
     "success": false,
-    "message": "Email is already registered",
-    "data": {}
+    "message": "Email already registered",
+    "data": null
 }
 ```
 
+---
+
 ### Login
 **REQUEST**
+* **URL:** `POST /api/auth/login`
+* **Headers:** `Content-Type: application/json`
+* **Body:**
 ```json
 {
     "email": "samuel@example.com",
@@ -54,313 +66,384 @@
 }
 ```
 
-**RESPONSE SUCCESS**
+**RESPONSE SUCCESS (200 OK)**
 ```json
 {
     "success": true,
-    "message": "Login successful",
+    "message": "Login ok",
     "data": {
+        "success": true,
+        "message": "Login successful",
         "accessToken": "eyJhbGciOiJIUzI1...",
         "tokenType": "Bearer",
-        "expiresIn": 3600
+        "expiresIn": 3600,
+        "role": "MAHASISWA"
     }
 }
 ```
 
-**RESPONSE ERROR**
+**RESPONSE ERROR (401 Unauthorized)**
 ```json
 {
     "success": false,
     "message": "Invalid email or password",
-    "data": {}
+    "data": null
 }
 ```
 
-### Get Profile
-**REQUEST**
-```text
-GET /api/users/{id} → nggak butuh body
-```
+---
 
-**RESPONSE SUCCESS**
+### Get My Profile
+**REQUEST**
+* **URL:** `GET /api/users/profile`
+* **Headers:** `Authorization: Bearer <token>`
+
+**RESPONSE SUCCESS (200 OK)**
 ```json
 {
     "success": true,
-    "message": "User profile retrieved successfully",
+    "message": "Profile data",
     "data": {
         "id": 101,
         "nama": "Samuel Yohanes",
         "email": "samuel@example.com",
+        "username": "samuel",
         "role": "MAHASISWA",
-        "skills": ["React", "Spring Boot"],
-        "portfolio": ["link1", "link2"]
+        "bio": "Suka koding",
+        "skills": "Flutter, Spring Boot",
+        "portfolioUrl": "http://github.com/...",
+        "location": "Bandung",
+        "phone": "08123456789",
+        "bidang": "IT",
+        "profilePictureUrl": "https://quickturn.blob.core.windows.net/...",
+        "averageRating": "4.8",
+        "totalReviews": 5,
+        "headline": "Junior Dev",
+        "university": "ITB",
+        "yearsExperience": 1,
+        "availability": "Part-Time",
+        "address": "Bandung, Indonesia",
+        "linkedinUrl": "https://linkedin.com/in/...",
+        "githubUrl": "https://github.com/...",
+        "youtubeUrl": null,
+        "instagramUrl": null,
+        "facebookUrl": null,
+        "businessWebsite": null
     }
 }
 ```
 
-**RESPONSE ERROR**
+---
+
+### Get Public Profile by ID
+**REQUEST**
+* **URL:** `GET /api/users/profile/{userId}`
+* **Headers:** `Authorization: Bearer <token>`
+
+**RESPONSE SUCCESS (200 OK)**
 ```json
 {
-    "success": false,
-    "message": "User not found",
-    "data": {}
+    "success": true,
+    "message": "Public profile",
+    "data": {
+        "id": 101,
+        "nama": "Samuel Yohanes",
+        "username": "samuel",
+        "role": "MAHASISWA",
+        "bio": "Suka koding",
+        "skills": "Flutter, Spring Boot",
+        "portfolioUrl": "http://github.com/...",
+        "location": "Bandung",
+        "bidang": "IT",
+        "profilePictureUrl": "https://quickturn.blob.core.windows.net/...",
+        "averageRating": "4.8",
+        "totalReviews": 5,
+        "headline": "Junior Dev",
+        "university": "ITB",
+        "yearsExperience": 1,
+        "availability": "Part-Time",
+        "linkedinUrl": "https://linkedin.com/in/...",
+        "githubUrl": "https://github.com/...",
+        "youtubeUrl": null,
+        "instagramUrl": null,
+        "facebookUrl": null,
+        "businessWebsite": null
+    }
 }
 ```
+
+---
+
+### Update Profile
+**REQUEST**
+* **URL:** `PUT /api/users/profile`
+* **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
+* **Body:** (Kirim field yang ingin diubah saja)
+```json
+{
+    "nama": "Samuel Yohanes Edit",
+    "bio": "Deskripsi bio baru",
+    "skills": "React Native, Spring Boot",
+    "portfolioUrl": "https://samuel.dev",
+    "location": "Jakarta",
+    "phone": "08987654321",
+    "headline": "Mobile Dev",
+    "university": "UI",
+    "yearsExperience": 2,
+    "availability": "Full-Time",
+    "address": "Jakarta, Indonesia"
+}
+```
+
+---
 
 ## 2. PROJECT MARKETPLACE
 
 ### Post Project (UMKM)
 **REQUEST**
+* **URL:** `POST /api/projects`
+* **Headers:** `Authorization: Bearer <token_umkm>`, `Content-Type: application/json`
+* **Body:**
 ```json
 {
-    "judul": "Website Katalog Produk",
-    "deskripsi": "Butuh website katalog max 20 item",
+    "title": "Website Katalog Produk",
+    "description": "Butuh website katalog max 20 item",
     "budget": 1000000,
-    "deadline": "2025-10-15",
-    "kategori": "Web Development"
+    "deadline": "2026-10-15",
+    "category": "Web Development"
 }
 ```
 
-**RESPONSE SUCCESS**
+**RESPONSE SUCCESS (201 Created)**
 ```json
 {
     "success": true,
-    "message": "Project posted successfully",
+    "message": "Project berhasil dibuat",
     "data": {
         "id": 55,
-        "judul": "Website Katalog Produk",
+        "title": "Website Katalog Produk",
+        "description": "Butuh website katalog max 20 item",
         "budget": 1000000,
-        "status": "OPEN"
+        "status": "OPEN",
+        "category": "Web Development",
+        "deadline": "2026-10-15T00:00:00"
     }
 }
 ```
 
-**RESPONSE ERROR**
-```json
-{
-    "success": false,
-    "message": "Project title and budget are required",
-    "data": {}
-}
-```
+---
 
-### Browse Projects
+### Browse Projects (Status Aware)
 **REQUEST**
-```text
-GET /api/projects?status=OPEN&kategori=Web → query params
-```
+* **URL:** `GET /api/projects`
+* **Headers:** `Authorization: Bearer <token>`
 
-**RESPONSE SUCCESS**
+**RESPONSE SUCCESS (200 OK)**
 ```json
 {
     "success": true,
-    "message": "Project list retrieved successfully",
+    "message": "All open projects retrieved",
     "data": [
         {
             "id": 55,
-            "judul": "Website Katalog Produk",
+            "title": "Website Katalog Produk",
             "budget": 1000000,
-            "status": "OPEN"
+            "category": "Web Development",
+            "deadline": "2026-10-15",
+            "status": "OPEN",
+            "ownerName": "UMKM Maju",
+            "ownerId": 10,
+            "hasApplied": false
         }
     ]
 }
 ```
 
+---
+
 ### Apply Project (Mahasiswa)
 **REQUEST**
+* **URL:** `POST /api/projects/{projectId}/apply`
+* **Headers:** `Authorization: Bearer <token_mahasiswa>`, `Content-Type: application/json`
+* **Body:**
 ```json
 {
-    "studentId": 101,
-    "proposal": "Saya bisa menyelesaikan dalam 2 minggu"
+    "proposal": "Saya sanggup membuat web ini dalam waktu 1 minggu menggunakan React.",
+    "bidAmount": 950000
 }
 ```
 
-**RESPONSE SUCCESS**
+**RESPONSE SUCCESS (201 Created)**
 ```json
 {
     "success": true,
     "message": "Application submitted successfully",
     "data": {
-        "applyId": 3001,
+        "id": 3001,
         "projectId": 55,
         "studentId": 101,
+        "proposal": "Saya sanggup membuat web ini dalam waktu 1 minggu menggunakan React.",
+        "bidAmount": 950000,
         "status": "PENDING"
     }
 }
 ```
 
-**RESPONSE ERROR**
-```json
-{
-    "success": false,
-    "message": "You have already applied for this project",
-    "data": {}
-}
-```
+---
 
-## 3. MATCHING & CONTRACT
-
-### Approve Application (UMKM pilih mahasiswa)
+### Get Applicants (UMKM Lihat Pelamar)
 **REQUEST**
-```text
-PATCH /api/projects/{projectId}/approve/{applyId} → no body
-```
+* **URL:** `GET /api/projects/{projectId}/applicants`
+* **Headers:** `Authorization: Bearer <token_umkm>`
 
-**RESPONSE SUCCESS**
+---
+
+### Accept Applicant (UMKM Terima Pelamar)
+**REQUEST**
+* **URL:** `POST /api/projects/{projectId}/applicants/{appId}/accept`
+* **Headers:** `Authorization: Bearer <token_umkm>`
+
+**RESPONSE SUCCESS (200 OK)**
 ```json
 {
     "success": true,
-    "message": "Application approved, contract created",
+    "message": "Pelamar diterima, project dimulai!",
+    "data": null
+}
+```
+
+---
+
+### Reject Applicant (UMKM Tolak Pelamar)
+**REQUEST**
+* **URL:** `POST /api/projects/{projectId}/applicants/{appId}/reject`
+* **Headers:** `Authorization: Bearer <token_umkm>`
+
+---
+
+### Submit Finishing (Mahasiswa Menyelesaikan Pekerjaan)
+**REQUEST**
+* **URL:** `POST /api/projects/{projectId}/finish`
+* **Headers:** `Authorization: Bearer <token_mahasiswa>`
+* **Body:**
+```json
+{
+    "finishingLink": "https://github.com/samuel/katalog-produk"
+}
+```
+
+---
+
+### Confirm Finishing (UMKM Konfirmasi & Tutup Project)
+**REQUEST**
+* **URL:** `POST /api/projects/{projectId}/finish/confirm`
+* **Headers:** `Authorization: Bearer <token_umkm>`
+
+---
+
+## 3. COMMUNICATION SYSTEM (CHAT)
+
+Sistem komunikasi utama menggunakan **WebSocket** (STOMP) untuk realtime chat, didukung REST API untuk history & upload attachment.
+
+### WebSocket Connection
+* **Endpoint Connection:** `/ws-chat`
+* **Topic Berlangganan (Incoming):** `/topic/public/{myUserId}`
+* **Kirim Message (Outgoing):** `/app/chat.sendMessage`
+* **Format Payload:**
+```json
+{
+    "senderId": 101,
+    "recipientId": 201,
+    "content": "Halo, apakah ada preferensi design?",
+    "attachmentUrl": null, // Diisi jika mengirim file
+    "attachmentType": null, // "IMAGE" atau "DOCUMENT"
+    "originalFilename": null,
+    "fileSize": null
+}
+```
+
+### Get Chat History
+* **URL:** `GET /api/chat/history?otherUserId={otherUserId}`
+* **Headers:** `Authorization: Bearer <token>`
+* **Response Success:** `ApiResponse` berisi list message percakapan antara kedua user.
+
+### Upload Chat Attachment
+* **URL:** `POST /api/chat/upload`
+* **Headers:** `Authorization: Bearer <token>`
+* **Request Params (Multipart):** `file` (MultipartFile), `recipientId` (Long)
+* **Response Success:** Mengembalikan URL file dan metadata attachment yang nantinya dikirim via WebSocket payload.
+
+---
+
+## 4. FILE UPLOADS & SUBMISSIONS
+
+### Profile Picture Upload
+* **URL:** `POST /api/files/profile-picture`
+* **Request (Multipart):** `file` (MultipartFile)
+* **Response Success:**
+```json
+{
+    "success": true,
+    "message": "Profile picture uploaded successfully",
     "data": {
-        "contractId": 501,
-        "projectId": 55,
-        "studentId": 101,
-        "status": "ONGOING"
+        "url": "https://quickturn.blob.core.windows.net/profile-pictures/..."
     }
 }
 ```
 
-**RESPONSE ERROR**
-```json
-{
-    "success": false,
-    "message": "Application not found",
-    "data": {}
-}
-```
+### Work Submission (Mahasiswa Unggah File Kerja Tambahan)
+* **URL:** `POST /api/files/submission/{projectId}`
+* **Request Params (Multipart):**
+  - `description` (String, optional)
+  - `links` (String, optional)
+  - `files` (List of MultipartFile, optional)
 
-## 4. COMMUNICATION SYSTEM
+---
 
-### Send Chat
-**REQUEST**
-```json
-{
-    "fromUserId": 101,
-    "toUserId": 201,
-    "message": "Halo, apakah ada preferensi design?"
-}
-```
-
-**RESPONSE SUCCESS**
-```json
-{
-    "success": true,
-    "message": "Message sent successfully",
-    "data": {
-        "chatId": 7001,
-        "fromUserId": 101,
-        "toUserId": 201,
-        "message": "Halo, apakah ada preferensi design?",
-        "sentAt": "2025-09-25T10:00:00Z"
-    }
-}
-```
-
-**RESPONSE ERROR**
-```json
-{
-    "success": false,
-    "message": "Unauthorized to send message",
-    "data": {}
-}
-```
-
-## 5. PAYMENT & TRANSACTION
-
-### Create Payment
-**REQUEST**
-```json
-{
-    "projectId": 55,
-    "amount": 1000000,
-    "paymentMethod": "GOPAY"
-}
-```
-
-**RESPONSE SUCCESS**
-```json
-{
-    "success": true,
-    "message": "Payment created successfully",
-    "data": {
-        "paymentId": "PMT-78901",
-        "projectId": 55,
-        "status": "PENDING",
-        "paymentUrl": "https://sandbox.midtrans.com/pay/PMT-78901"
-    }
-}
-```
-
-**RESPONSE ERROR**
-```json
-{
-    "success": false,
-    "message": "Payment gateway error, please try again",
-    "data": {}
-}
-```
-
-## 6. REVIEW & RATING
+## 5. REVIEW & RATING
 
 ### Submit Review
-**REQUEST**
+* **URL:** `POST /api/projects/{projectId}/review`
+* **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
+* **Body:**
 ```json
 {
-    "projectId": 55,
-    "reviewerId": 201,
     "rating": 5,
     "comment": "Pengerjaan cepat!"
 }
 ```
 
-**RESPONSE SUCCESS**
+**RESPONSE SUCCESS (200 OK)**
 ```json
 {
     "success": true,
     "message": "Review submitted successfully",
-    "data": {
-        "reviewId": 901,
-        "projectId": 55,
-        "rating": 5,
-        "comment": "Pengerjaan cepat!"
-    }
+    "data": null
 }
 ```
 
-**RESPONSE ERROR**
-```json
-{
-    "success": false,
-    "message": "You already submitted a review for this project",
-    "data": {}
-}
-```
+---
 
-## 7. ADMIN PANEL
+## 6. ADMIN PANEL
 
 ### Ban User
-**REQUEST**
-```text
-PATCH /api/admin/users/{id}/ban → no body
-```
+* **URL:** `PUT /api/admin/users/{id}/ban`
+* **Headers:** `Authorization: Bearer <token_admin>`
 
-**RESPONSE SUCCESS**
-```json
-{
-    "success": true,
-    "message": "User banned successfully",
-    "data": {
-        "userId": 101,
-        "status": "BANNED"
-    }
-}
-```
+### Unban User
+* **URL:** `PUT /api/admin/users/{id}/unban`
 
-**RESPONSE ERROR**
-```json
-{
-    "success": false,
-    "message": "User not found",
-    "data": {}
-}
-```
+### Toggle Ban User
+* **URL:** `PUT /api/admin/users/{id}/toggle-ban`
+
+### Get All Projects (Admin Audit)
+* **URL:** `GET /api/admin/projects`
+
+### Get Project Activity Logs (Admin Audit)
+* **URL:** `GET /api/admin/projects/{projectId}/logs`
+
+---
+
+> [!NOTE]
+> **PAYMENT GATEWAY (MIDTRANS / GOPAY)**
+> Integrasi Payment Gateway Midtrans (GOPAY, Virtual Account, dll.) saat ini **belum diimplementasikan** di sisi Java Backend. Alur transaksi saat ini langsung dari approve pelamar menuju ongoing dan dikonfirmasi manual saat penutupan project.

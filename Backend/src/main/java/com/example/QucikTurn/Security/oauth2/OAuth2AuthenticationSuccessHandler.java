@@ -1,10 +1,8 @@
 package com.example.QucikTurn.Security.oauth2;
 
 import com.example.QucikTurn.Entity.User;
-import com.example.QucikTurn.Entity.enums.AccountStatus;
-import com.example.QucikTurn.Entity.enums.Role;
-import com.example.QucikTurn.Repository.UserRepository;
 import com.example.QucikTurn.Security.JwtService;
+import com.example.QucikTurn.Service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,37 +11,36 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Custom Success Handler for OAuth2 Login.
  * After successful Google login, this handler:
- * 1. Creates or updates the user in the database.
+ * 1. Delegates user creation/update transactionally to UserService.
  * 2. Generates a JWT token for the authenticated user.
  * 3. Redirects to the frontend with the token as a URL parameter.
+ * 
+ * Note: @Transactional is intentionally NOT used on this handler method
+ * to ensure database connections are released immediately before executing
+ * network-bound operations (like response.sendRedirect).
  */
 @Component
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final JwtService jwtService;
 
     @Value("${app.frontend.url:http://localhost:3000}")
     private String frontendUrl;
 
-    public OAuth2AuthenticationSuccessHandler(UserRepository userRepository, JwtService jwtService) {
-        this.userRepository = userRepository;
+    public OAuth2AuthenticationSuccessHandler(UserService userService, JwtService jwtService) {
+        this.userService = userService;
         this.jwtService = jwtService;
     }
 
     @Override
-    @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
 
@@ -52,56 +49,10 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         String name = oAuth2User.getAttribute("name");
         String pictureUrl = oAuth2User.getAttribute("picture");
 
-        // Find or create user
-        Optional<User> existingUser = userRepository.findByEmail(email);
-        User user;
-        boolean isNewUser = false;
-
-        if (existingUser.isPresent()) {
-            // Existing user - update last login
-            user = existingUser.get();
-            user.setLastLoginAt(LocalDateTime.now());
-
-            // Update profile picture if not set
-            if (user.getProfilePictureUrl() == null || user.getProfilePictureUrl().isEmpty()) {
-                user.setProfilePictureUrl(pictureUrl);
-            }
-
-            // Google OAuth means email is verified by Google
-            if (!user.isEmailVerified()) {
-                user.setEmailVerified(true);
-            }
-        } else {
-            // New user - create record
-            isNewUser = true;
-            user = new User();
-            user.setEmail(email);
-            user.setNama(name);
-            user.setRole(Role.MAHASISWA); // Default role
-            user.setProfilePictureUrl(pictureUrl);
-            user.setActive(true);
-            user.setAccountStatus(AccountStatus.ACTIVE);
-            user.setLastLoginAt(LocalDateTime.now());
-
-            // Google OAuth means email is already verified
-            user.setEmailVerified(true);
-
-            // Generate unique username
-            String baseUsername = email.split("@")[0];
-            String candidate = baseUsername;
-            int counter = 1;
-            while (userRepository.existsByUsername(candidate)) {
-                candidate = baseUsername + counter;
-                counter++;
-            }
-            user.setUsername(candidate);
-
-            // OAuth users don't need password
-            user.setPasswordHash("OAUTH2_" + UUID.randomUUID().toString());
-        }
-
-        // Save user
-        userRepository.saveAndFlush(user);
+        // Delegate database operations to UserService inside a short-lived transaction
+        UserService.OAuth2UserProcessingResult result = userService.processOAuthPostLogin(email, name, pictureUrl);
+        User user = result.user();
+        boolean isNewUser = result.isNewUser();
 
         // Generate JWT token
         Map<String, Object> claims = Map.of(

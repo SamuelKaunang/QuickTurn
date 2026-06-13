@@ -2,6 +2,7 @@ package com.example.QucikTurn.Service;
 
 import com.example.QucikTurn.Entity.User;
 import com.example.QucikTurn.Entity.enums.Role;
+import com.example.QucikTurn.Entity.enums.AccountStatus;
 import com.example.QucikTurn.Repository.UserRepository;
 import com.example.QucikTurn.dto.PublicProfileResponse;
 import com.example.QucikTurn.dto.UpdateProfileRequest;
@@ -9,7 +10,10 @@ import com.example.QucikTurn.dto.UserSearchResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -187,5 +191,59 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setActive(!user.isEnabled());
         return userRepo.save(user);
+    }
+
+    /**
+     * Helper record to return processed OAuth2 user and isNewUser flag.
+     */
+    public static record OAuth2UserProcessingResult(User user, boolean isNewUser) {}
+
+    /**
+     * Centralized transactional method to process OAuth2 login/registration.
+     * This isolates database access to a short-lived transaction, preventing
+     * connection pool starvation during downstream redirect/network operations.
+     */
+    @Transactional
+    public OAuth2UserProcessingResult processOAuthPostLogin(String email, String name, String pictureUrl) {
+        Optional<User> existingUser = userRepo.findByEmail(email);
+        User user;
+        boolean isNewUser = false;
+
+        if (existingUser.isPresent()) {
+            user = existingUser.get();
+            user.setLastLoginAt(LocalDateTime.now());
+
+            if (user.getProfilePictureUrl() == null || user.getProfilePictureUrl().isEmpty()) {
+                user.setProfilePictureUrl(pictureUrl);
+            }
+
+            if (!user.isEmailVerified()) {
+                user.setEmailVerified(true);
+            }
+        } else {
+            isNewUser = true;
+            user = new User();
+            user.setEmail(email);
+            user.setNama(name);
+            user.setRole(Role.MAHASISWA); // Default role
+            user.setProfilePictureUrl(pictureUrl);
+            user.setActive(true);
+            user.setAccountStatus(AccountStatus.ACTIVE);
+            user.setLastLoginAt(LocalDateTime.now());
+            user.setEmailVerified(true);
+
+            String baseUsername = email.split("@")[0];
+            String candidate = baseUsername;
+            int counter = 1;
+            while (userRepo.existsByUsername(candidate)) {
+                candidate = baseUsername + counter;
+                counter++;
+            }
+            user.setUsername(candidate);
+            user.setPasswordHash("OAUTH2_" + UUID.randomUUID().toString());
+        }
+
+        user = userRepo.saveAndFlush(user);
+        return new OAuth2UserProcessingResult(user, isNewUser);
     }
 }
