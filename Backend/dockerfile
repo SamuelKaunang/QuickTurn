@@ -11,9 +11,10 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
-# **GRANT EXECUTION PERMISSIONS**
+# **GRANT EXECUTION PERMISSIONS & FIX WINDOWS LINE ENDINGS**
 # Karena di Alpine (Linux), file script butuh permission eksekusi
-RUN chmod +x mvnw
+# Kita juga jalankan dos2unix untuk mengubah format baris dari Windows (CRLF) ke Linux (LF)
+RUN apk add --no-cache dos2unix && dos2unix mvnw && chmod +x mvnw
 
 # Copy source code
 COPY src /app/src

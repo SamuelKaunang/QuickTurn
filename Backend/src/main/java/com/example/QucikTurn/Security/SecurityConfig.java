@@ -62,12 +62,16 @@ public class SecurityConfig {
                 "https://www.quickturn.web.id",
                 "http://localhost:3000", // Local development
                 "http://localhost:5173", // Vite local development
-                "http://localhost" // Docker production local
+                "http://localhost", // Docker production local
+                "https://flutlab.io" // FlutLab Cloud IDE
         ));
 
         // Allow Vercel preview deployment URLs (e.g., quick-turn-abc123.vercel.app)
         configuration.setAllowedOriginPatterns(Arrays.asList(
-                "https://*.vercel.app"));
+                "https://*.vercel.app",
+                "https://*.flutlab.io",
+                "https://*.flutlab.com"
+        ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(
