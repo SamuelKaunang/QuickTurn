@@ -2,6 +2,7 @@ package com.example.QucikTurn.dto;
 
 import com.example.QucikTurn.Entity.User;
 import com.example.QucikTurn.Entity.enums.ProjectComplexity;
+import com.example.QucikTurn.Entity.enums.WorkMode;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,6 +26,13 @@ public record ProjectWithStatusResponse(
                 String requiredSkills, // Comma-separated skills
                 String estimatedDuration, // Duration string (e.g., "1 week")
                 ProjectComplexity complexity, // BEGINNER, INTERMEDIATE, EXPERT
-                Integer applicantCount // Number of applicants (social proof)
+                Integer applicantCount, // Number of applicants (social proof)
+
+                // LOCATION FIELDS (nullable - present only if the project has them)
+                String city,
+                String address,
+                Double latitude,
+                Double longitude,
+                WorkMode workMode
 ) {
 }

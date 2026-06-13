@@ -12,6 +12,7 @@ import com.example.QucikTurn.dto.ApiResponse;
 import com.example.QucikTurn.dto.ApplicantResponse;
 import com.example.QucikTurn.dto.CreateProjectRequest;
 import com.example.QucikTurn.dto.FinishProjectRequest;
+import com.example.QucikTurn.dto.NearbyProjectResponse;
 import com.example.QucikTurn.dto.ReviewRequest;
 import com.example.QucikTurn.dto.ProjectWithStatusResponse;
 import com.example.QucikTurn.dto.UmkmProjectResponse;
@@ -83,6 +84,16 @@ public class ProjectController {
         Long studentId = (user != null && user.getRole().name().equals("MAHASISWA")) ? user.getId() : null;
         List<ProjectWithStatusResponse> list = projectViewerSvc.getOpenProjectsWithStatus(studentId);
         return ResponseEntity.ok(ApiResponse.ok("All open projects retrieved", list));
+    }
+
+    // --- GET NEARBY OPEN PROJECTS (Geoloc) ---
+    @GetMapping("/nearby")
+    public ResponseEntity<ApiResponse<List<NearbyProjectResponse>>> getNearbyProjects(
+            @RequestParam("lat") double lat,
+            @RequestParam("lng") double lng,
+            @RequestParam(value = "radiusKm", defaultValue = "10") double radiusKm) {
+        List<NearbyProjectResponse> list = projectViewerSvc.getNearbyProjects(lat, lng, radiusKm);
+        return ResponseEntity.ok(ApiResponse.ok("Nearby projects retrieved successfully", list));
     }
 
     // --- GET RECOMMENDED PROJECTS (AI-Powered) ---

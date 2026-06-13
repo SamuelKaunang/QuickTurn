@@ -2,6 +2,7 @@ package com.example.QucikTurn.Entity;
 
 import com.example.QucikTurn.Entity.enums.ProjectStatus;
 import com.example.QucikTurn.Entity.enums.ProjectComplexity;
+import com.example.QucikTurn.Entity.enums.WorkMode;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -62,6 +63,25 @@ public class Project {
 
     @Column(length = 255)
     private String attachmentName; // Original filename for display
+
+    // LOCATION FIELDS (optional) - stored at project level because a project's
+    // location can differ from the UMKM owner's registered business address.
+    // All nullable so existing project creation does not break.
+    @Column(length = 100)
+    private String city;
+
+    @Column(length = 255)
+    private String address;
+
+    @Column
+    private Double latitude; // Decimal degrees, range [-90, 90]
+
+    @Column
+    private Double longitude; // Decimal degrees, range [-180, 180]
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private WorkMode workMode; // REMOTE, HYBRID, ONSITE (nullable)
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -224,6 +244,47 @@ public class Project {
 
     public void setFinishedByUmkmId(Long finishedByUmkmId) {
         this.finishedByUmkmId = finishedByUmkmId;
+    }
+
+    // Location getters/setters
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public WorkMode getWorkMode() {
+        return workMode;
+    }
+
+    public void setWorkMode(WorkMode workMode) {
+        this.workMode = workMode;
     }
 
     // Brief & Attachment getters/setters

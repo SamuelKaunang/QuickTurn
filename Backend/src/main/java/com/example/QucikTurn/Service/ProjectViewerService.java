@@ -8,10 +8,13 @@ import com.example.QucikTurn.Entity.enums.ProjectStatus;
 import com.example.QucikTurn.Repository.ApplicationRepository;
 import com.example.QucikTurn.Repository.ProjectRepository;
 import com.example.QucikTurn.Repository.WorkSubmissionRepository;
+import com.example.QucikTurn.dto.NearbyProjectResponse;
 import com.example.QucikTurn.dto.ProjectWithStatusResponse;
 import com.example.QucikTurn.dto.UmkmProjectResponse;
+import com.example.QucikTurn.util.GeoUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +27,9 @@ import java.util.stream.Collectors;
 @Service
 @SuppressWarnings("null")
 public class ProjectViewerService {
+
+    /** Safety cap on the search radius to avoid overly broad scans. */
+    public static final double MAX_RADIUS_KM = 100.0;
 
     private final ProjectRepository projectRepo;
     private final ApplicationRepository applicationRepo;
@@ -76,6 +82,79 @@ public class ProjectViewerService {
             }
             return mapToDTO(p, myStatus);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * Get OPEN projects near the given coordinates within a radius (km).
+     *
+     * <p>
+     * Behavior:
+     * <ul>
+     * <li>Only OPEN projects are considered.</li>
+     * <li>Only projects with valid latitude and longitude are included
+     * (projects without coordinates never appear here).</li>
+     * <li>Distance is computed via the Haversine formula and projects beyond
+     * {@code radiusKm} are filtered out.</li>
+     * <li>Results are sorted nearest-first and include {@code distanceKm}.</li>
+     * </ul>
+     *
+     * @param lat      user latitude, must be in [-90, 90]
+     * @param lng      user longitude, must be in [-180, 180]
+     * @param radiusKm search radius in km, must be positive (capped at
+     *                 {@link #MAX_RADIUS_KM})
+     * @throws IllegalArgumentException if any parameter is out of range
+     */
+    public List<NearbyProjectResponse> getNearbyProjects(double lat, double lng, double radiusKm) {
+        // --- Validation (clear messages surfaced as 400 by GlobalExceptionHandler) ---
+        if (lat < -90 || lat > 90) {
+            throw new IllegalArgumentException("lat must be between -90 and 90");
+        }
+        if (lng < -180 || lng > 180) {
+            throw new IllegalArgumentException("lng must be between -180 and 180");
+        }
+        if (radiusKm <= 0) {
+            throw new IllegalArgumentException("radiusKm must be positive");
+        }
+
+        // Cap the radius to a safe maximum to avoid overly broad scans.
+        double effectiveRadius = Math.min(radiusKm, MAX_RADIUS_KM);
+
+        List<Project> candidates = projectRepo
+                .findByStatusAndLatitudeIsNotNullAndLongitudeIsNotNull(ProjectStatus.OPEN);
+
+        return candidates.stream()
+                // Defensive guard in case any coordinate slipped through as null.
+                .filter(p -> p.getLatitude() != null && p.getLongitude() != null)
+                .map(p -> {
+                    double distance = GeoUtils.haversineKm(lat, lng, p.getLatitude(), p.getLongitude());
+                    return Map.entry(p, distance);
+                })
+                .filter(entry -> entry.getValue() <= effectiveRadius)
+                .sorted(Comparator.comparingDouble(Map.Entry::getValue))
+                .map(entry -> mapToNearbyDTO(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Helper: Map Project entity + computed distance to the nearby DTO.
+     */
+    private NearbyProjectResponse mapToNearbyDTO(Project p, double distanceKm) {
+        return new NearbyProjectResponse(
+                p.getId(),
+                p.getTitle(),
+                p.getDescription(),
+                p.getCategory(),
+                p.getBudget(),
+                p.getDeadline(),
+                p.getStatus().name(),
+                p.getOwner() != null ? p.getOwner().getNama() : null,
+                p.getOwner() != null ? p.getOwner().getId() : null,
+                p.getCity(),
+                p.getAddress(),
+                p.getLatitude(),
+                p.getLongitude(),
+                p.getWorkMode(),
+                GeoUtils.roundToTwoDecimals(distanceKm));
     }
 
     /**
@@ -150,7 +229,12 @@ public class ProjectViewerService {
                 p.getRequiredSkills(),
                 p.getEstimatedDuration(),
                 p.getComplexity(),
-                p.getApplicantCount());
+                p.getApplicantCount(),
+                p.getCity(),
+                p.getAddress(),
+                p.getLatitude(),
+                p.getLongitude(),
+                p.getWorkMode());
     }
 
     /**

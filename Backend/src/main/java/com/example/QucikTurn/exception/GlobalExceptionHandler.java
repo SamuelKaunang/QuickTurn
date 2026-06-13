@@ -10,8 +10,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.HashMap;
@@ -139,6 +141,26 @@ public class GlobalExceptionHandler {
         log.debug("File upload size exceeded: {}", ex.getMessage());
         return ResponseEntity.badRequest()
                 .body(ApiResponse.error("File size exceeds the maximum allowed limit."));
+    }
+
+    /**
+     * Handle missing required query parameters (e.g. lat/lng on /nearby).
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingParam(MissingServletRequestParameterException ex) {
+        log.debug("Missing request parameter: {}", ex.getParameterName());
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.fail("Missing required parameter: " + ex.getParameterName()));
+    }
+
+    /**
+     * Handle query parameter type mismatches (e.g. lat=abc on /nearby).
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        log.debug("Parameter type mismatch: {}", ex.getName());
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.fail("Invalid value for parameter: " + ex.getName()));
     }
 
     /**

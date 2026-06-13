@@ -67,6 +67,13 @@ public class ProjectService {
         p.setApplicantCount(0);
         p.setBriefText(req.briefText());
 
+        // NEW: Optional location fields (nullable - safe for requests without them)
+        p.setCity(req.city());
+        p.setAddress(req.address());
+        p.setLatitude(req.latitude());
+        p.setLongitude(req.longitude());
+        p.setWorkMode(req.workMode());
+
         Project savedProject = projectRepo.save(p);
 
         // Log activity
