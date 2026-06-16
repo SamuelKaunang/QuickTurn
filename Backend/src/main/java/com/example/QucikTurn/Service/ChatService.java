@@ -27,6 +27,8 @@ public class ChatService {
     private UserRepository userRepository;
     @Autowired
     private ApplicationRepository applicationRepository;
+    @Autowired
+    private NotificationService notificationService;
 
     /**
      * Save a chat message after validating contract permission
@@ -35,7 +37,19 @@ public class ChatService {
         validateChatPermission(senderId, recipientId);
 
         ChatMessage chat = new ChatMessage(senderId, recipientId, content);
-        return chatMessageRepository.save(chat);
+        ChatMessage saved = chatMessageRepository.save(chat);
+
+        try {
+            User sender = userRepository.findById(senderId).orElse(null);
+            User recipient = userRepository.findById(recipientId).orElse(null);
+            if (sender != null && recipient != null) {
+                notificationService.notifyNewMessage(recipient, sender.getNama(), content, senderId);
+            }
+        } catch (Exception e) {
+            System.err.println("Gagal mengirim push notification chat: " + e.getMessage());
+        }
+
+        return saved;
     }
 
     /**
@@ -51,7 +65,22 @@ public class ChatService {
         chat.setAttachmentType(attachmentType);
         chat.setOriginalFilename(originalFilename);
         chat.setFileSize(fileSize);
-        return chatMessageRepository.save(chat);
+        ChatMessage saved = chatMessageRepository.save(chat);
+
+        try {
+            User sender = userRepository.findById(senderId).orElse(null);
+            User recipient = userRepository.findById(recipientId).orElse(null);
+            if (sender != null && recipient != null) {
+                String notificationContent = (content == null || content.isEmpty()) 
+                        ? "Mengirim lampiran: " + originalFilename 
+                        : content;
+                notificationService.notifyNewMessage(recipient, sender.getNama(), notificationContent, senderId);
+            }
+        } catch (Exception e) {
+            System.err.println("Gagal mengirim push notification chat: " + e.getMessage());
+        }
+
+        return saved;
     }
 
     /**

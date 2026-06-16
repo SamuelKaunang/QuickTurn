@@ -267,4 +267,18 @@ public class NotificationService {
                 "REVIEW", null,
                 "/profile-" + (user.getRole().name().equals("MAHASISWA") ? "mahasiswa" : "umkm"));
     }
+
+    /**
+     * Notify user when they receive a new chat message
+     */
+    public void notifyNewMessage(User recipient, String senderName, String content, Long senderId) {
+        createNotification(
+                recipient,
+                NotificationType.NEW_MESSAGE,
+                "Pesan Baru dari " + senderName,
+                content.length() > 60 ? content.substring(0, 57) + "..." : content,
+                "CHAT", senderId,
+                "/chat/" + senderId);
+    }
 }
+
