@@ -3,6 +3,7 @@ package com.example.QucikTurn.Controller;
 import com.example.QucikTurn.Entity.User;
 import com.example.QucikTurn.Entity.enums.Role;
 import com.example.QucikTurn.Service.AccountDeletionService;
+import com.example.QucikTurn.Service.DeviceTokenService;
 import com.example.QucikTurn.Service.UserService;
 import com.example.QucikTurn.dto.ApiResponse;
 import com.example.QucikTurn.dto.DeleteAccountRequest;
@@ -24,10 +25,14 @@ public class UserController {
 
     private final UserService userSvc;
     private final AccountDeletionService accountDeletionService;
+    private final DeviceTokenService deviceTokenService;
 
-    public UserController(UserService userSvc, AccountDeletionService accountDeletionService) {
+    public UserController(UserService userSvc,
+                          AccountDeletionService accountDeletionService,
+                          DeviceTokenService deviceTokenService) {
         this.userSvc = userSvc;
         this.accountDeletionService = accountDeletionService;
+        this.deviceTokenService = deviceTokenService;
     }
 
     // --- GET MY PROFILE ---
@@ -171,5 +176,22 @@ public class UserController {
     public ResponseEntity<ApiResponse<Map<String, String>>> getDeleteConfirmationPhrase() {
         return ResponseEntity.ok(ApiResponse.ok("Confirmation phrase",
                 Map.of("phrase", DeleteAccountRequest.REQUIRED_PHRASE)));
+    }
+
+    /**
+     * REGISTER DEVICE TOKEN for FCM Push Notifications.
+     * Called by the mobile app right after a successful login.
+     */
+    @PostMapping("/device-token")
+    public ResponseEntity<ApiResponse<Void>> registerDeviceToken(
+            @AuthenticationPrincipal User user,
+            @RequestBody Map<String, String> request) {
+        String deviceToken = request.get("deviceToken");
+        if (deviceToken == null || deviceToken.isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.fail("deviceToken is required"));
+        }
+        deviceTokenService.registerToken(user, deviceToken);
+        return ResponseEntity.ok(ApiResponse.ok("Device token registered", null));
     }
 }
