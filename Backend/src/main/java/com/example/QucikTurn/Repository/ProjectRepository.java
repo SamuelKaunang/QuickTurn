@@ -13,4 +13,12 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     // ✅ ADD THIS NEW QUERY
     @Query("SELECT p FROM Project p JOIN Application a ON p.id = a.project.id WHERE a.student.id = :studentId")
     List<Project> findProjectsByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * Projects of a given status that have both coordinates set.
+     * Used by the "nearby projects" feature so projects without coordinates are
+     * excluded at the database level (they still appear in normal browsing).
+     */
+    List<Project> findByStatusAndLatitudeIsNotNullAndLongitudeIsNotNull(
+            com.example.QucikTurn.Entity.enums.ProjectStatus status);
 }

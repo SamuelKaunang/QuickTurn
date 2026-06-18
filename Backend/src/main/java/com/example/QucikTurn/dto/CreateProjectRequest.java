@@ -1,6 +1,7 @@
 package com.example.QucikTurn.dto;
 
 import com.example.QucikTurn.Entity.enums.ProjectComplexity;
+import com.example.QucikTurn.Entity.enums.WorkMode;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,6 +21,16 @@ public record CreateProjectRequest(
         String requiredSkills, // Comma-separated skills (e.g., "Figma, Photoshop")
         String estimatedDuration, // Duration string (e.g., "1 week", "3 days")
         ProjectComplexity complexity, // BEGINNER, INTERMEDIATE, EXPERT
-        String briefText // Detailed instructions for accepted talent (private)
+        String briefText, // Detailed instructions for accepted talent (private)
+
+        // LOCATION FIELDS (all optional - existing requests without them still work)
+        String city,
+        String address,
+
+        @DecimalMin(value = "-90.0", message = "Latitude harus antara -90 dan 90") @DecimalMax(value = "90.0", message = "Latitude harus antara -90 dan 90") Double latitude,
+
+        @DecimalMin(value = "-180.0", message = "Longitude harus antara -180 dan 180") @DecimalMax(value = "180.0", message = "Longitude harus antara -180 dan 180") Double longitude,
+
+        WorkMode workMode // REMOTE, HYBRID, ONSITE (optional)
 ) {
 }
