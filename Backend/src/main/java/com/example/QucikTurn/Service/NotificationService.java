@@ -1,10 +1,13 @@
 package com.example.QucikTurn.Service;
 
+import com.example.QucikTurn.Config.FirebaseConfig;
 import com.example.QucikTurn.Entity.Notification;
 import com.example.QucikTurn.Entity.User;
 import com.example.QucikTurn.Entity.enums.NotificationType;
 import com.example.QucikTurn.Repository.NotificationRepository;
 import com.example.QucikTurn.dto.NotificationDTO;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +24,17 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final DeviceTokenService deviceTokenService;
+    private final FirebaseConfig firebaseConfig;
 
     public NotificationService(NotificationRepository notificationRepository,
-            SimpMessagingTemplate messagingTemplate) {
+                               SimpMessagingTemplate messagingTemplate,
+                               DeviceTokenService deviceTokenService,
+                               FirebaseConfig firebaseConfig) {
         this.notificationRepository = notificationRepository;
         this.messagingTemplate = messagingTemplate;
+        this.deviceTokenService = deviceTokenService;
+        this.firebaseConfig = firebaseConfig;
     }
 
     /**
@@ -62,7 +71,7 @@ public class NotificationService {
     }
 
     /**
-     * Send real-time notification via WebSocket
+     * Send real-time notification via WebSocket and Push Notification via FCM
      */
     private void sendRealTimeNotification(Long userId, NotificationDTO notification) {
         try {
@@ -75,6 +84,39 @@ public class NotificationService {
         } catch (Exception e) {
             // Log but don't fail - notification is still saved in DB
             System.err.println("Failed to send real-time notification: " + e.getMessage());
+        }
+
+        // Trigger FCM push notification asynchronously/safely
+        try {
+            if (firebaseConfig.isFirebaseEnabled()) {
+                List<String> tokens = deviceTokenService.getTokensForUser(userId);
+                if (tokens != null && !tokens.isEmpty()) {
+                    com.google.firebase.messaging.Notification fcmNotification = 
+                            com.google.firebase.messaging.Notification.builder()
+                                    .setTitle(notification.getTitle())
+                                    .setBody(notification.getMessage())
+                                    .build();
+
+                    for (String token : tokens) {
+                        try {
+                            Message msg = Message.builder()
+                                    .setToken(token)
+                                    .setNotification(fcmNotification)
+                                    .putData("type", notification.getType() != null ? notification.getType().name() : "")
+                                    .putData("relatedEntityType", notification.getRelatedEntityType() != null ? notification.getRelatedEntityType() : "")
+                                    .putData("relatedEntityId", notification.getRelatedEntityId() != null ? notification.getRelatedEntityId().toString() : "")
+                                    .putData("actionUrl", notification.getActionUrl() != null ? notification.getActionUrl() : "")
+                                    .build();
+
+                            FirebaseMessaging.getInstance().sendAsync(msg);
+                        } catch (Exception e) {
+                            System.err.println("Failed to send FCM token to " + token + ": " + e.getMessage());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to broadcast FCM notifications: " + e.getMessage());
         }
     }
 
@@ -225,4 +267,18 @@ public class NotificationService {
                 "REVIEW", null,
                 "/profile-" + (user.getRole().name().equals("MAHASISWA") ? "mahasiswa" : "umkm"));
     }
+
+    /**
+     * Notify user when they receive a new chat message
+     */
+    public void notifyNewMessage(User recipient, String senderName, String content, Long senderId) {
+        createNotification(
+                recipient,
+                NotificationType.NEW_MESSAGE,
+                "Pesan Baru dari " + senderName,
+                content.length() > 60 ? content.substring(0, 57) + "..." : content,
+                "CHAT", senderId,
+                "/chat/" + senderId);
+    }
 }
+
