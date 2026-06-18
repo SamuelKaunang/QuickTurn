@@ -13,6 +13,7 @@ import com.example.QucikTurn.dto.ProjectWithStatusResponse;
 import com.example.QucikTurn.dto.UmkmProjectResponse;
 import com.example.QucikTurn.util.GeoUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ public class ProjectViewerService {
     /**
      * Get projects by owner (UMKM) with applicant count.
      */
+    @Transactional(readOnly = true)
     public List<UmkmProjectResponse> getProjectsByOwnerWithApplicantCount(Long ownerId) {
         List<Project> projects = projectRepo.findByOwnerId(ownerId);
 
@@ -69,6 +71,7 @@ public class ProjectViewerService {
     /**
      * Get open projects with application status for a student.
      */
+    @Transactional(readOnly = true)
     public List<ProjectWithStatusResponse> getOpenProjectsWithStatus(Long studentId) {
         List<Project> projects = projectRepo.findByStatus(ProjectStatus.OPEN);
 
@@ -104,6 +107,7 @@ public class ProjectViewerService {
      *                 {@link #MAX_RADIUS_KM})
      * @throws IllegalArgumentException if any parameter is out of range
      */
+    @Transactional(readOnly = true)
     public List<NearbyProjectResponse> getNearbyProjects(double lat, double lng, double radiusKm) {
         // --- Validation (clear messages surfaced as 400 by GlobalExceptionHandler) ---
         if (lat < -90 || lat > 90) {
@@ -160,6 +164,7 @@ public class ProjectViewerService {
     /**
      * Get projects by student (applied/accepted).
      */
+    @Transactional(readOnly = true)
     public List<ProjectWithStatusResponse> getProjectsByStudent(Long studentId) {
         List<Project> projects = projectRepo.findProjectsByStudentId(studentId);
 
@@ -175,6 +180,7 @@ public class ProjectViewerService {
     /**
      * Get project brief for accepted talent only.
      */
+    @Transactional(readOnly = true)
     public Map<String, Object> getProjectBriefForAcceptedTalent(Long projectId, Long userId) {
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
@@ -241,6 +247,7 @@ public class ProjectViewerService {
      * Convert a list of Projects to ProjectWithStatusResponse DTOs.
      * Used by RecommendationService to return consistent response format.
      */
+    @Transactional(readOnly = true)
     public List<ProjectWithStatusResponse> convertToStatusResponse(List<Project> projects, Long studentId) {
         return projects.stream().map(p -> {
             String myStatus = null;
