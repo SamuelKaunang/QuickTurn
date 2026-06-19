@@ -12,5 +12,6 @@ public record ApplicantResponse(
     BigDecimal bidAmount,
     String status,
     LocalDateTime appliedAt,
-    Double studentRating
+    Double studentRating,
+    String studentProfilePictureUrl
 ) {}

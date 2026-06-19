@@ -20,8 +20,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class AuthService {
@@ -34,19 +37,25 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UserService userService;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String googleClientId;
 
     public AuthService(UserRepository userRepository,
             PasswordResetTokenRepository tokenRepo,
             EmailService emailService,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            JwtService jwtService) {
+            JwtService jwtService,
+            UserService userService) {
         this.userRepository = userRepository;
         this.tokenRepo = tokenRepo;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.userService = userService;
     }
 
     // -------- REGISTER --------
@@ -246,5 +255,52 @@ public class AuthService {
 
         return new AuthResponse(true, "Role berhasil dipilih!", newToken, "Bearer",
                 (int) jwtService.getExpires(), user.getRole().name());
+    }
+
+    // -------- GOOGLE LOGIN --------
+    public AuthResponse loginWithGoogle(String idToken) {
+        try {
+            String verifyUrl = "https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken;
+            RestTemplate restTemplate = new RestTemplate();
+            
+            @SuppressWarnings("unchecked")
+            Map<String, Object> payload = restTemplate.getForObject(verifyUrl, Map.class);
+            
+            if (payload == null || payload.containsKey("error")) {
+                return new AuthResponse(false, "Token Google tidak valid atau kadaluarsa", null, null, 0, null);
+            }
+
+            // Verify audience matches our Client ID
+            String aud = (String) payload.get("aud");
+            if (aud == null || !aud.equals(googleClientId)) {
+                log.error("Google ID Token audience mismatch. Expected: {}, got: {}", googleClientId, aud);
+                return new AuthResponse(false, "Token Google tidak sah untuk aplikasi ini", null, null, 0, null);
+            }
+
+            String email = (String) payload.get("email");
+            String name = (String) payload.get("name");
+            String pictureUrl = (String) payload.get("picture");
+
+            if (email == null) {
+                return new AuthResponse(false, "Email tidak ditemukan di profil Google", null, null, 0, null);
+            }
+
+            // Process user (create if new, update lastLogin if existing)
+            UserService.OAuth2UserProcessingResult result = userService.processOAuthPostLogin(email, name, pictureUrl);
+            User user = result.user();
+
+            // Generate JWT
+            var claims = new HashMap<String, Object>();
+            claims.put("uid", user.getId());
+            claims.put("role", user.getRole().name());
+
+            String token = jwtService.generateToken(user.getEmail(), claims);
+
+            return new AuthResponse(true, "Login Google berhasil", token, "Bearer", (int) jwtService.getExpires(), user.getRole().name());
+
+        } catch (Exception e) {
+            log.error("Google Authentication failed", e);
+            return new AuthResponse(false, "Gagal memverifikasi token Google: " + e.getMessage(), null, null, 0, null);
+        }
     }
 }

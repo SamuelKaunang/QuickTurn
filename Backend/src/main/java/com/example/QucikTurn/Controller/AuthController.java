@@ -9,6 +9,7 @@ import com.example.QucikTurn.dto.auth.RegisterRequest;
 import com.example.QucikTurn.dto.auth.ResetPasswordRequest;
 import com.example.QucikTurn.dto.auth.VerifyCodeRequest;
 import com.example.QucikTurn.dto.auth.VerifyCodeResponse;
+import com.example.QucikTurn.dto.auth.GoogleLoginRequest;
 import com.example.QucikTurn.Service.AuthService;
 import com.example.QucikTurn.Service.EmailVerificationService;
 import jakarta.validation.Valid;
@@ -40,6 +41,13 @@ public class AuthController {
         var res = svc.login(req);
         return ResponseEntity.status(res.success() ? 200 : 401).body(
                 res.success() ? ApiResponse.ok("Login ok", res) : ApiResponse.fail(res.message()));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<ApiResponse<AuthResponse>> googleLogin(@Valid @RequestBody GoogleLoginRequest req) {
+        var res = svc.loginWithGoogle(req.idToken());
+        return ResponseEntity.status(res.success() ? 200 : 401).body(
+                res.success() ? ApiResponse.ok("Login Google ok", res) : ApiResponse.fail(res.message()));
     }
 
     // -------- STEP 1: FORGOT PASSWORD (Kirim verification code) --------

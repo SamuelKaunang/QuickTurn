@@ -123,7 +123,8 @@ public class ApplicationService {
                 app.getBidAmount(),
                 app.getStatus().name(),
                 app.getCreatedAt(),
-                app.getStudent().getAverageRating())).collect(Collectors.toList());
+                app.getStudent().getAverageRating(),
+                app.getStudent().getProfilePictureUrl())).collect(Collectors.toList());
     }
 
     // --- LOGIC UMKM MENERIMA PELAMAR ---
