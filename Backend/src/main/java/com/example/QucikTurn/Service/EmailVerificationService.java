@@ -63,13 +63,47 @@ public class EmailVerificationService {
         EmailVerificationToken verificationToken = new EmailVerificationToken(user);
         tokenRepository.save(verificationToken);
 
-        // Build verification URL
-        String verificationUrl = frontendUrl + "/verify-email?token=" + verificationToken.getToken();
-
         // Send email asynchronously
-        emailService.sendVerificationEmail(user.getEmail(), user.getNama(), verificationUrl);
+        emailService.sendEmailVerificationCode(user.getEmail(), user.getNama(), verificationToken.getToken());
 
-        log.info("Verification email sent to: {}", maskEmail(user.getEmail()));
+        log.info("Verification code sent to: {}", maskEmail(user.getEmail()));
+    }
+
+    /**
+     * Verify email using 6-digit OTP code.
+     * Returns the verified user.
+     */
+    @Transactional
+    public User verifyEmail(String email, String code) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        EmailVerificationToken verificationToken = tokenRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("No verification code found for this user"));
+
+        if (verificationToken.isExpired()) {
+            throw new RuntimeException("Verification code has expired. Please request a new one.");
+        }
+
+        if (verificationToken.getVerifiedAt() != null) {
+            throw new RuntimeException("Email has already been verified.");
+        }
+
+        if (!verificationToken.getToken().equals(code)) {
+            throw new RuntimeException("Verification code is incorrect");
+        }
+
+        // Mark token as used
+        verificationToken.markVerified();
+        tokenRepository.save(verificationToken);
+
+        // Mark user as verified
+        user.setEmailVerified(true);
+        userRepository.save(user);
+
+        log.info("Email verified for user: {}", maskEmail(user.getEmail()));
+
+        return user;
     }
 
     /**

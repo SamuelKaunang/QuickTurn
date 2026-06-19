@@ -103,6 +103,35 @@ public class AuthController {
     // ============================================================
 
     /**
+     * Verify email using 6-digit OTP code (Mobile/Web register flow).
+     */
+    @PostMapping("/verify-email")
+    public ResponseEntity<ApiResponse<AuthResponse>> verifyEmailOtp(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        String code = payload.get("code");
+        try {
+            AuthResponse res = svc.verifyEmailOtp(email, code);
+            return ResponseEntity.ok(ApiResponse.ok("Email berhasil diverifikasi!", res));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
+    }
+
+    /**
+     * Resend verification OTP code.
+     */
+    @PostMapping("/resend-verification-otp")
+    public ResponseEntity<ApiResponse<String>> resendVerificationOtp(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        try {
+            svc.resendEmailVerificationOtp(email);
+            return ResponseEntity.ok(ApiResponse.ok("Kode verifikasi baru telah dikirim ke email Anda.", null));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(e.getMessage()));
+        }
+    }
+
+    /**
      * Verify email using token from email link.
      * This is called when user clicks the verification link.
      */

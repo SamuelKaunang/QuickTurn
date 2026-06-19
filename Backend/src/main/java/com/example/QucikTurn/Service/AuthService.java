@@ -38,6 +38,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserService userService;
+    private final EmailVerificationService emailVerificationService;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
@@ -48,7 +49,8 @@ public class AuthService {
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
             JwtService jwtService,
-            UserService userService) {
+            UserService userService,
+            EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
         this.tokenRepo = tokenRepo;
         this.emailService = emailService;
@@ -56,6 +58,7 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.userService = userService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     // -------- REGISTER --------
@@ -83,17 +86,13 @@ public class AuthService {
             requestedRole = Role.MAHASISWA; // Downgrade to safe default
         }
         user.setRole(requestedRole);
+        user.setEmailVerified(false); // Verification required
         userRepository.save(user);
 
-        var claims = new HashMap<String, Object>();
-        claims.put("uid", user.getId());
-        claims.put("role", user.getRole().name());
+        // Send OTP verification code
+        emailVerificationService.sendVerificationEmail(user);
 
-        String token = jwtService.generateToken(user.getEmail(), claims);
-
-        // FIXED: Added user.getRole().name() to the response
-        return new AuthResponse(true, "Registration successful", token, "Bearer", (int) jwtService.getExpires(),
-                user.getRole().name());
+        return new AuthResponse(true, "OTP_SENT", null, null, 0, user.getRole().name());
     }
 
     // -------- LOGIN --------
@@ -302,5 +301,24 @@ public class AuthService {
             log.error("Google Authentication failed", e);
             return new AuthResponse(false, "Gagal memverifikasi token Google: " + e.getMessage(), null, null, 0, null);
         }
+    }
+
+    public AuthResponse verifyEmailOtp(String email, String code) {
+        User user = emailVerificationService.verifyEmail(email, code);
+
+        var claims = new HashMap<String, Object>();
+        claims.put("uid", user.getId());
+        claims.put("role", user.getRole().name());
+
+        String token = jwtService.generateToken(user.getEmail(), claims);
+
+        return new AuthResponse(true, "Email verified successfully!", token, "Bearer", (int) jwtService.getExpires(),
+                user.getRole().name());
+    }
+
+    public void resendEmailVerificationOtp(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        emailVerificationService.sendVerificationEmail(user);
     }
 }

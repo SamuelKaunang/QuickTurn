@@ -42,8 +42,9 @@ public class EmailVerificationToken {
 
     public EmailVerificationToken(User user) {
         this.user = user;
-        this.token = UUID.randomUUID().toString();
-        this.expiryDate = LocalDateTime.now().plusHours(TOKEN_EXPIRATION_HOURS);
+        // Generate a 6-digit numeric code
+        this.token = String.format("%06d", new java.security.SecureRandom().nextInt(1000000));
+        this.expiryDate = LocalDateTime.now().plusMinutes(15);
     }
 
     // --- HELPER METHODS ---
